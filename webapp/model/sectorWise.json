@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "Sector": "Roads",
+      "BorrowerGroup": "Roads",
+      "ProjectsCY": 12,
+      "ProjectCostCY": 73976.31,
+      "DisbursementCY": 274.52,
+      "GrossSanctionCY": 1107.37,
+      "NetSanctionCY": 1107.37,
+      "PrincipalOsCY": 1107.37,
+      "ExposureCY": 3200
+    },
+    {
+      "Sector": "Energy",
+      "BorrowerGroup": "Energy",
+      "ProjectsCY": 9,
+      "ProjectCostCY": 73976.31,
+      "DisbursementCY": 274.52,
+      "GrossSanctionCY": 1107.37,
+      "NetSanctionCY": 1107.37,
+      "PrincipalOsCY": 1107.37,
+      "ExposureCY": 2800
+    }
+  ]
+}

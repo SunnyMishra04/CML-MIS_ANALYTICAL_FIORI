@@ -1,0 +1,79 @@
+/* Global Background */
+.appBackground {
+    background-color: #f5f7fa; /* Softer blue-grey */
+}
+
+/* Sidebar Styling */
+.customSidebar {
+    background-color: #ffffff;
+    height: 100%;
+}
+
+.customListItem {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Page Title styling */
+.pageTitle {
+    color: #32363a;
+    font-weight: 700;
+}
+
+/* Tab Bar cleanup */
+.sapMITH {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* KPI Cards */
+.kpiCard .sapFCardContent {
+    padding: 1rem;
+}
+
+.subtleTitle {
+    color: #6a6d70;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.bigKpiNumber .sapMObjectNumberText {
+    font-size: 2.5rem !important; /* Make numbers pop */
+    font-weight: 300;
+}
+
+.bigKpiNumber .sapMObjectNumberUnit {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-left: 0.2rem;
+}
+
+/* Filter Bar */
+.filterBarCard {
+    background-color: #ffffff;
+}
+
+/* Chart Cards */
+.chartCard {
+    border: none;
+    box-shadow: 0 0 2px rgba(0,0,0,0.1);
+}
+
+/* Table Card */
+.customCard {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 2px rgba(0,0,0,0.1);
+}
+
+.subtleText {
+    color: #6a6d70;
+    font-size: 0.875rem;
+}
+
+/* VizFrame padding */
+.sapVizFrame {
+    margin-top: 1rem;
+}

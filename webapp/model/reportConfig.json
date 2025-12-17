@@ -1,0 +1,75 @@
+{
+  "DEV_GROUP": {
+    "title": "Developer Group Report",
+    "dataFile": "model/devGroup.json",
+    "columns": {
+      "col1Header": "Scheme",
+      "col2Header": "Borrower Group",
+      "col3Header": "Borrower Group Name"
+    },
+    "fields": {
+      "col1": "Scheme",
+      "col2": "BorrowerGroup",
+      "col3": "BorrowerGroupName"
+    },
+    "buckets": {
+      "CY": {
+        "label": "01.04.2025–30.11.2025",
+        "noProj": "ProjectsCY",
+        "projCost": "ProjectCostCY",
+        "disb": "DisbursementCY",
+        "gross": "GrossSanctionCY",
+        "net": "NetSanctionCY",
+        "os": "PrincipalOsCY",
+        "cost": "ProjectCostCY"
+      },
+      "PY": {
+        "label": "01.04.2024–31.03.2025",
+        "noProj": "ProjectsCY",
+        "projCost": "ProjectCostCY",
+        "disb": "DisbursementCY",
+        "gross": "GrossSanctionCY",
+        "net": "NetSanctionCY",
+        "os": "PrincipalOsCY",
+        "cost": "ProjectCostCY"
+      }
+    }
+  },
+
+  "SECTOR_WISE": {
+    "title": "Sector Wise Report",
+    "dataFile": "model/sectorWise.json",
+    "columns": {
+      "col1Header": "Sector Name",
+      "col2Header": "Sub-Sector Name",
+      "col3Header": ""
+    },
+    "fields": {
+      "col1": "SectorName",
+      "col2": "SubSectorName",
+      "col3": ""
+    },
+    "buckets": {
+      "CY": {
+        "label": "01.04.2025–30.11.2025",
+        "noProj": "ProjectsCY",
+        "projCost": "ProjectCostCY",
+        "disb": "DisbursementCY",
+        "gross": "GrossSanctionCY",
+        "net": "NetSanctionCY",
+        "os": "PrincipalOsCY",
+        "cost": "ProjectCostCY"
+      },
+      "PY": {
+        "label": "01.04.2024–31.03.2025",
+        "noProj": "ProjectsCY",
+        "projCost": "ProjectCostCY",
+        "disb": "DisbursementCY",
+        "gross": "GrossSanctionCY",
+        "net": "NetSanctionCY",
+        "os": "PrincipalOsCY",
+        "cost": "ProjectCostCY"
+      }
+    }
+  }
+}

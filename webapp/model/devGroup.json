@@ -1,0 +1,35 @@
+{
+  "rows": [
+    {
+      "Scheme": "Direct Lending",
+      "BorrowerGroup": 115,
+      "BorrowerGroupName": "Adani Group",
+      "ProjectsCY": 7,
+      "ProjectCostCY": 73976.31,
+      "DisbursementCY": 274.52,
+      "GrossSanctionCY": 1107.37,
+      "NetSanctionCY": 1107.37,
+      "PrincipalOsCY": 1107.37
+    },
+    {
+      "Scheme": "Direct Lending",
+      "BorrowerGroup": 107,
+      "BorrowerGroupName": "Tata Power",
+      "ProjectsCY": 9,
+      "ProjectCostCY": 65146.16,
+      "DisbursementCY": 353.88,
+      "GrossSanctionCY": 804.57,
+      "NetSanctionCY": 381.66,
+      "PrincipalOsCY": 381.66
+    },
+
+{
+
+
+
+}
+
+  ]
+
+
+}
