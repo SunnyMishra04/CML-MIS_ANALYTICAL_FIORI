@@ -71,5 +71,32 @@
         "cost": "ProjectCostCY"
       }
     }
-  }
+  },
+  "GEO_REPORT": {
+    "title": "Geographical Report",
+    "dataFile": "model/geoReport.json",
+    "type": "geo",  
+    "columns": {
+      "col1Header": "State / Region",
+      "col2Header": "Scheme",
+      "col3Header": ""
+    },
+    "fields": {
+      "col1": "StateName",
+      "col2": "Scheme",
+      "col3": ""
+    },
+    "buckets": {
+      "CY": {
+        "label": "Apr–Nov 2025",
+        "noProj": "ProjectsCY",
+        "projCost": "ProjectCostCY",
+        "disb": "DisbursementCY",
+        "gross": "GrossSanctionCY",
+        "net": "NetSanctionCY",
+        "os": "PrincipalOsCY",
+        "cost": "ProjectCostCY"
+      }
+    }
+}
 }

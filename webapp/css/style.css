@@ -77,3 +77,32 @@
 .sapVizFrame {
     margin-top: 1rem;
 }
+
+
+/* --- GEO MAP STYLING --- */
+
+/* The Container for the SVG */
+.mapBox {
+    background: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 2px rgba(0,0,0,0.1);
+    padding: 1rem;
+    overflow: hidden; /* Prevent SVG spill */
+}
+
+/* SVG Path Behaviors (The States) */
+#indiaMapContainer svg path {
+    transition: all 0.3s ease; /* Smooth color change */
+    cursor: pointer;           /* Hand cursor on hover */
+    stroke: #ffffff;           /* White borders between states */
+    stroke-width: 1px;
+}
+
+/* Hover Effect: Darker border and slight pop */
+#indiaMapContainer svg path:hover {
+    stroke: #333333;           /* Dark border on hover */
+    stroke-width: 2px;
+    opacity: 0.8;
+    filter: drop-shadow(0px 0px 4px rgba(0,0,0,0.4)); /* 3D effect */
+    z-index: 100;              /* Bring to front */
+}

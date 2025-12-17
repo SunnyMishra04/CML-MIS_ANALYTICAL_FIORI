@@ -4,6 +4,7 @@
     xmlns:l="sap.ui.layout"
     xmlns:f="sap.f"
     xmlns:card="sap.f.cards"
+    xmlns:core="sap.ui.core"  
     xmlns:viz="sap.viz.ui5.controls"
     xmlns:vizData="sap.viz.ui5.data"
     xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds">
@@ -183,9 +184,44 @@
                                             </l:Grid>
 
                                         </VBox>
+                                        
                                     </ScrollContainer>
                                 </IconTabFilter>
                             </items>
+                            <IconTabFilter id="_IDGenIconTabFilter3" key="geo" text="Geo Map" icon="sap-icon://map" visible="{= ${view>/isGeoReport} }">
+        <HBox id="_IDGenHBox2" width="100%" height="600px" alignItems="Start" class="sapUiMediumMarginTop">
+            
+            <VBox id="_IDGenVBox4" width="60%" height="100%" class="sapUiMediumMarginEnd mapBox">
+                <core:HTML id="_IDGenHTML" content='&lt;div id="indiaMapContainer" style="width:100%; height:100%;"&gt;&lt;/div&gt;' />
+            </VBox>
+
+            <VBox id="_IDGenVBox5" width="40%">
+                <f:Card id="_IDGenCard" width="100%" class="chartCard">
+                    <f:header>
+                        <card:Header id="_IDGenHeader2" title="Regional Distribution" subtitle="Loans by Zone" iconSrc="sap-icon://choropleth-chart"/>
+                    </f:header>
+                    <f:content>
+                        <viz:VizFrame id="geoVizFrame" uiConfig="{applicationSet:'fiori'}" vizType="bar" width="100%" height="400px">
+                             <viz:dataset>
+                                <vizData:FlattenedDataset id="geoDataset" data="{geo>/items}">
+                                    <vizData:dimensions>
+                                        <vizData:DimensionDefinition id="_IDGenDimensionDefinition2" name="Zone" value="{geo>Zone}" />
+                                    </vizData:dimensions>
+                                    <vizData:measures>
+                                        <vizData:MeasureDefinition id="_IDGenMeasureDefinition3" name="Value" value="{geo>Value}" />
+                                    </vizData:measures>
+                                </vizData:FlattenedDataset>
+                            </viz:dataset>
+                            <viz:feeds>
+                                <vizFeeds:FeedItem id="_IDGenFeedItem4" uid="valueAxis" type="Measure" values="Value" />
+                                <vizFeeds:FeedItem id="_IDGenFeedItem5" uid="categoryAxis" type="Dimension" values="Zone" />
+                            </viz:feeds>
+                        </viz:VizFrame>
+                    </f:content>
+                </f:Card>
+            </VBox>
+        </HBox>
+    </IconTabFilter>
                         </IconTabBar>
                     </VBox>
                 </HBox>
