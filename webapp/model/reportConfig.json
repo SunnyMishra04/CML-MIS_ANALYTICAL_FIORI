@@ -14,7 +14,7 @@
     },
     "buckets": {
       "CY": {
-        "label": "01.04.2025–30.11.2025",
+        "label": "01.04.2025 - 30.11.2025", 
         "noProj": "ProjectsCY",
         "projCost": "ProjectCostCY",
         "disb": "DisbursementCY",
@@ -24,7 +24,7 @@
         "cost": "ProjectCostCY"
       },
       "PY": {
-        "label": "01.04.2024–31.03.2025",
+        "label": "01.04.2024 - 31.03.2025",
         "noProj": "ProjectsCY",
         "projCost": "ProjectCostCY",
         "disb": "DisbursementCY",
@@ -35,7 +35,6 @@
       }
     }
   },
-
   "SECTOR_WISE": {
     "title": "Sector Wise Report",
     "dataFile": "model/sectorWise.json",
@@ -51,7 +50,7 @@
     },
     "buckets": {
       "CY": {
-        "label": "01.04.2025–30.11.2025",
+        "label": "01.04.2025 - 30.11.2025",
         "noProj": "ProjectsCY",
         "projCost": "ProjectCostCY",
         "disb": "DisbursementCY",
@@ -61,7 +60,7 @@
         "cost": "ProjectCostCY"
       },
       "PY": {
-        "label": "01.04.2024–31.03.2025",
+        "label": "01.04.2024 - 31.03.2025",
         "noProj": "ProjectsCY",
         "projCost": "ProjectCostCY",
         "disb": "DisbursementCY",
@@ -75,7 +74,7 @@
   "GEO_REPORT": {
     "title": "Geographical Report",
     "dataFile": "model/geoReport.json",
-    "type": "geo",  
+    "type": "geo",
     "columns": {
       "col1Header": "State / Region",
       "col2Header": "Scheme",
@@ -88,7 +87,17 @@
     },
     "buckets": {
       "CY": {
-        "label": "Apr–Nov 2025",
+        "label": "01.04.2025 - 30.11.2025",
+        "noProj": "ProjectsCY",
+        "projCost": "ProjectCostCY",
+        "disb": "DisbursementCY",
+        "gross": "GrossSanctionCY",
+        "net": "NetSanctionCY",
+        "os": "PrincipalOsCY",
+        "cost": "ProjectCostCY"
+      },
+      "PY": {
+        "label": "01.04.2024 - 31.03.2025",
         "noProj": "ProjectsCY",
         "projCost": "ProjectCostCY",
         "disb": "DisbursementCY",
@@ -98,5 +107,5 @@
         "cost": "ProjectCostCY"
       }
     }
-}
+  }
 }
