@@ -4,16 +4,17 @@
     min-height: 100vh;
 }
 
-/* ===== SIDEBAR DARK THEME ===== */
+/* ===== SIDEBAR DARK THEME (FIXED - FULL HEIGHT) ===== */
 .customSidebar {
     background-color: #1a202c !important;
-    height: 100vh !important; /* Force to full screen height */
-    position: sticky;         /* Keep it locked during scroll */
-    top: 0;
+    min-height: 100vh !important;
+    height: 100% !important;
+    position: relative;
     border-right: 1px solid #2d3748;
     transition: width 0.3s ease;
     z-index: 10;
 }
+
 .sidebarTitle {
     color: #ffffff !important;
     font-weight: 300;
@@ -21,12 +22,6 @@
     font-size: 0.9rem;
 }
 
-#_IDGenHBox2 {
-    display: flex;
-    width: 100%;
-    gap: 1.5rem; /* Space between map and chart */
-    align-items: stretch;
-}
 /* STRONGER SELECTORS FOR SIDEBAR TEXT - FORCE WHITE COLOR */
 .customSidebar .sapMSLI .sapMSLITitleOnly,
 .customSidebar .sapMSLITitleOnly,
@@ -149,7 +144,7 @@
     background-color: #f7fafc;
 }
 
-/* ===== MAP CONTAINER ===== */
+/* ===== MAP CONTAINER (FIXED LAYOUT) ===== */
 .indiaMapWrapper {
     width: 100%;
     height: 100%;
@@ -163,16 +158,30 @@
 }
 
 .mapContainerBox {
-    flex: 1 1 65%; /* Map takes 65% but can shrink/grow */
     background: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    min-width: 600px; /* Prevent it from getting too small */
+    flex: 1;
+    max-width: 65%;
 }
 
+/* Fix Regional Distribution card - prevent overlap */
 #_IDGenVBox5 {
-    flex: 0 0 320px; /* Chart stays exactly this wide */
-    max-width: 350px;
+    flex: 0 0 33%;
+    max-width: 400px;
+    min-width: 320px;
+}
+
+#_IDGenCard5 {
+    height: 100%;
+    max-height: 720px;
+}
+
+/* Ensure geo tab HBox stretches properly */
+#_IDGenHBox4 {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
 }
 
 /* ===== MAP TOOLTIP (FIXED - NO STRETCHING) ===== */
@@ -204,7 +213,7 @@
     line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: e11llipsis;
+    text-overflow: ellipsis;
 }
 
 .tooltip-row {

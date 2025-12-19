@@ -166,38 +166,61 @@
                                         </VBox>
                                     </IconTabFilter>
 
-                                    <IconTabFilter id="_IDGenIconTabFilter2" key="geo" text="Geographical" icon="sap-icon://map" visible="{view>/isGeoReport}">
-                                        <HBox id="_IDGenHBox4" width="100%" height="750px" alignItems="Start" class="sapUiMediumMarginTop">
-                                            <items>
-                                                <VBox id="_IDGenVBox4" width="65%" height="100%" class="mapContainerBox">
-                                                    <items>
-                                                        <core:HTML id="_IDGenHTML" content='&lt;div id="indiaMapContainer" class="indiaMapWrapper"&gt;&lt;/div&gt;'/>
-                                                    </items>
-                                                </VBox>
-                                                <VBox id="_IDGenVBox5" width="35%" class="sapUiSmallMarginBegin">
-                                                    <items>
-                                                        <f:Card id="_IDGenCard5" class="chartCard">
-                                                            <f:header><card:Header id="_IDGenHeader2" title="Regional Distribution" subtitle="Amount by Zone" iconSrc="sap-icon://choropleth-chart"/></f:header>
-                                                            <f:content>
-                                                                <viz:VizFrame id="geoVizFrame" vizType="bar" width="100%" height="550px">
-                                                                    <viz:dataset>
-                                                                        <vizData:FlattenedDataset id="_IDGenFlattenedDataset2" data="{geoData>/items}">
-                                                                            <vizData:dimensions><vizData:DimensionDefinition id="_IDGenDimensionDefinition2" name="Zone" value="{geoData>Zone}"/></vizData:dimensions>
-                                                                            <vizData:measures><vizData:MeasureDefinition id="_IDGenMeasureDefinition2" name="Value" value="{geoData>Value}"/></vizData:measures>
-                                                                        </vizData:FlattenedDataset>
-                                                                    </viz:dataset>
-                                                                    <viz:feeds>
-                                                                        <vizFeeds:FeedItem id="_IDGenFeedItem5" uid="valueAxis" type="Measure" values="Value"/>
-                                                                        <vizFeeds:FeedItem id="_IDGenFeedItem6" uid="categoryAxis" type="Dimension" values="Zone"/>
-                                                                    </viz:feeds>
-                                                                </viz:VizFrame>
-                                                            </f:content>
-                                                        </f:Card>
-                                                    </items>
-                                                </VBox>
-                                            </items>
-                                        </HBox>
-                                    </IconTabFilter>
+                                   <IconTabFilter id="_IDGenIconTabFilter2" key="geo" text="Geographical" icon="sap-icon://map" visible="{view>/isGeoReport}">
+    <HBox id="_IDGenHBox4" width="100%" height="750px" alignItems="Stretch" class="sapUiMediumMarginTop">
+        <items>
+            <VBox id="_IDGenVBox4" width="65%" height="100%" class="mapContainerBox">
+                <items>
+                    <core:HTML id="_IDGenHTML" content='&lt;div id="indiaMapContainer" class="indiaMapWrapper"&gt;&lt;/div&gt;'/>
+                </items>
+            </VBox>
+            <VBox id="_IDGenVBox5" width="33%" class="sapUiSmallMarginBegin">
+                <items>
+                    <f:Card id="_IDGenCard5" class="chartCard">
+                        <f:header>
+                            <card:Header id="_IDGenHeader2" 
+                                       title="Regional Distribution" 
+                                       subtitle="Amount by Zone" 
+                                       iconSrc="sap-icon://choropleth-chart"/>
+                        </f:header>
+                        <f:content>
+                            <viz:VizFrame id="geoVizFrame" 
+                                        vizType="bar" 
+                                        width="100%" 
+                                        height="650px">
+                                <viz:dataset>
+                                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset2" data="{geoData>/items}">
+                                        <vizData:dimensions>
+                                            <vizData:DimensionDefinition id="_IDGenDimensionDefinition2" 
+                                                                        name="Zone" 
+                                                                        value="{geoData>Zone}"/>
+                                        </vizData:dimensions>
+                                        <vizData:measures>
+                                            <vizData:MeasureDefinition id="_IDGenMeasureDefinition2" 
+                                                                     name="Value" 
+                                                                     value="{geoData>Value}"/>
+                                        </vizData:measures>
+                                    </vizData:FlattenedDataset>
+                                </viz:dataset>
+                                <viz:feeds>
+                                    <vizFeeds:FeedItem id="_IDGenFeedItem5" 
+                                                     uid="valueAxis" 
+                                                     type="Measure" 
+                                                     values="Value"/>
+                                    <vizFeeds:FeedItem id="_IDGenFeedItem6" 
+                                                     uid="categoryAxis" 
+                                                     type="Dimension" 
+                                                     values="Zone"/>
+                                </viz:feeds>
+                            </viz:VizFrame>
+                        </f:content>
+                    </f:Card>
+                </items>
+            </VBox>
+        </items>
+    </HBox>
+</IconTabFilter>
+
                                 </items>
                             </IconTabBar>
                         </items>
