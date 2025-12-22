@@ -1,79 +1,300 @@
-/* Global Background */
+/* ===== APP BACKGROUND ===== */
 .appBackground {
-    background-color: #f5f7fa; /* Softer blue-grey */
+    background-color: #f5f7fa !important;
+    min-height: 100vh;
 }
 
-/* Sidebar Styling */
+/* ===== SIDEBAR DARK THEME (FIXED - FULL HEIGHT) ===== */
 .customSidebar {
-    background-color: #ffffff;
-    height: 100%;
+    background-color: #1a202c !important;
+    min-height: 100vh !important;
+    height: 100% !important;
+    position: relative;
+    border-right: 1px solid #2d3748;
+    transition: width 0.3s ease;
+    z-index: 10;
 }
 
-.customListItem {
-    border-bottom: 1px solid #f0f0f0;
+.sidebarTitle {
+    color: #ffffff !important;
+    font-weight: 300;
+    letter-spacing: 1.5px;
+    font-size: 0.9rem;
 }
 
-/* Page Title styling */
+/* STRONGER SELECTORS FOR SIDEBAR TEXT - FORCE WHITE COLOR */
+.customSidebar .sapMSLI .sapMSLITitleOnly,
+.customSidebar .sapMSLITitleOnly,
+.customSidebar .sapMSLITitle,
+.customListItem .sapMSLITitle,
+.customListItem .sapMSLITitleOnly {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+}
+
+/* Ensure selected items also have white text */
+.customListItem.sapMLIBSelected .sapMSLITitle,
+.customListItem.sapMLIBSelected .sapMSLITitleOnly {
+    color: #ffffff !important;
+}
+
+/* Ensure hovered items also have white text */
+.customListItem:hover .sapMSLITitle,
+.customListItem:hover .sapMSLITitleOnly {
+    color: #ffffff !important;
+}
+
+.customListItem .sapMSLIIcon {
+    color: #3182ce !important;
+}
+
+.customListItem.sapMLIBSelected {
+    background-color: #2d3748 !important;
+    border-left: 4px solid #3182ce !important;
+}
+
+.customListItem:hover {
+    background-color: #2d3748 !important;
+}
+
+/* ===== HEADER TOOLBAR ===== */
+.customHeaderToolbar {
+    background-color: #ffffff !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 0.5rem 1rem;
+}
+
 .pageTitle {
-    color: #32363a;
-    font-weight: 700;
+    color: #1a202c;
+    font-weight: 600;
 }
 
-/* Tab Bar cleanup */
-.sapMITH {
-    background: transparent !important;
-    box-shadow: none !important;
+.headerLabel {
+    color: #4a5568;
+    font-size: 0.85rem;
+    margin-left: 1rem;
+    margin-right: 0.5rem;
 }
 
-/* KPI Cards */
-.kpiCard .sapFCardContent {
-    padding: 1rem;
+.customSegmented .sapMSegBBtn {
+    background-color: #edf2f7;
+    border-radius: 6px;
 }
 
+.customSegmented .sapMSegBBtnSelected {
+    background-color: #3182ce !important;
+    color: #ffffff !important;
+}
+
+/* ===== CARDS ===== */
+.customCard,
+.chartCard,
+.kpiCard {
+    background: #ffffff !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    border: none !important;
+}
+
+.kpiCard {
+    height: 140px !important;
+}
+
+.chartCard {
+    margin-bottom: 1rem !important;
+}
+
+/* ===== KPI NUMBERS ===== */
 .subtleTitle {
-    color: #6a6d70;
-    text-transform: uppercase;
     font-size: 0.75rem;
+    color: #718096;
+    font-weight: 600;
     letter-spacing: 0.5px;
+    text-transform: uppercase;
     margin-bottom: 0.5rem;
 }
 
 .bigKpiNumber .sapMObjectNumberText {
-    font-size: 2.5rem !important; /* Make numbers pop */
+    font-size: 2.5rem !important;
+    line-height: 1.2 !important;
+    color: #2c5282;
     font-weight: 300;
 }
 
 .bigKpiNumber .sapMObjectNumberUnit {
-    font-size: 1.2rem;
+    font-size: 1rem !important;
+    color: #718096;
+}
+
+/* ===== TABLE ===== */
+#dataTable {
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+#dataTable .sapMListTblHeaderCell {
+    background-color: #f7fafc;
     font-weight: 600;
-    margin-left: 0.2rem;
+    color: #2d3748;
 }
 
-/* Filter Bar */
-.filterBarCard {
-    background-color: #ffffff;
+#dataTable .sapMListTblRow:hover {
+    background-color: #f7fafc;
 }
 
-/* Chart Cards */
-.chartCard {
-    border: none;
-    box-shadow: 0 0 2px rgba(0,0,0,0.1);
-}
-
-/* Table Card */
-.customCard {
-    background: white;
+/* ===== MAP CONTAINER (FIXED LAYOUT) ===== */
+.indiaMapWrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 2px rgba(0,0,0,0.1);
 }
 
-.subtleText {
-    color: #6a6d70;
-    font-size: 0.875rem;
+.mapContainerBox {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    flex: 1;
+    max-width: 65%;
 }
 
-/* VizFrame padding */
-.sapVizFrame {
-    margin-top: 1rem;
+/* Fix Regional Distribution card - prevent overlap */
+#_IDGenVBox5 {
+    flex: 0 0 33%;
+    max-width: 400px;
+    min-width: 320px;
+}
+
+#_IDGenCard5 {
+    height: 100%;
+    max-height: 720px;
+}
+
+/* Ensure geo tab HBox stretches properly */
+#_IDGenHBox4 {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+/* ===== MAP TOOLTIP (FIXED - NO STRETCHING) ===== */
+.map-tooltip {
+    position: absolute;
+    display: none;
+    background: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border-left: 4px solid #3182ce;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    pointer-events: none;
+    box-sizing: border-box;
+    min-width: 160px;
+    max-width: 220px;
+    max-height: 120px;
+    overflow: hidden;
+    white-space: normal;
+}
+
+.tooltip-header {
+    font-weight: bold;
+    color: #1a202c;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    margin-top: 3px;
+    color: #4a5568;
+    line-height: 1.4;
+    gap: 8px;
+}
+
+.tooltip-row span {
+    flex-shrink: 0;
+    min-width: 60px;
+}
+
+.tooltip-row strong {
+    color: #2d3748;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* ===== ICON TAB BAR ===== */
+.sapMITBHead {
+    background-color: transparent !important;
+}
+
+.sapMITBFilter {
+    color: #4a5568 !important;
+}
+
+.sapMITBFilterSelected {
+    color: #3182ce !important;
+}
+
+/* ===== INFO STRIP ===== */
+.infoStripText {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* ===== MAP HOVER EFFECTS (FIXED - NO FLICKERING) ===== */
+
+/* Base state for all map paths - smoother transition */
+#indiaMapContainer path {
+    transition: transform 0.3s ease-out,
+        filter 0.3s ease-out,
+        stroke 0.3s ease-out,
+        stroke-width 0.3s ease-out;
+    transform-origin: center;
+    cursor: default;
+    will-change: transform, filter;
+}
+
+/* Only states with data get pointer cursor and effects */
+#indiaMapContainer path.state-active {
+    cursor: pointer !important;
+}
+
+/* Inactive states - no interaction */
+#indiaMapContainer path:not(.state-active) {
+    cursor: default !important;
+    pointer-events: none;
+}
+
+/* Hover effect - 3D pop-out WITHOUT pulse animation (no flickering) */
+#indiaMapContainer path.state-active:hover {
+    transform: scale(1.12) translateY(-3px);
+    filter: drop-shadow(0 8px 16px rgba(10, 110, 209, 0.45)) brightness(1.15);
+    stroke: #ffffff;
+    stroke-width: 2;
+    z-index: 999;
+}
+
+/* Click/Active state - slight push down */
+#indiaMapContainer path.state-active:active {
+    transform: scale(1.08) translateY(-1px);
+    filter: drop-shadow(0 4px 10px rgba(10, 110, 209, 0.35));
+    transition: all 0.1s ease;
 }

@@ -1,192 +1,229 @@
 <mvc:View controllerName="iifcl.cml.cmlmisapp.controller.Main"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m"
-    xmlns:l="sap.ui.layout"
-    xmlns:f="sap.f"
-    xmlns:card="sap.f.cards"
-    xmlns:viz="sap.viz.ui5.controls"
-    xmlns:vizData="sap.viz.ui5.data"
-    xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds">
+    xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:f="sap.f"
+    xmlns:card="sap.f.cards" xmlns:core="sap.ui.core" xmlns:viz="sap.viz.ui5.controls"
+    xmlns:vizData="sap.viz.ui5.data" xmlns:vizFeeds="sap.viz.ui5.controls.common.feeds">
 
     <App id="mainapp">
-        <Page id="rootPage" title="CML MIS Analytics Workbench" class="appBackground" showHeader="true">
+        <Page id="rootPage" showHeader="false" class="appBackground">
             <content>
                 <HBox id="MainLayoutHBox" width="100%" height="100%" renderType="Bare" fitContainer="true">
 
-                    <VBox id="SidebarBox" 
-                          width="{= ${view>/sidebarCollapsed} ? '0px' : '260px' }" 
-                          visible="{= !${view>/sidebarCollapsed} }" 
-                          class="customSidebar sapUiSmallBorderRight">
-                        
-                        <Title id="_IDGenTitle" text="MIS Reports" level="H3" class="sapUiMediumMarginTop sapUiSmallMarginBegin sapUiSmallMarginBottom"/>
-                        
-                        <List id="reportList" 
-                              mode="SingleSelectMaster" 
-                              items="{reports>/reports}" 
-                              selectionChange=".onReportSelect" 
-                              backgroundDesign="Transparent"
-                              showSeparators="None">
-                            <StandardListItem id="_IDGenStandardListItem" title="{reports>title}" 
-                                              description="{reports>id}" 
-                                              type="Active" 
-                                              icon="sap-icon://chart-vertical-bar"
-                                              class="customListItem"/>
-                        </List>
+                    <VBox id="SidebarBox" width="{= ${view>/sidebarCollapsed} ? '0px' : '280px' }" 
+                          visible="{= !${view>/sidebarCollapsed} }" class="customSidebar">
+                        <items>
+                            <HBox id="_IDGenHBox" alignItems="Center" class="sapUiMediumMarginTop sapUiMediumMarginBegin sapUiSmallMarginBottom">
+                                <core:Icon id="_IDGenIcon" src="sap-icon://bbyd-dashboard" size="1.5rem" color="white" class="sapUiTinyMarginEnd"/>
+                                <Title id="_IDGenTitle" text="MIS WORKBENCH" level="H3" class="sidebarTitle"/>
+                            </HBox>
+                            <List id="_IDGenList" items="{reports>/reports}" mode="SingleSelectMaster" selectionChange=".onReportSelect" backgroundDesign="Transparent" showSeparators="None">
+                                <StandardListItem id="_IDGenStandardListItem" title="{reports>title}" type="Active" icon="sap-icon://chart-vertical-bar" class="customListItem"/>
+                            </List>
+                        </items>
                     </VBox>
 
                     <VBox id="ContentBox" width="100%" class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
+                        <items>
+                            <OverflowToolbar id="_IDGenOverflowToolbar" class="customHeaderToolbar sapUiSmallMarginTop">
+                                <Button id="_IDGenButton" icon="sap-icon://menu2" press=".onToggleSidebar" type="Transparent"/>
+                                <Title id="_IDGenTitle1" text="{view>/currentReportTitle}" level="H2" class="pageTitle sapUiSmallMarginBegin"/>
+                                <ToolbarSpacer id="_IDGenToolbarSpacer"/>
+                                
+                                <Label id="_IDGenLabel" text="Period:" design="Bold" class="headerLabel"/>
+                                <SegmentedButton id="_IDGenSegmentedButton" selectedKey="{view>/selectedBucketKey}" selectionChange=".onBucketToggle" class="customSegmented">
+                                    <items>
+                                        <SegmentedButtonItem id="_IDGenSegmentedButtonItem" key="CY" text="{view>/periodLabelCY}"/>
+                                        <SegmentedButtonItem id="_IDGenSegmentedButtonItem1" key="PY" text="{view>/periodLabelPY}"/>
+                                    </items>
+                                </SegmentedButton>
 
-                        <HBox id="_IDGenHBox" alignItems="Center" justifyContent="SpaceBetween" class="sapUiSmallMarginTop sapUiTinyMarginBottom">
-                            <Title id="_IDGenTitle1" text="{view>/currentReportTitle}" level="H2" class="pageTitle"/>
-                            <Button id="_IDGenButton" icon="{= ${view>/sidebarCollapsed} ? 'sap-icon://expand-group' : 'sap-icon://collapse-group' }" 
-                                    press=".onToggleSidebar" type="Transparent"/>
-                        </HBox>
+                                <Label id="_IDGenLabel1" text="Metric:" design="Bold" class="headerLabel sapUiSmallMarginBegin"/>
+                                <SegmentedButton id="_IDGenSegmentedButton1" selectedKey="{view>/selectedMetricKey}" selectionChange=".onMetricToggle" class="customSegmented">
+                                    <items>
+                                        <SegmentedButtonItem id="_IDGenSegmentedButtonItem2" key="gross" text="Gross"/>
+                                        <SegmentedButtonItem id="_IDGenSegmentedButtonItem3" key="disb" text="Disb."/>
+                                        <SegmentedButtonItem id="_IDGenSegmentedButtonItem4" key="net" text="Net"/>
+                                        <SegmentedButtonItem id="_IDGenSegmentedButtonItem5" key="os" text="O/S"/>
+                                    </items>
+                                </SegmentedButton>
+                            </OverflowToolbar>
 
-                        <IconTabBar id="tabBar" expandable="false" class="sapUiNoContentPadding" expanded="true">
-                            <items>
-                                <IconTabFilter id="_IDGenIconTabFilter" key="data" text="Data Table" icon="sap-icon://table-view">
-                                    <VBox id="_IDGenVBox" class="sapUiMediumMarginTop">
-                                        <Table id="dataTable" items="{view>/rows}" class="customCard">
-                                            <headerToolbar>
-                                                <OverflowToolbar id="_IDGenOverflowToolbar">
-                                                    <Title id="_IDGenTitle2" text="Detailed Records" level="H4"/>
-                                                    <ToolbarSpacer id="_IDGenToolbarSpacer"/>
-                                                    <Text id="_IDGenText" text="{view>/activeBucketLabel} | {view>/activeMetricLabel}" class="sapUiTinyMarginEnd subtleText"/>
-                                                </OverflowToolbar>
-                                            </headerToolbar>
+                            <HBox id="_IDGenHBox1" width="100%" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginTop sapUiTinyMarginBottom">
+                                <items>
+                                    <HBox id="_IDGenHBox2" alignItems="Center">
+                                        <core:Icon id="_IDGenIcon1" src="sap-icon://calendar" size="1rem" color="#3182ce" class="sapUiTinyMarginEnd"/>
+                                        <Text id="_IDGenText" text="Period: {view>/periodLabelActive}" class="infoStripText sapUiMediumMarginEnd"/>
+                                        <core:Icon id="_IDGenIcon2" src="sap-icon://bar-chart" size="1rem" color="#3182ce" class="sapUiTinyMarginEnd"/>
+                                        <Text id="_IDGenText1" text="Viewing: {view>/activeMetricLabel}" class="infoStripText"/>
+                                    </HBox>
+                                </items>
+                            </HBox>
+
+                            <IconTabBar id="tabBar" select=".onTabSelect" expandable="false" class="sapUiNoContentPadding">
+                                <items>
+                                    <IconTabFilter id="_IDGenIconTabFilter" key="data" text="Data Table" icon="sap-icon://table-view">
+                                        <Table id="_IDGenTable" items="{view>/rows}" class="customCard sapUiMediumMarginTop">
                                             <columns>
-                                                <Column id="_IDGenColumn"><Text id="_IDGenText1" text="{view>/col1Header}" /></Column>
-                                                <Column id="_IDGenColumn1"><Text id="_IDGenText2" text="{view>/col2Header}" /></Column>
-                                                <Column id="_IDGenColumn2" visible="{view>/showCol3}"><Text id="_IDGenText3" text="{view>/col3Header}" /></Column>
-                                                <Column id="_IDGenColumn3" hAlign="End"><Text id="_IDGenText4" text="Projects (CY)" /></Column>
-                                                <Column id="_IDGenColumn4" hAlign="End"><Text id="_IDGenText5" text="Proj. Cost (CY)" /></Column>
-                                                <Column id="_IDGenColumn5" hAlign="End"><Text id="_IDGenText6" text="{view>/measureLabel}" /></Column>
+                                                <Column id="_IDGenColumn"><Text id="_IDGenText2" text="{view>/col1Header}"/></Column>
+                                                <Column id="_IDGenColumn1"><Text id="_IDGenText3" text="{view>/col2Header}"/></Column>
+                                                <Column id="_IDGenColumn2" visible="{view>/showCol3}"><Text id="_IDGenText4" text="{view>/col3Header}"/></Column> 
+                                                <Column id="_IDGenColumn3" hAlign="End"><Text id="_IDGenText5" text="Projects"/></Column>
+                                                <Column id="_IDGenColumn4" hAlign="End"><Text id="_IDGenText6" text="Proj. Cost (Cr)"/></Column>
+                                                <Column id="_IDGenColumn5" hAlign="End"><Text id="_IDGenText7" text="{view>/activeMetricLabel}"/></Column>
                                             </columns>
                                             <items>
                                                 <ColumnListItem id="_IDGenColumnListItem">
                                                     <cells>
-                                                        <Text id="_IDGenText7" text="{= ${view>Scheme} || ${view>SectorName} }" />
-                                                        <Text id="_IDGenText8" text="{= ${view>BorrowerGroup} || ${view>SubSectorName} }" />
-                                                        <Text id="_IDGenText9" text="{view>BorrowerGroupName}" visible="{view>/showCol3}" />
-                                                        <ObjectNumber id="_IDGenObjectNumber" number="{path: 'view>ProjectsCY', formatter: '.formatter.projects'}" />
-                                                        <ObjectNumber id="_IDGenObjectNumber1" number="{path: 'view>ProjectCostCYUI', formatter: '.formatter.metric'}" unit="Cr" />
-                                                        <ObjectNumber id="_IDGenObjectNumber2" number="{path: 'view>CurrentMetric', formatter: '.formatter.metric'}" unit="Cr" state="Information" />
+                                                        <Text id="_IDGenText8" text="{view>DisplayCol1}"/>
+                                                        <Text id="_IDGenText9" text="{view>DisplayCol2}"/>
+                                                        <Text id="_IDGenText10" text="{view>BorrowerGroupName}"/>
+                                                        <ObjectNumber id="_IDGenObjectNumber" number="{view>ProjectsCY}"/>
+                                                        <ObjectNumber id="_IDGenObjectNumber1" number="{path: 'view>ProjectCostCY', formatter: '.formatter.metric'}" unit="Cr"/>
+                                                        <ObjectNumber id="_IDGenObjectNumber2" number="{path: 'view>CurrentMetric', formatter: '.formatter.metric'}" unit="Cr" state="Information"/>
                                                     </cells>
                                                 </ColumnListItem>
                                             </items>
                                         </Table>
-                                    </VBox>
-                                </IconTabFilter>
+                                    </IconTabFilter>
 
-                                <IconTabFilter id="_IDGenIconTabFilter1" key="analytics" text="Dashboard" icon="sap-icon://bar-chart">
-                                    <ScrollContainer id="_IDGenScrollContainer" width="100%" height="100%" horizontal="false" vertical="true">
-                                        <VBox id="_IDGenVBox1" class="sapUiSmallMarginTop sapUiSmallMarginBottom" width="100%">
+                                    <IconTabFilter id="_IDGenIconTabFilter1" 
+    key="analytics" 
+    text="Analytics" 
+    icon="sap-icon://line-chart">
+                                        <VBox id="_IDGenVBox" class="sapUiMediumMarginTop">
+                                            <items>
+                                                <HBox id="_IDGenHBox3" width="100%" height="160px" class="sapUiSmallMarginBottom">
+                                                    <items>
+                                                        <f:Card id="_IDGenCard" class="kpiCard sapUiSmallMarginEnd" width="280px">
+                                                            <f:content>
+                                                                <VBox id="_IDGenVBox1" height="140px" class="sapUiSmallMargin" justifyContent="Center">
+                                                                    <items>
+                                                                        <Text id="_IDGenText11" text="TOTAL PROJECTS" class="subtleTitle"/>
+                                                                        <ObjectNumber id="_IDGenObjectNumber3" number="{view>/totalProjects}" class="bigKpiNumber" state="Success"/>
+                                                                    </items>
+                                                                </VBox>
+                                                            </f:content>
+                                                        </f:Card>
+                                                        <f:Card id="_IDGenCard1" class="kpiCard sapUiSmallMarginEnd" width="280px">
+                                                            <f:content>
+                                                                <VBox id="_IDGenVBox2" height="140px" class="sapUiSmallMargin" justifyContent="Center">
+                                                                    <items>
+                                                                        <Text id="_IDGenText12" text="PROJECT COST (SUM)" class="subtleTitle"/>
+                                                                        <ObjectNumber id="_IDGenObjectNumber4" number="{view>/totalProjectCost}" unit="Cr" class="bigKpiNumber"/>
+                                                                    </items>
+                                                                </VBox>
+                                                            </f:content>
+                                                        </f:Card>
+                                                        <f:Card id="_IDGenCard2" class="kpiCard" width="280px">
+                                                            <f:content>
+                                                                <VBox id="_IDGenVBox3" height="140px" class="sapUiSmallMargin" justifyContent="Center">
+                                                                    <items>
+                                                                        <Text id="_IDGenText13" text="{view>/activeMetricLabel}" class="subtleTitle"/>
+                                                                        <ObjectNumber id="_IDGenObjectNumber5" number="{view>/totalMetric}" unit="Cr" class="bigKpiNumber" state="Information"/>
+                                                                    </items>
+                                                                </VBox>
+                                                            </f:content>
+                                                        </f:Card>
+                                                    </items>
+                                                </HBox>
 
-                                            <HBox id="_IDGenHBox1" width="100%" class="sapUiSmallMarginBottom">
-                                                <f:Card id="_IDGenCard1" class="sapUiSmallMarginEnd kpiCard" width="300px">
-                                                    <f:content>
-                                                        <VBox id="_IDGenVBox2" class="sapUiSmallMargin">
-                                                            <Title id="_IDGenTitle3" text="Total Projects (CY)" level="H5" class="subtleTitle"/>
-                                                            <ObjectNumber id="_IDGenObjectNumber3" number="{view>/totalProjects}" class="bigKpiNumber" state="Success"/>
-                                                        </VBox>
-                                                    </f:content>
-                                                </f:Card>
-                                                
-                                                <f:Card id="_IDGenCard2" class="kpiCard" width="300px">
-                                                    <f:content>
-                                                        <VBox id="_IDGenVBox3" class="sapUiSmallMargin">
-                                                            <Title id="_IDGenTitle4" text="{view>/measureLabel}" level="H5" class="subtleTitle"/>
-                                                            <ObjectNumber id="_IDGenObjectNumber4" number="{view>/totalMetric}" unit="Cr" class="bigKpiNumber" state="Information"/>
-                                                        </VBox>
-                                                    </f:content>
-                                                </f:Card>
-                                            </HBox>
-
-                                            <f:Card id="_IDGenCard3" class="sapUiSmallMarginBottom filterBarCard" width="100%">
-                                                <f:content>
-                                                    <OverflowToolbar id="_IDGenOverflowToolbar1" design="Transparent" class="sapUiTinyMargin">
-                                                        <Label id="_IDGenLabel" text="Period:" design="Bold"/>
-                                                        <SegmentedButton id="_IDGenSegmentedButton" selectedKey="{view>/selectedBucketKey}" selectionChange=".onBucketToggle">
-                                                            <items>
-                                                                <SegmentedButtonItem id="_IDGenSegmentedButtonItem" key="CY" text="Apr–Nov 2025" />
-                                                                <SegmentedButtonItem id="_IDGenSegmentedButtonItem1" key="PY" text="Apr 24–Mar 25" />
-                                                            </items>
-                                                        </SegmentedButton>
-                                                        
-                                                        <ToolbarSpacer id="_IDGenToolbarSpacer1"/>
-                                                        
-                                                        <Label id="_IDGenLabel1" text="Metric:" design="Bold" class="sapUiSmallMarginBegin"/>
-                                                        <SegmentedButton id="_IDGenSegmentedButton1" selectedKey="{view>/selectedMetricKey}" selectionChange=".onMetricToggle">
-                                                            <items>
-                                                                <SegmentedButtonItem id="_IDGenSegmentedButtonItem2" key="gross" text="Gross Sanc." />
-                                                                <SegmentedButtonItem id="_IDGenSegmentedButtonItem3" key="disb"  text="Disbursement" />
-                                                                <SegmentedButtonItem id="_IDGenSegmentedButtonItem4" key="net"   text="Net Sanc." />
-                                                                <SegmentedButtonItem id="_IDGenSegmentedButtonItem5" key="os"    text="Principal O/S" />
-                                                                <SegmentedButtonItem id="_IDGenSegmentedButtonItem6" key="cost"  text="Proj. Cost" />
-                                                            </items>
-                                                        </SegmentedButton>
-                                                    </OverflowToolbar>
-                                                </f:content>
-                                            </f:Card>
-
-                                            <l:Grid id="_IDGenGrid" defaultSpan="L6 M12 S12" hSpacing="1" vSpacing="1">
-                                                <l:content>
-                                                    <f:Card id="_IDGenCard4" class="chartCard" width="100%">
-                                                        <f:header>
-                                                            <card:Header id="_IDGenHeader" title="Trend by Group / Sector" iconSrc="sap-icon://vertical-bar-chart" />
-                                                        </f:header>
+                                                <l:Grid id="_IDGenGrid" defaultSpan="L6 M12 S12" hSpacing="1" vSpacing="1">
+                                                    <f:Card id="_IDGenCard3" class="chartCard">
+                                                        <f:header><card:Header id="_IDGenHeader" title="Contribution Trend" iconSrc="sap-icon://vertical-bar-chart"/></f:header>
                                                         <f:content>
-                                                            <viz:VizFrame id="devGroupChart" uiConfig="{applicationSet:'fiori'}" vizType="column" width="100%" height="320px">
+                                                            <viz:VizFrame id="devGroupChart" vizType="column" height="400px" width="100%">
                                                                 <viz:dataset>
                                                                     <vizData:FlattenedDataset id="_IDGenFlattenedDataset" data="{view>/rows}">
-                                                                        <vizData:dimensions>
-                                                                            <vizData:DimensionDefinition id="_IDGenDimensionDefinition" name="Group / Sector" value="{view>GenericDim}" />
-                                                                        </vizData:dimensions>
-                                                                        <vizData:measures>
-                                                                            <vizData:MeasureDefinition id="_IDGenMeasureDefinition" name="Metric" value="{view>CurrentMetric}" />
-                                                                        </vizData:measures>
+                                                                        <vizData:dimensions><vizData:DimensionDefinition id="_IDGenDimensionDefinition" name="Dim" value="{view>GenericDim}"/></vizData:dimensions>
+                                                                        <vizData:measures><vizData:MeasureDefinition id="_IDGenMeasureDefinition" name="Val" value="{view>CurrentMetric}"/></vizData:measures>
                                                                     </vizData:FlattenedDataset>
                                                                 </viz:dataset>
                                                                 <viz:feeds>
-                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem" uid="categoryAxis" type="Dimension" values="Group / Sector" />
-                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem1" uid="valueAxis" type="Measure" values="Metric" />
+                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem1" uid="categoryAxis" type="Dimension" values="Dim"/>
+                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem2" uid="valueAxis" type="Measure" values="Val"/>
                                                                 </viz:feeds>
                                                             </viz:VizFrame>
                                                         </f:content>
                                                     </f:Card>
-
-                                                    <f:Card id="_IDGenCard5" class="chartCard" width="100%">
-                                                        <f:header>
-                                                            <card:Header id="_IDGenHeader1" title="Share across Groups" iconSrc="sap-icon://donut-chart" />
-                                                        </f:header>
+                                                    <f:Card id="_IDGenCard4" class="chartCard">
+                                                        <f:header><card:Header id="_IDGenHeader1" title="Distribution Share" iconSrc="sap-icon://pie-chart"/></f:header>
                                                         <f:content>
-                                                            <viz:VizFrame id="shareChart" uiConfig="{applicationSet:'fiori'}" vizType="donut" width="100%" height="320px">
+                                                            <viz:VizFrame id="shareChart" vizType="donut" height="400px" width="100%">
                                                                 <viz:dataset>
                                                                     <vizData:FlattenedDataset id="_IDGenFlattenedDataset1" data="{view>/rows}">
-                                                                        <vizData:dimensions>
-                                                                            <vizData:DimensionDefinition id="_IDGenDimensionDefinition1" name="Group / Sector" value="{view>GenericDim}" />
-                                                                        </vizData:dimensions>
-                                                                        <vizData:measures>
-                                                                            <vizData:MeasureDefinition id="_IDGenMeasureDefinition1" name="Metric" value="{view>CurrentMetric}" />
-                                                                        </vizData:measures>
+                                                                        <vizData:dimensions><vizData:DimensionDefinition id="_IDGenDimensionDefinition1" name="Dim" value="{view>GenericDim}"/></vizData:dimensions>
+                                                                        <vizData:measures><vizData:MeasureDefinition id="_IDGenMeasureDefinition1" name="Val" value="{view>CurrentMetric}"/></vizData:measures>
                                                                     </vizData:FlattenedDataset>
                                                                 </viz:dataset>
                                                                 <viz:feeds>
-                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem2" uid="size" type="Measure" values="Metric" />
-                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem3" uid="color" type="Dimension" values="Group / Sector" />
+                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem3" uid="color" type="Dimension" values="Dim"/>
+                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem4" uid="size" type="Measure" values="Val"/>
                                                                 </viz:feeds>
                                                             </viz:VizFrame>
                                                         </f:content>
                                                     </f:Card>
-
-                                                </l:content>
-                                            </l:Grid>
-
+                                                </l:Grid>
+                                            </items>
                                         </VBox>
-                                    </ScrollContainer>
-                                </IconTabFilter>
-                            </items>
-                        </IconTabBar>
+                                    </IconTabFilter>
+
+                                   <IconTabFilter id="_IDGenIconTabFilter2" key="geo" text="Geographical" icon="sap-icon://map" visible="{view>/isGeoReport}">
+    <HBox id="_IDGenHBox4" width="100%" height="750px" alignItems="Stretch" class="sapUiMediumMarginTop">
+        <items>
+            <VBox id="_IDGenVBox4" width="65%" height="100%" class="mapContainerBox">
+                <items>
+                    <core:HTML id="_IDGenHTML" content='&lt;div id="indiaMapContainer" class="indiaMapWrapper"&gt;&lt;/div&gt;'/>
+                </items>
+            </VBox>
+            <VBox id="_IDGenVBox5" width="33%" class="sapUiSmallMarginBegin">
+                <items>
+                    <f:Card id="_IDGenCard5" class="chartCard">
+                        <f:header>
+                            <card:Header id="_IDGenHeader2" 
+                                       title="Regional Distribution" 
+                                       subtitle="Amount by Zone" 
+                                       iconSrc="sap-icon://choropleth-chart"/>
+                        </f:header>
+                        <f:content>
+                            <viz:VizFrame id="geoVizFrame" 
+                                        vizType="bar" 
+                                        width="100%" 
+                                        height="650px">
+                                <viz:dataset>
+                                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset2" data="{geoData>/items}">
+                                        <vizData:dimensions>
+                                            <vizData:DimensionDefinition id="_IDGenDimensionDefinition2" 
+                                                                        name="Zone" 
+                                                                        value="{geoData>Zone}"/>
+                                        </vizData:dimensions>
+                                        <vizData:measures>
+                                            <vizData:MeasureDefinition id="_IDGenMeasureDefinition2" 
+                                                                     name="Value" 
+                                                                     value="{geoData>Value}"/>
+                                        </vizData:measures>
+                                    </vizData:FlattenedDataset>
+                                </viz:dataset>
+                                <viz:feeds>
+                                    <vizFeeds:FeedItem id="_IDGenFeedItem5" 
+                                                     uid="valueAxis" 
+                                                     type="Measure" 
+                                                     values="Value"/>
+                                    <vizFeeds:FeedItem id="_IDGenFeedItem6" 
+                                                     uid="categoryAxis" 
+                                                     type="Dimension" 
+                                                     values="Zone"/>
+                                </viz:feeds>
+                            </viz:VizFrame>
+                        </f:content>
+                    </f:Card>
+                </items>
+            </VBox>
+        </items>
+    </HBox>
+</IconTabFilter>
+
+                                </items>
+                            </IconTabBar>
+                        </items>
                     </VBox>
                 </HBox>
             </content>
