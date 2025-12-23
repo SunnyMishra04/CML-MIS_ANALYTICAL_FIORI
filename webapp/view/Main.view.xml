@@ -8,6 +8,7 @@
             <content>
                 <HBox id="MainLayoutHBox" width="100%" height="100%" renderType="Bare" fitContainer="true">
 
+                    <!-- SIDEBAR -->
                     <VBox id="SidebarBox" width="{= ${view>/sidebarCollapsed} ? '0px' : '280px' }" 
                           visible="{= !${view>/sidebarCollapsed} }" class="customSidebar">
                         <items>
@@ -21,15 +22,21 @@
                         </items>
                     </VBox>
 
+                    <!-- CONTENT AREA -->
                     <VBox id="ContentBox" width="100%" class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
                         <items>
+                            <!-- TOOLBAR -->
                             <OverflowToolbar id="_IDGenOverflowToolbar" class="customHeaderToolbar sapUiSmallMarginTop">
                                 <Button id="_IDGenButton" icon="sap-icon://menu2" press=".onToggleSidebar" type="Transparent"/>
                                 <Title id="_IDGenTitle1" text="{view>/currentReportTitle}" level="H2" class="pageTitle sapUiSmallMarginBegin"/>
                                 <ToolbarSpacer id="_IDGenToolbarSpacer"/>
                                 
                                 <Label id="_IDGenLabel" text="Period:" design="Bold" class="headerLabel"/>
-                                <SegmentedButton id="_IDGenSegmentedButton" selectedKey="{view>/selectedBucketKey}" selectionChange=".onBucketToggle" class="customSegmented">
+                                <SegmentedButton id="periodSelector" 
+                                    selectedKey="{view>/selectedBucketKey}" 
+                                    selectionChange=".onBucketToggle" 
+                                    class="customSegmented"
+                                    enabled="{= !${view>/comparisonMode} }">
                                     <items>
                                         <SegmentedButtonItem id="_IDGenSegmentedButtonItem" key="CY" text="{view>/periodLabelCY}"/>
                                         <SegmentedButtonItem id="_IDGenSegmentedButtonItem1" key="PY" text="{view>/periodLabelPY}"/>
@@ -45,80 +52,238 @@
                                         <SegmentedButtonItem id="_IDGenSegmentedButtonItem5" key="os" text="O/S"/>
                                     </items>
                                 </SegmentedButton>
+
+                                <!-- Comparison Toggle Button -->
+                                <ToolbarSeparator id="_IDGenToolbarSeparator"/>
+                                <ToggleButton id="comparisonToggle"
+                                    text="Compare CY vs PY"
+                                    icon="sap-icon://compare"
+                                    pressed="{view>/comparisonMode}"
+                                    press=".onComparisonToggle"
+                                    type="Emphasized"/>
                             </OverflowToolbar>
 
+                            <!-- INFO STRIP -->
                             <HBox id="_IDGenHBox1" width="100%" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginTop sapUiTinyMarginBottom">
                                 <items>
-                                    <HBox id="_IDGenHBox2" alignItems="Center">
+                                    <HBox id="_IDGenHBox2" alignItems="Center" wrap="Wrap">
+                                        <!-- Main Period -->
                                         <core:Icon id="_IDGenIcon1" src="sap-icon://calendar" size="1rem" color="#3182ce" class="sapUiTinyMarginEnd"/>
-                                        <Text id="_IDGenText" text="Period: {view>/periodLabelActive}" class="infoStripText sapUiMediumMarginEnd"/>
+                                        <Text id="_IDGenText" 
+                                            text="Period: {view>/periodDisplayText}" 
+                                            class="infoStripText sapUiMediumMarginEnd"/>
+                                        
+                                        <!-- Comparison Period (visible only when comparing) -->
+                                        <HBox id="comparisonPeriodBox" 
+                                            visible="{view>/showComparisonPeriod}" 
+                                            alignItems="Center">
+                                            <core:Icon id="iconCompare" 
+                                                src="sap-icon://compare" 
+                                                size="0.875rem" 
+                                                color="#718096" 
+                                                class="sapUiTinyMarginEnd"/>
+                                            <Text id="txtComparisonPeriod" 
+                                                text="Comparing with: {view>/periodLabelPY}" 
+                                                class="infoStripTextSecondary sapUiMediumMarginEnd"/>
+                                        </HBox>
+                                        
+                                        <!-- Active Metric -->
                                         <core:Icon id="_IDGenIcon2" src="sap-icon://bar-chart" size="1rem" color="#3182ce" class="sapUiTinyMarginEnd"/>
-                                        <Text id="_IDGenText1" text="Viewing: {view>/activeMetricLabel}" class="infoStripText"/>
+                                        <Text id="_IDGenText1" 
+                                            text="Viewing: {view>/activeMetricLabel}" 
+                                            class="infoStripText"/>
                                     </HBox>
                                 </items>
                             </HBox>
 
                             <IconTabBar id="tabBar" select=".onTabSelect" expandable="false" class="sapUiNoContentPadding">
                                 <items>
+                                    <!-- DATA TABLE TAB -->
                                     <IconTabFilter id="_IDGenIconTabFilter" key="data" text="Data Table" icon="sap-icon://table-view">
                                         <Table id="_IDGenTable" items="{view>/rows}" class="customCard sapUiMediumMarginTop">
                                             <columns>
+                                                <!-- Dimension Columns -->
                                                 <Column id="_IDGenColumn"><Text id="_IDGenText2" text="{view>/col1Header}"/></Column>
                                                 <Column id="_IDGenColumn1"><Text id="_IDGenText3" text="{view>/col2Header}"/></Column>
-                                                <Column id="_IDGenColumn2" visible="{view>/showCol3}"><Text id="_IDGenText4" text="{view>/col3Header}"/></Column> 
-                                                <Column id="_IDGenColumn3" hAlign="End"><Text id="_IDGenText5" text="Projects"/></Column>
-                                                <Column id="_IDGenColumn4" hAlign="End"><Text id="_IDGenText6" text="Proj. Cost (Cr)"/></Column>
-                                                <Column id="_IDGenColumn5" hAlign="End"><Text id="_IDGenText7" text="{view>/activeMetricLabel}"/></Column>
+                                                <Column id="_IDGenColumn2" visible="{view>/showCol3}"><Text id="_IDGenText4" text="{view>/col3Header}"/></Column>
+                                                
+                                                <!-- CY Columns -->
+                                                <Column id="_IDGenColumn3" hAlign="End">
+                                                    <Text id="_IDGenText5" text="{= ${view>/comparisonMode} ? 'Projects (CY)' : 'Projects' }"/>
+                                                </Column>
+                                                <Column id="_IDGenColumn4" hAlign="End">
+                                                    <Text id="_IDGenText6" text="{= ${view>/comparisonMode} ? 'Proj. Cost (CY)' : 'Proj. Cost (Cr)' }"/>
+                                                </Column>
+                                                <Column id="_IDGenColumn5" hAlign="End">
+                                                    <Text id="_IDGenText7" text="{= ${view>/comparisonMode} ? ${view>/activeMetricLabel} + ' (CY)' : ${view>/activeMetricLabel} }"/>
+                                                </Column>
+
+                                                <!-- PY Columns (Visible only in comparison mode) -->
+                                                <Column id="colProjectsPY" hAlign="End" visible="{view>/showComparisonColumns}">
+                                                    <Text id="txtProjectsPY" text="Projects (PY)"/>
+                                                </Column>
+                                                <Column id="colMetricPY" hAlign="End" visible="{view>/showComparisonColumns}">
+                                                    <Text id="txtMetricPY1" text="{view>/activeMetricLabel} (PY)"/>
+                                                </Column>
+
+                                                <!-- Variance Columns (Visible only in comparison mode) -->
+                                                <Column id="colProjectsVar" hAlign="End" visible="{view>/showComparisonColumns}">
+                                                    <Text id="txtProjectsVar" text="Δ Projects"/>
+                                                </Column>
+                                                <Column id="colProjectsVarPct" hAlign="End" visible="{view>/showComparisonColumns}">
+                                                    <Text id="txtProjectsVarPct" text="% Change"/>
+                                                </Column>
+                                                <Column id="colMetricVar" hAlign="End" visible="{view>/showComparisonColumns}">
+                                                    <Text id="txtMetricVar" text="Δ Amount"/>
+                                                </Column>
+                                                <Column id="colMetricVarPct" hAlign="End" visible="{view>/showComparisonColumns}">
+                                                    <Text id="txtMetricVarPct" text="% Change"/>
+                                                </Column>
                                             </columns>
+                                            
                                             <items>
                                                 <ColumnListItem id="_IDGenColumnListItem">
                                                     <cells>
+                                                        <!-- Dimension Cells -->
                                                         <Text id="_IDGenText8" text="{view>DisplayCol1}"/>
                                                         <Text id="_IDGenText9" text="{view>DisplayCol2}"/>
                                                         <Text id="_IDGenText10" text="{view>BorrowerGroupName}"/>
+                                                        
+                                                        <!-- CY Cells -->
                                                         <ObjectNumber id="_IDGenObjectNumber" number="{view>ProjectsCY}"/>
-                                                        <ObjectNumber id="_IDGenObjectNumber1" number="{path: 'view>ProjectCostCY', formatter: '.formatter.metric'}" unit="Cr"/>
-                                                        <ObjectNumber id="_IDGenObjectNumber2" number="{path: 'view>CurrentMetric', formatter: '.formatter.metric'}" unit="Cr" state="Information"/>
+                                                        <ObjectNumber id="_IDGenObjectNumber1" 
+                                                            number="{path: 'view>ProjectCostCY', formatter: '.formatter.metric'}" 
+                                                            unit="Cr"/>
+                                                        <ObjectNumber id="_IDGenObjectNumber2" 
+                                                            number="{path: 'view>MetricCY', formatter: '.formatter.metric'}" 
+                                                            unit="Cr" 
+                                                            state="Information"/>
+
+                                                        <!-- PY Cells -->
+                                                        <ObjectNumber id="objProjectsPY" number="{view>ProjectsPY}"/>
+                                                        <ObjectNumber id="objMetricPY" 
+                                                            number="{path: 'view>MetricPY', formatter: '.formatter.metric'}" 
+                                                            unit="Cr"/>
+
+                                                        <!-- Variance Cells -->
+                                                        <ObjectNumber id="objProjectsVar" 
+                                                            number="{view>ProjectsVar}"
+                                                            state="{= ${view>ProjectsVar} >= 0 ? 'Success' : 'Error' }"/>
+                                                        <ObjectNumber id="objProjectsVarPct" 
+                                                            number="{path: 'view>ProjectsVarPct', formatter: '.formatter.percentage'}"
+                                                            unit="%"
+                                                            state="{= ${view>ProjectsVarPct} >= 0 ? 'Success' : 'Error' }"/>
+                                                        <ObjectNumber id="objMetricVar" 
+                                                            number="{path: 'view>MetricVar', formatter: '.formatter.metric'}"
+                                                            unit="Cr"
+                                                            state="{= ${view>MetricVar} >= 0 ? 'Success' : 'Error' }"/>
+                                                        <ObjectNumber id="objMetricVarPct" 
+                                                            number="{path: 'view>MetricVarPct', formatter: '.formatter.percentage'}"
+                                                            unit="%"
+                                                            state="{= ${view>MetricVarPct} >= 0 ? 'Success' : 'Error' }"/>
                                                     </cells>
                                                 </ColumnListItem>
                                             </items>
                                         </Table>
                                     </IconTabFilter>
 
-                                    <IconTabFilter id="_IDGenIconTabFilter1" 
-    key="analytics" 
-    text="Analytics" 
-    icon="sap-icon://line-chart">
+                                    <!-- ✅ ENHANCED ANALYTICS TAB -->
+                                    <IconTabFilter id="_IDGenIconTabFilter1" key="analytics" text="Analytics" icon="sap-icon://line-chart">
                                         <VBox id="_IDGenVBox" class="sapUiMediumMarginTop">
                                             <items>
-                                                <HBox id="_IDGenHBox3" width="100%" height="160px" class="sapUiSmallMarginBottom">
+                                                <!-- KPI CARDS -->
+                                                <HBox id="_IDGenHBox3" width="100%" height="220px" class="sapUiSmallMarginBottom">
                                                     <items>
-                                                        <f:Card id="_IDGenCard" class="kpiCard sapUiSmallMarginEnd" width="280px">
+                                                        <!-- Total Projects KPI -->
+                                                        <f:Card id="_IDGenCard" class="kpiCard sapUiSmallMarginEnd" width="320px">
                                                             <f:content>
-                                                                <VBox id="_IDGenVBox1" height="140px" class="sapUiSmallMargin" justifyContent="Center">
+                                                                <VBox id="_IDGenVBox1" height="200px" class="sapUiSmallMargin" justifyContent="SpaceBetween">
                                                                     <items>
-                                                                        <Text id="_IDGenText11" text="TOTAL PROJECTS" class="subtleTitle"/>
-                                                                        <ObjectNumber id="_IDGenObjectNumber3" number="{view>/totalProjects}" class="bigKpiNumber" state="Success"/>
+                                                                        <VBox id="mainKpiProjects">
+                                                                            <Text id="_IDGenText11" text="TOTAL PROJECTS" class="subtleTitle"/>
+                                                                            <ObjectNumber id="_IDGenObjectNumber3" 
+                                                                                number="{view>/totalProjects}" 
+                                                                                class="bigKpiNumber" 
+                                                                                state="Success"/>
+                                                                        </VBox>
+                                                                        
+                                                                        <VBox id="deltaProjects" 
+                                                                            visible="{view>/comparisonMode}" 
+                                                                            class="deltaContainer">
+                                                                            <HBox id="deltaProjRow" alignItems="Center" class="sapUiTinyMarginBottom">
+                                                                                <core:Icon id="iconProjDelta" 
+                                                                                    src="{= ${view>/totalProjectsVar} >= 0 ? 'sap-icon://arrow-top' : 'sap-icon://arrow-bottom' }" 
+                                                                                    size="0.9rem" 
+                                                                                    color="{= ${view>/totalProjectsVar} >= 0 ? '#107e3e' : '#bb0000' }"/>
+                                                                                <Text id="txtProjDelta" 
+                                                                                    text="{view>/totalProjectsVar} ({view>/totalProjectsVarPct}%)" 
+                                                                                    class="deltaTextLarge"/>
+                                                                            </HBox>
+                                                                            <Text id="txtProjPY" 
+                                                                                text="PY ({view>/periodLabelPY}): {view>/totalProjectsPY}" 
+                                                                                class="pyTextLarge"/>
+                                                                        </VBox>
                                                                     </items>
                                                                 </VBox>
                                                             </f:content>
                                                         </f:Card>
-                                                        <f:Card id="_IDGenCard1" class="kpiCard sapUiSmallMarginEnd" width="280px">
+
+                                                        <!-- Project Cost KPI -->
+                                                        <f:Card id="_IDGenCard1" class="kpiCard sapUiSmallMarginEnd" width="320px">
                                                             <f:content>
-                                                                <VBox id="_IDGenVBox2" height="140px" class="sapUiSmallMargin" justifyContent="Center">
+                                                                <VBox id="_IDGenVBox2" height="200px" class="sapUiSmallMargin" justifyContent="SpaceBetween">
                                                                     <items>
-                                                                        <Text id="_IDGenText12" text="PROJECT COST (SUM)" class="subtleTitle"/>
-                                                                        <ObjectNumber id="_IDGenObjectNumber4" number="{view>/totalProjectCost}" unit="Cr" class="bigKpiNumber"/>
+                                                                        <VBox id="mainKpiCost">
+                                                                            <Text id="_IDGenText12" text="PROJECT COST (SUM)" class="subtleTitle"/>
+                                                                            <ObjectNumber id="_IDGenObjectNumber4" 
+                                                                                number="{path: 'view>/totalProjectCost', formatter: '.formatter.metricCompact'}" 
+                                                                                class="bigKpiNumber"/>
+                                                                        </VBox>
+                                                                        
+                                                                        <VBox id="deltaCost" 
+                                                                            visible="{view>/comparisonMode}" 
+                                                                            class="deltaContainer">
+                                                                            <Text id="txtCostPY" 
+                                                                                text="PY ({view>/periodLabelPY}): {path: 'view>/totalProjectCostPY', formatter: '.formatter.metricCompact'}" 
+                                                                                class="pyTextLarge"/>
+                                                                        </VBox>
                                                                     </items>
                                                                 </VBox>
                                                             </f:content>
                                                         </f:Card>
-                                                        <f:Card id="_IDGenCard2" class="kpiCard" width="280px">
+
+                                                        <!-- Active Metric KPI -->
+                                                        <f:Card id="_IDGenCard2" class="kpiCard" width="320px">
                                                             <f:content>
-                                                                <VBox id="_IDGenVBox3" height="140px" class="sapUiSmallMargin" justifyContent="Center">
+                                                                <VBox id="_IDGenVBox3" height="200px" class="sapUiSmallMargin" justifyContent="SpaceBetween">
                                                                     <items>
-                                                                        <Text id="_IDGenText13" text="{view>/activeMetricLabel}" class="subtleTitle"/>
-                                                                        <ObjectNumber id="_IDGenObjectNumber5" number="{view>/totalMetric}" unit="Cr" class="bigKpiNumber" state="Information"/>
+                                                                        <VBox id="mainKpiMetric">
+                                                                            <Text id="_IDGenText13" text="{view>/activeMetricLabel}" class="subtleTitle"/>
+                                                                            <ObjectNumber id="_IDGenObjectNumber5" 
+                                                                                number="{path: 'view>/totalMetric', formatter: '.formatter.metricCompact'}" 
+                                                                                class="bigKpiNumber" 
+                                                                                state="Information"/>
+                                                                        </VBox>
+                                                                        
+                                                                        <VBox id="deltaMetric" 
+                                                                            visible="{view>/comparisonMode}" 
+                                                                            class="deltaContainer">
+                                                                            <HBox id="deltaMetricRow" alignItems="Center" wrap="Wrap" class="sapUiTinyMarginBottom">
+                                                                                <core:Icon id="iconMetricDelta" 
+                                                                                    src="{= ${view>/totalMetricVar} >= 0 ? 'sap-icon://arrow-top' : 'sap-icon://arrow-bottom' }" 
+                                                                                    size="0.9rem" 
+                                                                                    color="{= ${view>/totalMetricVar} >= 0 ? '#107e3e' : '#bb0000' }"/>
+                                                                                <Text id="txtMetricDeltaAmount" 
+                                                                                    text="{path: 'view>/totalMetricVar', formatter: '.formatter.varianceWithSign'} " 
+                                                                                    class="deltaTextLarge"/>
+                                                                                <Text id="txtMetricDeltaPct" 
+                                                                                    text="({path: 'view>/totalMetricVarPct', formatter: '.formatter.percentage'}%)" 
+                                                                                    class="deltaTextLarge"/>
+                                                                            </HBox>
+                                                                            <Text id="txtMetricPY" 
+                                                                                text="PY ({view>/periodLabelPY}): {path: 'view>/totalMetricPY', formatter: '.formatter.metricCompact'}" 
+                                                                                class="pyTextLarge"/>
+                                                                        </VBox>
                                                                     </items>
                                                                 </VBox>
                                                             </f:content>
@@ -126,101 +291,329 @@
                                                     </items>
                                                 </HBox>
 
-                                                <l:Grid id="_IDGenGrid" defaultSpan="L6 M12 S12" hSpacing="1" vSpacing="1">
-                                                    <f:Card id="_IDGenCard3" class="chartCard">
-                                                        <f:header><card:Header id="_IDGenHeader" title="Contribution Trend" iconSrc="sap-icon://vertical-bar-chart"/></f:header>
+                                                <!-- ✅ ENHANCED CHARTS GRID -->
+                                                <l:Grid id="_IDGenGrid" defaultSpan="L12 M12 S12" hSpacing="1" vSpacing="1">
+                                                    
+                                                    <!-- ✅ CHART 1: Normal Mode - Top 10 Column Chart -->
+                                                    <f:Card id="_IDGenCard3" class="chartCard" visible="{= !${view>/showComparisonChart} }">
+                                                        <f:header>
+                                                            <card:Header id="_IDGenHeader" 
+                                                                title="Top 10 Contributors" 
+                                                                subtitle="Current Period Performance"
+                                                                iconSrc="sap-icon://vertical-bar-chart"/>
+                                                        </f:header>
                                                         <f:content>
-                                                            <viz:VizFrame id="devGroupChart" vizType="column" height="400px" width="100%">
+                                                            <viz:VizFrame id="devGroupChart" 
+                                                                vizType="column" 
+                                                                height="450px" 
+                                                                width="100%"
+                                                                vizProperties="{
+                                                                    plotArea: {
+                                                                        dataLabel: {
+                                                                            visible: true,
+                                                                            formatString: '#,##0.0'
+                                                                        },
+                                                                        colorPalette: ['#5899DA']
+                                                                    },
+                                                                    categoryAxis: {
+                                                                        title: {
+                                                                            visible: false
+                                                                        }
+                                                                    },
+                                                                    valueAxis: {
+                                                                        title: {
+                                                                            text: 'Amount (Cr)'
+                                                                        }
+                                                                    },
+                                                                    title: {
+                                                                        visible: false
+                                                                    }
+                                                                }">
                                                                 <viz:dataset>
-                                                                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset" data="{view>/rows}">
-                                                                        <vizData:dimensions><vizData:DimensionDefinition id="_IDGenDimensionDefinition" name="Dim" value="{view>GenericDim}"/></vizData:dimensions>
-                                                                        <vizData:measures><vizData:MeasureDefinition id="_IDGenMeasureDefinition" name="Val" value="{view>CurrentMetric}"/></vizData:measures>
+                                                                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset" data="{view>/chartData}">
+                                                                        <vizData:dimensions>
+                                                                            <vizData:DimensionDefinition id="_IDGenDimensionDefinition" 
+                                                                                name="Dimension" 
+                                                                                value="{view>Dimension}"/>
+                                                                        </vizData:dimensions>
+                                                                        <vizData:measures>
+                                                                            <vizData:MeasureDefinition id="_IDGenMeasureDefinition" 
+                                                                                name="Value" 
+                                                                                value="{view>Value}"/>
+                                                                        </vizData:measures>
                                                                     </vizData:FlattenedDataset>
                                                                 </viz:dataset>
                                                                 <viz:feeds>
-                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem1" uid="categoryAxis" type="Dimension" values="Dim"/>
-                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem2" uid="valueAxis" type="Measure" values="Val"/>
+                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem1" 
+                                                                        uid="categoryAxis" 
+                                                                        type="Dimension" 
+                                                                        values="Dimension"/>
+                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem2" 
+                                                                        uid="valueAxis" 
+                                                                        type="Measure" 
+                                                                        values="Value"/>
                                                                 </viz:feeds>
                                                             </viz:VizFrame>
                                                         </f:content>
                                                     </f:Card>
-                                                    <f:Card id="_IDGenCard4" class="chartCard">
-                                                        <f:header><card:Header id="_IDGenHeader1" title="Distribution Share" iconSrc="sap-icon://pie-chart"/></f:header>
+
+                                                    <!-- ✅ CHART 2: Normal Mode - Distribution Donut -->
+                                                    <f:Card id="_IDGenCard4" class="chartCard" visible="{= !${view>/showComparisonChart} }">
+                                                        <f:header>
+                                                            <card:Header id="_IDGenHeader1" 
+                                                                title="Distribution Share" 
+                                                                subtitle="Top 10 Contributors"
+                                                                iconSrc="sap-icon://pie-chart"/>
+                                                        </f:header>
                                                         <f:content>
-                                                            <viz:VizFrame id="shareChart" vizType="donut" height="400px" width="100%">
+                                                            <viz:VizFrame id="shareChart" 
+                                                                vizType="donut" 
+                                                                height="450px" 
+                                                                width="100%"
+                                                                vizProperties="{
+                                                                    plotArea: {
+                                                                        dataLabel: {
+                                                                            visible: true,
+                                                                            type: 'percentage'
+                                                                        }
+                                                                    },
+                                                                    legend: {
+                                                                        visible: true,
+                                                                        position: 'right'
+                                                                    },
+                                                                    title: {
+                                                                        visible: false
+                                                                    }
+                                                                }">
                                                                 <viz:dataset>
-                                                                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset1" data="{view>/rows}">
-                                                                        <vizData:dimensions><vizData:DimensionDefinition id="_IDGenDimensionDefinition1" name="Dim" value="{view>GenericDim}"/></vizData:dimensions>
-                                                                        <vizData:measures><vizData:MeasureDefinition id="_IDGenMeasureDefinition1" name="Val" value="{view>CurrentMetric}"/></vizData:measures>
+                                                                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset1" data="{view>/chartData}">
+                                                                        <vizData:dimensions>
+                                                                            <vizData:DimensionDefinition id="_IDGenDimensionDefinition1" 
+                                                                                name="Dim" 
+                                                                                value="{view>Dimension}"/>
+                                                                        </vizData:dimensions>
+                                                                        <vizData:measures>
+                                                                            <vizData:MeasureDefinition id="_IDGenMeasureDefinition1" 
+                                                                                name="Val" 
+                                                                                value="{view>Value}"/>
+                                                                        </vizData:measures>
                                                                     </vizData:FlattenedDataset>
                                                                 </viz:dataset>
                                                                 <viz:feeds>
-                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem3" uid="color" type="Dimension" values="Dim"/>
-                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem4" uid="size" type="Measure" values="Val"/>
+                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem3" 
+                                                                        uid="color" 
+                                                                        type="Dimension" 
+                                                                        values="Dim"/>
+                                                                    <vizFeeds:FeedItem id="_IDGenFeedItem4" 
+                                                                        uid="size" 
+                                                                        type="Measure" 
+                                                                        values="Val"/>
                                                                 </viz:feeds>
                                                             </viz:VizFrame>
                                                         </f:content>
                                                     </f:Card>
+
+                                                    <!-- ✅ NEW: CY vs PY Comparison Chart (Dual Column) -->
+                                                    <f:Card id="comparisonChartCard" 
+                                                        class="chartCard chartCardFullWidth" 
+                                                        visible="{view>/showComparisonChart}">
+                                                        <f:header>
+                                                            <card:Header id="comparisonChartHeader" 
+                                                                title="Top 10: Current Year vs Previous Year" 
+                                                                subtitle="Side-by-Side Comparison"
+                                                                iconSrc="sap-icon://compare"/>
+                                                        </f:header>
+                                                        <f:content>
+                                                            <viz:VizFrame id="comparisonChart" 
+                                                                vizType="dual_column" 
+                                                                height="450px" 
+                                                                width="100%"
+                                                                vizProperties="{
+                                                                    plotArea: {
+                                                                        dataLabel: {
+                                                                            visible: true,
+                                                                            formatString: '#,##0'
+                                                                        },
+                                                                        colorPalette: ['#5899DA', '#E8743B']
+                                                                    },
+                                                                    categoryAxis: {
+                                                                        title: {
+                                                                            visible: false
+                                                                        }
+                                                                    },
+                                                                    valueAxis: {
+                                                                        title: {
+                                                                            text: 'Amount (Cr)'
+                                                                        }
+                                                                    },
+                                                                    legend: {
+                                                                        visible: true,
+                                                                        position: 'bottom'
+                                                                    },
+                                                                    title: {
+                                                                        visible: false
+                                                                    }
+                                                                }">
+                                                                <viz:dataset>
+                                                                    <vizData:FlattenedDataset id="comparisonDataset" data="{view>/chartData}">
+                                                                        <vizData:dimensions>
+                                                                            <vizData:DimensionDefinition id="compDimension" 
+                                                                                name="Dimension" 
+                                                                                value="{view>Dimension}"/>
+                                                                        </vizData:dimensions>
+                                                                        <vizData:measures>
+                                                                            <vizData:MeasureDefinition id="compMeasureCY" 
+                                                                                name="Current Year" 
+                                                                                value="{view>CY}"/>
+                                                                            <vizData:MeasureDefinition id="compMeasurePY" 
+                                                                                name="Previous Year" 
+                                                                                value="{view>PY}"/>
+                                                                        </vizData:measures>
+                                                                    </vizData:FlattenedDataset>
+                                                                </viz:dataset>
+                                                                <viz:feeds>
+                                                                    <vizFeeds:FeedItem id="compFeedCategory" 
+                                                                        uid="categoryAxis" 
+                                                                        type="Dimension" 
+                                                                        values="Dimension"/>
+                                                                    <vizFeeds:FeedItem id="compFeedValue" 
+                                                                        uid="valueAxis" 
+                                                                        type="Measure" 
+                                                                        values="Current Year"/>
+                                                                    <vizFeeds:FeedItem id="compFeedValue2" 
+                                                                        uid="valueAxis2" 
+                                                                        type="Measure" 
+                                                                        values="Previous Year"/>
+                                                                </viz:feeds>
+                                                            </viz:VizFrame>
+                                                        </f:content>
+                                                    </f:Card>
+
+                                                    <!-- ✅ NEW: Waterfall Chart (Variance Breakdown) -->
+                                                    <f:Card id="waterfallCard" 
+                                                        class="chartCard chartCardFullWidth" 
+                                                        visible="{view>/showComparisonChart}">
+                                                        <f:header>
+                                                            <card:Header id="waterfallHeader" 
+                                                                title="Variance Breakdown" 
+                                                                subtitle="Top Contributors to Change (PY → CY)"
+                                                                iconSrc="sap-icon://trend-up"/>
+                                                        </f:header>
+                                                        <f:content>
+                                                            <viz:VizFrame id="waterfallChart" 
+                                                                vizType="waterfall" 
+                                                                height="450px" 
+                                                                width="100%"
+                                                                vizProperties="{
+                                                                    plotArea: {
+                                                                        dataLabel: {
+                                                                            visible: true,
+                                                                            formatString: '#,##0'
+                                                                        },
+                                                                        colorPalette: ['#5899DA', '#19A979', '#ED4A7B']
+                                                                    },
+                                                                    categoryAxis: {
+                                                                        title: {
+                                                                            visible: false
+                                                                        }
+                                                                    },
+                                                                    valueAxis: {
+                                                                        title: {
+                                                                            text: 'Variance (Cr)'
+                                                                        }
+                                                                    },
+                                                                    title: {
+                                                                        visible: false
+                                                                    }
+                                                                }">
+                                                                <viz:dataset>
+                                                                    <vizData:FlattenedDataset id="waterfallDataset" data="{view>/waterfallData}">
+                                                                        <vizData:dimensions>
+                                                                            <vizData:DimensionDefinition id="waterfallDim" 
+                                                                                name="Category" 
+                                                                                value="{view>Category}"/>
+                                                                        </vizData:dimensions>
+                                                                        <vizData:measures>
+                                                                            <vizData:MeasureDefinition id="waterfallMeasure" 
+                                                                                name="Value" 
+                                                                                value="{view>Value}"/>
+                                                                        </vizData:measures>
+                                                                    </vizData:FlattenedDataset>
+                                                                </viz:dataset>
+                                                                <viz:feeds>
+                                                                    <vizFeeds:FeedItem id="waterfallFeedCategory" 
+                                                                        uid="categoryAxis" 
+                                                                        type="Dimension" 
+                                                                        values="Category"/>
+                                                                    <vizFeeds:FeedItem id="waterfallFeedValue" 
+                                                                        uid="valueAxis" 
+                                                                        type="Measure" 
+                                                                        values="Value"/>
+                                                                </viz:feeds>
+                                                            </viz:VizFrame>
+                                                        </f:content>
+                                                    </f:Card>
+
                                                 </l:Grid>
                                             </items>
                                         </VBox>
                                     </IconTabFilter>
 
-                                   <IconTabFilter id="_IDGenIconTabFilter2" key="geo" text="Geographical" icon="sap-icon://map" visible="{view>/isGeoReport}">
-    <HBox id="_IDGenHBox4" width="100%" height="750px" alignItems="Stretch" class="sapUiMediumMarginTop">
-        <items>
-            <VBox id="_IDGenVBox4" width="65%" height="100%" class="mapContainerBox">
-                <items>
-                    <core:HTML id="_IDGenHTML" content='&lt;div id="indiaMapContainer" class="indiaMapWrapper"&gt;&lt;/div&gt;'/>
-                </items>
-            </VBox>
-            <VBox id="_IDGenVBox5" width="33%" class="sapUiSmallMarginBegin">
-                <items>
-                    <f:Card id="_IDGenCard5" class="chartCard">
-                        <f:header>
-                            <card:Header id="_IDGenHeader2" 
-                                       title="Regional Distribution" 
-                                       subtitle="Amount by Zone" 
-                                       iconSrc="sap-icon://choropleth-chart"/>
-                        </f:header>
-                        <f:content>
-                            <viz:VizFrame id="geoVizFrame" 
-                                        vizType="bar" 
-                                        width="100%" 
-                                        height="650px">
-                                <viz:dataset>
-                                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset2" data="{geoData>/items}">
-                                        <vizData:dimensions>
-                                            <vizData:DimensionDefinition id="_IDGenDimensionDefinition2" 
-                                                                        name="Zone" 
-                                                                        value="{geoData>Zone}"/>
-                                        </vizData:dimensions>
-                                        <vizData:measures>
-                                            <vizData:MeasureDefinition id="_IDGenMeasureDefinition2" 
-                                                                     name="Value" 
-                                                                     value="{geoData>Value}"/>
-                                        </vizData:measures>
-                                    </vizData:FlattenedDataset>
-                                </viz:dataset>
-                                <viz:feeds>
-                                    <vizFeeds:FeedItem id="_IDGenFeedItem5" 
-                                                     uid="valueAxis" 
-                                                     type="Measure" 
-                                                     values="Value"/>
-                                    <vizFeeds:FeedItem id="_IDGenFeedItem6" 
-                                                     uid="categoryAxis" 
-                                                     type="Dimension" 
-                                                     values="Zone"/>
-                                </viz:feeds>
-                            </viz:VizFrame>
-                        </f:content>
-                    </f:Card>
-                </items>
-            </VBox>
-        </items>
-    </HBox>
-</IconTabFilter>
-
+                                    <!-- Geographical Tab -->
+                                    <IconTabFilter id="_IDGenIconTabFilter2" key="geo" text="Geographical" icon="sap-icon://map" visible="{view>/isGeoReport}">
+                                        <HBox id="_IDGenHBox4" width="100%" height="750px" alignItems="Stretch" class="sapUiMediumMarginTop">
+                                            <items>
+                                                <VBox id="_IDGenVBox4" width="65%" height="100%" class="mapContainerBox">
+                                                    <items>
+                                                        <core:HTML id="_IDGenHTML" content='&lt;div id="indiaMapContainer" class="indiaMapWrapper"&gt;&lt;/div&gt;'/>
+                                                    </items>
+                                                </VBox>
+                                                <VBox id="_IDGenVBox5" width="33%" class="sapUiSmallMarginBegin">
+                                                    <items>
+                                                        <f:Card id="_IDGenCard5" class="chartCard">
+                                                            <f:header>
+                                                                <card:Header id="_IDGenHeader2" 
+                                                                           title="Regional Distribution" 
+                                                                           subtitle="Amount by Zone" 
+                                                                           iconSrc="sap-icon://choropleth-chart"/>
+                                                            </f:header>
+                                                            <f:content>
+                                                                <viz:VizFrame id="geoVizFrame" 
+                                                                            vizType="bar" 
+                                                                            width="100%" 
+                                                                            height="650px">
+                                                                    <viz:dataset>
+                                                                        <vizData:FlattenedDataset id="_IDGenFlattenedDataset2" data="{geoData>/items}">
+                                                                            <vizData:dimensions>
+                                                                                <vizData:DimensionDefinition id="_IDGenDimensionDefinition2" 
+                                                                                                            name="Zone" 
+                                                                                                            value="{geoData>Zone}"/>
+                                                                            </vizData:dimensions>
+                                                                            <vizData:measures>
+                                                                                <vizData:MeasureDefinition id="_IDGenMeasureDefinition2" 
+                                                                                                         name="Value" 
+                                                                                                         value="{geoData>Value}"/>
+                                                                            </vizData:measures>
+                                                                        </vizData:FlattenedDataset>
+                                                                    </viz:dataset>
+                                                                    <viz:feeds>
+                                                                        <vizFeeds:FeedItem id="_IDGenFeedItem5" 
+                                                                                         uid="valueAxis" 
+                                                                                         type="Measure" 
+                                                                                         values="Value"/>
+                                                                        <vizFeeds:FeedItem id="_IDGenFeedItem6" 
+                                                                                         uid="categoryAxis" 
+                                                                                         type="Dimension" 
+                                                                                         values="Zone"/>
+                                                                    </viz:feeds>
+                                                                </viz:VizFrame>
+                                                            </f:content>
+                                                        </f:Card>
+                                                    </items>
+                                                </VBox>
+                                            </items>
+                                        </HBox>
+                                    </IconTabFilter>
                                 </items>
                             </IconTabBar>
                         </items>

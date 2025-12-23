@@ -44,15 +44,42 @@ sap.ui.define([
             this.getView().setModel(oReportsModel, "reports");
 
             var oViewModel = new JSONModel({
-                currentReportId: "", currentReportTitle: "Select a report", sidebarCollapsed: false,
-                selectedBucketKey: "CY", selectedMetricKey: "gross",
-                periodLabelCY: "Current Year", periodLabelPY: "Previous Year",
-                periodLabelActive: "", activeMetricLabel: "",
-                totalProjects: 0, totalProjectCost: 0, totalMetric: 0,
-                rows: [], col1Header: "Dimension", col2Header: "Sub-Dimension", col3Header: "Details", showCol3: false
+                currentReportId: "",
+                currentReportTitle: "Select a report",
+                sidebarCollapsed: false,
+                selectedBucketKey: "CY",
+                selectedMetricKey: "gross",
+                periodLabelCY: "Current Year",
+                periodLabelPY: "Previous Year",
+                periodLabelActive: "",
+                activeMetricLabel: "",
+                totalProjects: 0,
+                totalProjectCost: 0,
+                totalMetric: 0,
+                rows: [],
+                col1Header: "Dimension",
+                col2Header: "Sub-Dimension",
+                col3Header: "Details",
+                showCol3: false,
+
+                // Comparison Mode Properties
+                comparisonMode: false,
+                showComparisonColumns: false,
+                totalProjectsPY: 0,
+                totalProjectCostPY: 0,
+                totalMetricPY: 0,
+                totalProjectsVar: 0,
+                totalProjectsVarPct: 0,
+                totalMetricVar: 0,
+                totalMetricVarPct: 0,
+
+                // ✅ NEW: Enhanced period display for comparison
+                periodDisplayText: "", // Full formatted period text
+                showComparisonPeriod: false // Show "Comparing with:" text
             });
             this.getView().setModel(oViewModel, "view");
         },
+
 
         onToggleSidebar: function () {
             var oVM = this.getView().getModel("view");
@@ -65,7 +92,7 @@ sap.ui.define([
             }
         },
 
-        _repaintMap: function() {
+        _repaintMap: function () {
             var aRows = this.getView().getModel("view").getProperty("/rows");
             if (this.getView().getModel("view").getProperty("/currentReportId") === "GEO_REPORT") {
                 setTimeout(function () { this._renderGeoMap(aRows); }.bind(this), 300);
@@ -77,39 +104,165 @@ sap.ui.define([
             this._loadReport(sId);
         },
 
-        onBucketToggle: function () { this._refreshData(); },
+       onBucketToggle: function (oEvent) {
+            var oViewModel = this.getView().getModel("view");
+            var bComparisonMode = oViewModel.getProperty("/comparisonMode");
+
+            // ✅ NEW: If comparison mode is ON, prevent switching (keep CY)
+            if (bComparisonMode) {x
+                oEvent.getSource().setSelectedKey("CY");
+                sap.m.MessageToast.show("Period is locked to Current Year in comparison mode");
+                return;
+            }
+
+            // Update period display
+            this._updatePeriodDisplay();
+
+            this._refreshData();
+        }
+        ,
         onMetricToggle: function () { this._refreshData(); },
+
+        onComparisonToggle: function (oEvent) {
+            var bComparisonMode = oEvent.getParameter("pressed");
+            var oViewModel = this.getView().getModel("view");
+
+            oViewModel.setProperty("/comparisonMode", bComparisonMode);
+            oViewModel.setProperty("/showComparisonColumns", bComparisonMode);
+
+            // NEW: When comparison mode is ON, lock to CY
+            if (bComparisonMode) {
+                oViewModel.setProperty("/selectedBucketKey", "CY");
+            }
+
+            // Update period display
+            this._updatePeriodDisplay();
+
+            this._refreshData();
+        },
+
 
         _refreshData: function () {
             var sId = this.getView().getModel("view").getProperty("/currentReportId");
             if (sId) this._loadReport(sId);
         },
 
-        _loadReport: function (sId) {
-            var oCfg = this._oReportConfig[sId] || {};
-            var oViewModel = this.getView().getModel("view");
+// ✅ NEW: Prepare data for comparison charts
+_prepareComparisonChartData: function(aRows) {
+    var oViewModel = this.getView().getModel("view");
+    var bComparisonMode = oViewModel.getProperty("/comparisonMode");
+    var sMetricKey = oViewModel.getProperty("/selectedMetricKey");
+    
+    if (!bComparisonMode) {
+        // Normal mode: Show top 10 by CY metric
+        var aTopRows = aRows
+            .sort((a, b) => b.MetricCY - a.MetricCY)
+            .slice(0, 10);
+        
+        var aChartData = aTopRows.map(r => ({
+            Dimension: r.GenericDim,
+            Value: r.MetricCY,
+            Projects: r.ProjectsCY
+        }));
+        
+        oViewModel.setProperty("/chartData", aChartData);
+        oViewModel.setProperty("/showComparisonChart", false);
+        
+    } else {
+        // Comparison mode: Show CY vs PY for top 10
+        var aTopRows = aRows
+            .sort((a, b) => b.MetricCY - a.MetricCY)
+            .slice(0, 10);
+        
+        var aComparisonData = aTopRows.map(r => ({
+            Dimension: r.GenericDim,
+            CY: r.MetricCY,
+            PY: r.MetricPY,
+            Variance: r.MetricVar,
+            VariancePct: r.MetricVarPct,
+            ProjectsCY: r.ProjectsCY,
+            ProjectsPY: r.ProjectsPY
+        }));
+        
+        oViewModel.setProperty("/chartData", aComparisonData);
+        oViewModel.setProperty("/showComparisonChart", true);
+    }
+},
 
-            oViewModel.setProperty("/currentReportId", sId);
-            oViewModel.setProperty("/currentReportTitle", oCfg.title || sId);
-            oViewModel.setProperty("/isGeoReport", sId === "GEO_REPORT");
+// ✅ NEW: Prepare waterfall chart data (variance breakdown)
+_prepareWaterfallData: function(aRows) {
+    var oViewModel = this.getView().getModel("view");
+    
+    // Get top 5 positive and top 5 negative variances
+    var aPositive = aRows
+        .filter(r => r.MetricVar > 0)
+        .sort((a, b) => b.MetricVar - a.MetricVar)
+        .slice(0, 5);
+    
+    var aNegative = aRows
+        .filter(r => r.MetricVar < 0)
+        .sort((a, b) => a.MetricVar - b.MetricVar)
+        .slice(0, 5);
+    
+    var aWaterfallData = [
+        { Category: "PY Total", Value: oViewModel.getProperty("/totalMetricPY"), Type: "Total" }
+    ];
+    
+    aPositive.forEach(r => {
+        aWaterfallData.push({
+            Category: r.GenericDim + " ▲",
+            Value: r.MetricVar,
+            Type: "Increase"
+        });
+    });
+    
+    aNegative.forEach(r => {
+        aWaterfallData.push({
+            Category: r.GenericDim + " ▼",
+            Value: Math.abs(r.MetricVar),
+            Type: "Decrease"
+        });
+    });
+    
+    aWaterfallData.push({
+        Category: "CY Total",
+        Value: oViewModel.getProperty("/totalMetric"),
+        Type: "Total"
+    });
+    
+    oViewModel.setProperty("/waterfallData", aWaterfallData);
+},
 
-            if (oCfg.buckets) {
-                oViewModel.setProperty("/periodLabelCY", oCfg.buckets.CY?.label || "Current Year");
-                oViewModel.setProperty("/periodLabelPY", oCfg.buckets.PY?.label || "Previous Year");
-            }
+    _loadReport: function (sId) {
+    var oCfg = this._oReportConfig[sId] || {};
+    var oViewModel = this.getView().getModel("view");
 
-            oViewModel.setProperty("/col1Header", oCfg.columns?.col1Header || "Dimension");
-            oViewModel.setProperty("/col2Header", oCfg.columns?.col2Header || "Sub-Dimension");
-            oViewModel.setProperty("/col3Header", oCfg.columns?.col3Header || "Details");
-            oViewModel.setProperty("/showCol3", !!oCfg.columns?.col3Header);
+    oViewModel.setProperty("/currentReportId", sId);
+    oViewModel.setProperty("/currentReportTitle", oCfg.title || sId);
+    oViewModel.setProperty("/isGeoReport", sId === "GEO_REPORT");
 
-            this._applyMeasureLabel(oCfg, oViewModel);
-            var aRows = this._loadDummyData(sId, oCfg);
+    if (oCfg.buckets) {
+        oViewModel.setProperty("/periodLabelCY", oCfg.buckets.CY?.label || "Current Year");
+        oViewModel.setProperty("/periodLabelPY", oCfg.buckets.PY?.label || "Previous Year");
+    }
 
-            if (sId === "GEO_REPORT") {
-                this._repaintMap();
-            }
-        },
+    oViewModel.setProperty("/col1Header", oCfg.columns?.col1Header || "Dimension");
+    oViewModel.setProperty("/col2Header", oCfg.columns?.col2Header || "Sub-Dimension");
+    oViewModel.setProperty("/col3Header", oCfg.columns?.col3Header || "Details");
+    oViewModel.setProperty("/showCol3", !!oCfg.columns?.col3Header);
+
+    this._applyMeasureLabel(oCfg, oViewModel);
+    
+    //  NEW: Update period display after loading config
+    this._updatePeriodDisplay();
+    
+    var aRows = this._loadDummyData(sId, oCfg);
+
+    if (sId === "GEO_REPORT") {
+        this._repaintMap();
+    }
+},
+
 
         _loadDummyData: function (sReportId, oCfg) {
             var oViewModel = this.getView().getModel("view");
@@ -125,47 +278,147 @@ sap.ui.define([
             var sField3 = oCfg.fields?.col3 || "";
             var sBucketKey = oViewModel.getProperty("/selectedBucketKey");
             var sMetricKey = oViewModel.getProperty("/selectedMetricKey");
-            var oBucketCfg = oCfg.buckets ? oCfg.buckets[sBucketKey] : null;
+            var bComparisonMode = oViewModel.getProperty("/comparisonMode");
 
-            if (oBucketCfg) {
+            var oBucketCY = oCfg.buckets ? oCfg.buckets.CY : null;
+            var oBucketPY = oCfg.buckets ? oCfg.buckets.PY : null;
+            var oBucketActive = oCfg.buckets ? oCfg.buckets[sBucketKey] : null;
+
+            if (oBucketActive) {
                 aRows.forEach(function (r) {
                     r.DisplayCol1 = r[sField1] || r.Sector || r.SectorName || r.StateName || "Unknown";
                     r.DisplayCol2 = r[sField2] || r.SubSectorName || r.Scheme || "-";
                     r.BorrowerGroupName = r[sField3] || r.BorrowerGroupName || "";
-                    
-                    // FIXED: GenericDim ensures charts show Entities (Groups/Sectors) instead of just one bar
                     r.GenericDim = (sReportId === "DEV_GROUP") ? r.BorrowerGroupName : r.DisplayCol1;
 
-                    r.ProjectsCY = Number(r[oBucketCfg.noProj] || 0);
-                    r.ProjectCostCY = Number(r[oBucketCfg.projCost] || 0);
-                    r.CurrentMetric = Number(r[oBucketCfg[sMetricKey]] || 0);
+                    // ✅ UPDATED: Load both CY and PY data always (for comparison)
+                    if (oBucketCY) {
+                        r.ProjectsCY = Number(r[oBucketCY.noProj] || 0);
+                        r.ProjectCostCY = Number(r[oBucketCY.projCost] || 0);
+                        r.MetricCY = Number(r[oBucketCY[sMetricKey]] || 0);
+                    }
+
+                    if (oBucketPY) {
+                        r.ProjectsPY = Number(r[oBucketPY.noProj] || 0);
+                        r.ProjectCostPY = Number(r[oBucketPY.projCost] || 0);
+                        r.MetricPY = Number(r[oBucketPY[sMetricKey]] || 0);
+                    }
+
+                    // ✅ NEW: Calculate variance for each row
+                    r.ProjectsVar = r.ProjectsCY - r.ProjectsPY;
+                    r.MetricVar = r.MetricCY - r.MetricPY;
+                    r.ProjectsVarPct = r.ProjectsPY !== 0 ? ((r.ProjectsVar / r.ProjectsPY) * 100) : 0;
+                    r.MetricVarPct = r.MetricPY !== 0 ? ((r.MetricVar / r.MetricPY) * 100) : 0;
+
+                    // Set CurrentMetric based on selected bucket
+                    r.CurrentMetric = (sBucketKey === "CY") ? r.MetricCY : r.MetricPY;
                 });
             }
 
             oViewModel.setProperty("/rows", []);
             oViewModel.setProperty("/rows", aRows);
-            this._calculateKPIs(aRows);
+            this._calculateKPIs(aRows, bComparisonMode);
+            this._prepareComparisonChartData(aRows);
+    
+    if (bComparisonMode) {
+        this._prepareWaterfallData(aRows);
+    }
             return aRows;
+      
+      
         },
 
-        _calculateKPIs: function (aRows) {
-            var iProj = 0, fCost = 0, fMetric = 0;
-            aRows.forEach(r => { 
-                iProj += r.ProjectsCY; 
-                fCost += r.ProjectCostCY; 
-                fMetric += r.CurrentMetric; 
+        _updatePeriodDisplay: function() {
+    var oViewModel = this.getView().getModel("view");
+    var sBucketKey = oViewModel.getProperty("/selectedBucketKey");
+    var bComparisonMode = oViewModel.getProperty("/comparisonMode");
+    var sPeriodCY = oViewModel.getProperty("/periodLabelCY");
+    var sPeriodPY = oViewModel.getProperty("/periodLabelPY");
+    
+    var sPeriodText = "";
+    var bShowComparison = false;
+    
+    if (bComparisonMode) {
+        // ✅ Comparison Mode: Show "CY | Comparing with: PY"
+        sPeriodText = sPeriodCY;
+        bShowComparison = true;
+    } else {
+        // Normal Mode: Show selected period
+        sPeriodText = (sBucketKey === "CY") ? sPeriodCY : sPeriodPY;
+        bShowComparison = false;
+    }
+    
+    oViewModel.setProperty("/periodDisplayText", sPeriodText);
+    oViewModel.setProperty("/periodLabelActive", sPeriodText);
+    oViewModel.setProperty("/showComparisonPeriod", bShowComparison);
+},
+
+        _calculateKPIs: function (aRows, bComparisonMode) {
+            var iProjCY = 0, fCostCY = 0, fMetricCY = 0;
+            var iProjPY = 0, fCostPY = 0, fMetricPY = 0;
+
+            aRows.forEach(r => {
+                iProjCY += r.ProjectsCY || 0;
+                fCostCY += r.ProjectCostCY || 0;
+                fMetricCY += r.MetricCY || 0;
+
+                if (bComparisonMode) {
+                    iProjPY += r.ProjectsPY || 0;
+                    fCostPY += r.ProjectCostPY || 0;
+                    fMetricPY += r.MetricPY || 0;
+                }
             });
+
             var oVM = this.getView().getModel("view");
-            oVM.setProperty("/totalProjects", iProj);
-            oVM.setProperty("/totalProjectCost", fCost.toFixed(2));
-            oVM.setProperty("/totalMetric", fMetric.toFixed(2));
+
+            // CY Totals
+            oVM.setProperty("/totalProjects", iProjCY);
+            oVM.setProperty("/totalProjectCost", fCostCY.toFixed(2));
+            oVM.setProperty("/totalMetric", fMetricCY.toFixed(2));
+
+            // PY Totals and Variances
+            if (bComparisonMode) {
+                oVM.setProperty("/totalProjectsPY", iProjPY);
+                oVM.setProperty("/totalProjectCostPY", fCostPY.toFixed(2));
+                oVM.setProperty("/totalMetricPY", fMetricPY.toFixed(2));
+
+                var iVarProj = iProjCY - iProjPY;
+                var fVarMetric = fMetricCY - fMetricPY;
+
+                // ✅ FIXED: Safe percentage calculation with fallback
+                var fVarPctProj = 0;
+                var fVarPctMetric = 0;
+
+                if (iProjPY > 0) {
+                    fVarPctProj = ((iVarProj / iProjPY) * 100);
+                } else if (iVarProj !== 0) {
+                    fVarPctProj = iVarProj > 0 ? 999.9 : -99.9; // Show as max/min
+                }
+
+                if (fMetricPY > 0) {
+                    fVarPctMetric = ((fVarMetric / fMetricPY) * 100);
+                } else if (fVarMetric !== 0) {
+                    fVarPctMetric = fVarMetric > 0 ? 999.9 : -99.9; // Show as max/min
+                }
+
+                oVM.setProperty("/totalProjectsVar", iVarProj);
+                oVM.setProperty("/totalProjectsVarPct", fVarPctProj.toFixed(2));
+                oVM.setProperty("/totalMetricVar", fVarMetric.toFixed(2));
+                oVM.setProperty("/totalMetricVarPct", fVarPctMetric.toFixed(2));
+            }
         },
+
 
         _applyMeasureLabel: function (oCfg, oViewModel) {
             var sMetricKey = oViewModel.getProperty("/selectedMetricKey");
             var sBucketKey = oViewModel.getProperty("/selectedBucketKey");
-            var mLabels = { "gross": "Gross Sanction", "disb": "Disbursement", "net": "Net Sanction", "os": "Principal O/S" };
-            
+            var mLabels = {
+                "gross": "Gross Sanction",
+                "disb": "Disbursement",
+                "net": "Net Sanction",
+                "os": "Principal O/S"
+            };
+
             var sActiveMetric = mLabels[sMetricKey] || "Amount";
             var sActivePeriod = oCfg.buckets ? (oCfg.buckets[sBucketKey]?.label || "Period") : "Period";
 
@@ -194,7 +447,7 @@ sap.ui.define([
             });
 
             var fMaxVal = Math.max.apply(Math, Object.values(mDataById).map(o => o.val).concat([1]));
-            
+
             oContainer.querySelectorAll("path").forEach(path => {
                 var sId = path.getAttribute("id");
                 var oInfo = mDataById[sId];
@@ -208,7 +461,8 @@ sap.ui.define([
                     path.onmousemove = e => {
                         oTooltip.innerHTML = `<div class='tooltip-header'>${that._mapConfig[sId]}</div><div class='tooltip-row'><span>Amount:</span> <strong>${oInfo.val.toFixed(2)} Cr</strong></div><div class='tooltip-row'><span>Projects:</span> <strong>${oInfo.count}</strong></div>`;
                         oTooltip.style.display = "block";
-                        oTooltip.style.left = (e.pageX + 20) + "px"; oTooltip.style.top = (e.pageY + 20) + "px";
+                        oTooltip.style.left = (e.pageX + 20) + "px";
+                        oTooltip.style.top = (e.pageY + 20) + "px";
                     };
                     path.onmouseout = () => oTooltip.style.display = "none";
                     path.onclick = e => that._showStateDetails(e, that._mapConfig[sId], oInfo);
@@ -235,13 +489,19 @@ sap.ui.define([
         },
 
         _normalizeStateName: function (sName) {
-            var mMap = { "Orissa": "Odisha", "Andra Pradesh": "Andhra Pradesh", "Telengana": "Telangana", "Jammu & Kashmir": "Jammu and Kashmir" };
+            var mMap = {
+                "Orissa": "Odisha",
+                "Andra Pradesh": "Andhra Pradesh",
+                "Telengana": "Telangana",
+                "Jammu & Kashmir": "Jammu and Kashmir"
+            };
             return sName ? (mMap[sName.trim()] || sName.trim()) : "";
         },
 
-        _createTooltip: function() {
+        _createTooltip: function () {
             var oT = document.createElement("div");
-            oT.id = "mapTooltip"; oT.className = "map-tooltip";
+            oT.id = "mapTooltip";
+            oT.className = "map-tooltip";
             document.body.appendChild(oT);
             return oT;
         },
@@ -250,19 +510,30 @@ sap.ui.define([
             if (!this._oPopover) {
                 this._oPopover = new Popover({
                     title: "State Details",
-                    content: [new VBox({ class: "sapUiSmallMargin", items: [
-                        new Title({ text: "{pop>/name}", level: "H3" }),
-                        new ObjectStatus({ title: "Total Amount", text: "{pop>/val} Cr", state: "Success" }),
-                        new ObjectAttribute({ title: "Project Count", text: "{pop>/count}" }),
-                        new ObjectAttribute({ title: "Primary Scheme", text: "{pop>/scheme}" })
-                    ]})]
+                    content: [new VBox({
+                        class: "sapUiSmallMargin",
+                        items: [
+                            new Title({ text: "{pop>/name}", level: "H3" }),
+                            new ObjectStatus({ title: "Total Amount", text: "{pop>/val} Cr", state: "Success" }),
+                            new ObjectAttribute({ title: "Project Count", text: "{pop>/count}" }),
+                            new ObjectAttribute({ title: "Primary Scheme", text: "{pop>/scheme}" })
+                        ]
+                    })]
                 });
                 this.getView().addDependent(this._oPopover);
             }
-            this._oPopover.setModel(new JSONModel({ name: sName, val: oInfo.val.toFixed(2), count: oInfo.count, scheme: oInfo.row.DisplayCol2 || "N/A" }), "pop");
+            this._oPopover.setModel(new JSONModel({
+                name: sName,
+                val: oInfo.val.toFixed(2),
+                count: oInfo.count,
+                scheme: oInfo.row.DisplayCol2 || "N/A"
+            }), "pop");
             this._oPopover.openBy(this.byId("_IDGenHTML"));
         },
-        _getIndiaSVGFull: function() {
+
+
+
+        _getIndiaSVGFull: function () {
             // I've extracted ALL 36 paths from your index.php for you
             return `
             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 758" shape-rendering="geometricPrecision" preserveAspectRatio="xMidYMid meet" 
