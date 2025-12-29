@@ -264,70 +264,98 @@ _prepareWaterfallData: function(aRows) {
 },
 
 
-        _loadDummyData: function (sReportId, oCfg) {
-            var oViewModel = this.getView().getModel("view");
-            var aRows = [];
-            if (oCfg && oCfg.dataFile) {
-                var oJson = new JSONModel();
-                oJson.loadData(oCfg.dataFile, null, false);
-                aRows = oJson.getProperty("/rows") || [];
-            }
-
-            var sField1 = oCfg.fields?.col1 || "";
-            var sField2 = oCfg.fields?.col2 || "";
-            var sField3 = oCfg.fields?.col3 || "";
-            var sBucketKey = oViewModel.getProperty("/selectedBucketKey");
-            var sMetricKey = oViewModel.getProperty("/selectedMetricKey");
-            var bComparisonMode = oViewModel.getProperty("/comparisonMode");
-
-            var oBucketCY = oCfg.buckets ? oCfg.buckets.CY : null;
-            var oBucketPY = oCfg.buckets ? oCfg.buckets.PY : null;
-            var oBucketActive = oCfg.buckets ? oCfg.buckets[sBucketKey] : null;
-
-            if (oBucketActive) {
-                aRows.forEach(function (r) {
-                    r.DisplayCol1 = r[sField1] || r.Sector || r.SectorName || r.StateName || "Unknown";
-                    r.DisplayCol2 = r[sField2] || r.SubSectorName || r.Scheme || "-";
-                    r.BorrowerGroupName = r[sField3] || r.BorrowerGroupName || "";
-                    r.GenericDim = (sReportId === "DEV_GROUP") ? r.BorrowerGroupName : r.DisplayCol1;
-
-                    // ✅ UPDATED: Load both CY and PY data always (for comparison)
-                    if (oBucketCY) {
-                        r.ProjectsCY = Number(r[oBucketCY.noProj] || 0);
-                        r.ProjectCostCY = Number(r[oBucketCY.projCost] || 0);
-                        r.MetricCY = Number(r[oBucketCY[sMetricKey]] || 0);
-                    }
-
-                    if (oBucketPY) {
-                        r.ProjectsPY = Number(r[oBucketPY.noProj] || 0);
-                        r.ProjectCostPY = Number(r[oBucketPY.projCost] || 0);
-                        r.MetricPY = Number(r[oBucketPY[sMetricKey]] || 0);
-                    }
-
-                    // ✅ NEW: Calculate variance for each row
-                    r.ProjectsVar = r.ProjectsCY - r.ProjectsPY;
-                    r.MetricVar = r.MetricCY - r.MetricPY;
-                    r.ProjectsVarPct = r.ProjectsPY !== 0 ? ((r.ProjectsVar / r.ProjectsPY) * 100) : 0;
-                    r.MetricVarPct = r.MetricPY !== 0 ? ((r.MetricVar / r.MetricPY) * 100) : 0;
-
-                    // Set CurrentMetric based on selected bucket
-                    r.CurrentMetric = (sBucketKey === "CY") ? r.MetricCY : r.MetricPY;
-                });
-            }
-
-            oViewModel.setProperty("/rows", []);
-            oViewModel.setProperty("/rows", aRows);
-            this._calculateKPIs(aRows, bComparisonMode);
-            this._prepareComparisonChartData(aRows);
+       _loadDummyData: function (sReportId, oCfg) {
+    var oViewModel = this.getView().getModel("view");
+    var aRows = [];
     
+    // 1. Load data from file
+    if (oCfg && oCfg.dataFile) {
+        var oJson = new JSONModel();
+        oJson.loadData(oCfg.dataFile, null, false);
+        aRows = oJson.getProperty("/rows") || [];
+    }
+
+    // 2. Get configuration keys
+    var sField1 = oCfg.fields?.col1 || "";
+    var sField2 = oCfg.fields?.col2 || "";
+    var sField3 = oCfg.fields?.col3 || "";
+    var sBucketKey = oViewModel.getProperty("/selectedBucketKey");
+    var sMetricKey = oViewModel.getProperty("/selectedMetricKey");
+    var bComparisonMode = oViewModel.getProperty("/comparisonMode");
+
+    var oBucketCY = oCfg.buckets ? oCfg.buckets.CY : null;
+    var oBucketPY = oCfg.buckets ? oCfg.buckets.PY : null;
+    var oBucketActive = oCfg.buckets ? oCfg.buckets[sBucketKey] : null;
+
+    // ✅ FIX: Define Multiplier for 1 Crore
+    var fCr = 10000000;
+
+    if (oBucketActive) {
+        aRows.forEach(function (r) {
+            // Map Dimension Columns
+            r.DisplayCol1 = r[sField1] || r.Sector || r.SectorName || r.StateName || "Unknown";
+            r.DisplayCol2 = r[sField2] || r.SubSectorName || r.Scheme || "-";
+            r.BorrowerGroupName = r[sField3] || r.BorrowerGroupName || "";
+            r.GenericDim = (sReportId === "DEV_GROUP") ? r.BorrowerGroupName : r.DisplayCol1;
+
+            // --- CY DATA PROCESSING ---
+            if (oBucketCY) {
+                r.ProjectsCY = Number(r[oBucketCY.noProj] || 0);
+
+                // ✅ FIX 1: Convert Project Cost from Crores to Raw Rupees
+                r.ProjectCostCY = Number(r[oBucketCY.projCost] || 0) * fCr;
+
+                // ✅ FIX 2: Handle Metric Scaling
+                // If metric is O/S ('os'), use raw value. For others (Disb, Sanction), multiply by Cr.
+                var rawMetricCY = Number(r[oBucketCY[sMetricKey]] || 0);
+                if (sMetricKey === 'os') {
+                    r.MetricCY = rawMetricCY; 
+                } else {
+                    r.MetricCY = rawMetricCY * fCr;
+                }
+            }
+
+            // --- PY DATA PROCESSING ---
+            if (oBucketPY) {
+                r.ProjectsPY = Number(r[oBucketPY.noProj] || 0);
+
+                // ✅ FIX 3: Apply same logic to Previous Year
+                r.ProjectCostPY = Number(r[oBucketPY.projCost] || 0) * fCr;
+
+                var rawMetricPY = Number(r[oBucketPY[sMetricKey]] || 0);
+                if (sMetricKey === 'os') {
+                    r.MetricPY = rawMetricPY;
+                } else {
+                    r.MetricPY = rawMetricPY * fCr;
+                }
+            }
+
+            // Calculate Variances
+            r.ProjectsVar = r.ProjectsCY - r.ProjectsPY;
+            r.MetricVar = r.MetricCY - r.MetricPY;
+            
+            // Calculate Percentages (Safe division)
+            r.ProjectsVarPct = r.ProjectsPY !== 0 ? ((r.ProjectsVar / r.ProjectsPY) * 100) : 0;
+            r.MetricVarPct = r.MetricPY !== 0 ? ((r.MetricVar / r.MetricPY) * 100) : 0;
+
+            // Set CurrentMetric for map/charts
+            r.CurrentMetric = (sBucketKey === "CY") ? r.MetricCY : r.MetricPY;
+        });
+    }
+
+    oViewModel.setProperty("/rows", []);
+    oViewModel.setProperty("/rows", aRows);
+    
+    // Update dependent components
+    this._calculateKPIs(aRows, bComparisonMode);
+    this._prepareComparisonChartData(aRows);
+
     if (bComparisonMode) {
         this._prepareWaterfallData(aRows);
     }
-            return aRows;
-      
-      
-        },
-
+    
+    return aRows;
+},
         _updatePeriodDisplay: function() {
     var oViewModel = this.getView().getModel("view");
     var sBucketKey = oViewModel.getProperty("/selectedBucketKey");
@@ -373,8 +401,8 @@ _prepareWaterfallData: function(aRows) {
 
             // CY Totals
             oVM.setProperty("/totalProjects", iProjCY);
-            oVM.setProperty("/totalProjectCost", fCostCY.toFixed(2));
-            oVM.setProperty("/totalMetric", fMetricCY.toFixed(2));
+            oVM.setProperty("/totalProjectCost", fCostCY);
+            oVM.setProperty("/totalMetric", fMetricCY);
 
             // PY Totals and Variances
             if (bComparisonMode) {
