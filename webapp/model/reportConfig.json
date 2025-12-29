@@ -25,13 +25,13 @@
       },
       "PY": {
         "label": "01.04.2024 - 31.03.2025",
-        "noProj": "ProjectsCY",
-        "projCost": "ProjectCostCY",
-        "disb": "DisbursementCY",
-        "gross": "GrossSanctionCY",
-        "net": "NetSanctionCY",
-        "os": "PrincipalOsCY",
-        "cost": "ProjectCostCY"
+        "noProj": "ProjectsPY",
+        "projCost": "ProjectCostPY",
+        "disb": "DisbursementPY",
+        "gross": "GrossSanctionPY",
+        "net": "NetSanctionPY",
+        "os": "PrincipalOsPY",
+        "cost": "ProjectCostPY"
       }
     }
   },
@@ -61,13 +61,13 @@
       },
       "PY": {
         "label": "01.04.2024 - 31.03.2025",
-        "noProj": "ProjectsCY",
-        "projCost": "ProjectCostCY",
-        "disb": "DisbursementCY",
-        "gross": "GrossSanctionCY",
-        "net": "NetSanctionCY",
-        "os": "PrincipalOsCY",
-        "cost": "ProjectCostCY"
+        "noProj": "ProjectsPY",
+        "projCost": "ProjectCostPY",
+        "disb": "DisbursementPY",
+        "gross": "GrossSanctionPY",
+        "net": "NetSanctionPY",
+        "os": "PrincipalOsPY",
+        "cost": "ProjectCostPY"
       }
     }
   },
@@ -98,13 +98,13 @@
       },
       "PY": {
         "label": "01.04.2024 - 31.03.2025",
-        "noProj": "ProjectsCY",
-        "projCost": "ProjectCostCY",
-        "disb": "DisbursementCY",
-        "gross": "GrossSanctionCY",
-        "net": "NetSanctionCY",
-        "os": "PrincipalOsCY",
-        "cost": "ProjectCostCY"
+        "noProj": "ProjectsPY",
+        "projCost": "ProjectCostPY",
+        "disb": "DisbursementPY",
+        "gross": "GrossSanctionPY",
+        "net": "NetSanctionPY",
+        "os": "PrincipalOsPY",
+        "cost": "ProjectCostPY"
       }
     }
   }
