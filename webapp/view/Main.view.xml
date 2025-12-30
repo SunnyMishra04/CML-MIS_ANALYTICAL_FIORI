@@ -75,6 +75,12 @@
                                     pressed="{view>/comparisonMode}"
                                     press=".onComparisonToggle"
                                     type="Emphasized"/>
+
+                                    <Button id="btnExport"
+    icon="sap-icon://excel-attachment"
+    tooltip="Export to Excel"
+    press=".onExport"
+    type="Transparent"/>
                             </OverflowToolbar>
 
                             <!-- INFO STRIP -->
@@ -150,6 +156,7 @@
                                                 <Column id="_IDGenColumn4" hAlign="End"><Text id="_IDGenText7" text="Cost (CY)"/></Column>
                                                 <Column id="_IDGenColumn5" hAlign="End"><Text id="_IDGenText8" text="{view>/activeMetricLabel} (CY)"/></Column>
                                                 <Column id="_IDGenColumn6" hAlign="End" visible="{view>/comparisonMode}"><Text id="_IDGenText9" text="Projects (PY)"/></Column>
+                                                <Column id="colProjectCostPY" hAlign="End" visible="{view>/comparisonMode}"><Text id="txtProjectCostPY" text="Cost (PY)"/></Column>
                                                 <Column id="_IDGenColumn7" hAlign="End" visible="{view>/comparisonMode}"><Text id="_IDGenText10" text="{view>/activeMetricLabel} (PY)"/></Column>
                                                 <Column id="_IDGenColumn8" hAlign="End" visible="{view>/comparisonMode}"><Text id="_IDGenText14" text="Proj. Var"/></Column>
                                                 <Column id="_IDGenColumn9" hAlign="End" visible="{view>/comparisonMode}"><Text id="_IDGenText15" text="Metric Var"/></Column>
@@ -165,6 +172,7 @@
                                                         <ObjectNumber id="_IDGenObjectNumber1" number="{path: 'view>ProjectCostCY', formatter: '.formatter.metric'}" unit="Cr"/>
                                                         <ObjectNumber id="_IDGenObjectNumber2" number="{path: 'view>MetricCY', formatter: '.formatter.metric'}" unit="Cr" state="Information"/>
                                                         <ObjectNumber id="_IDGenObjectNumber6" number="{view>ProjectsPY}"/>
+                                                        <ObjectNumber id="objProjectCostPY" number="{path: 'view>ProjectCostPY', formatter: '.formatter.metric'}" unit="Cr"/>
                                                         <ObjectNumber id="_IDGenObjectNumber7" number="{path: 'view>MetricPY', formatter: '.formatter.metric'}" unit="Cr"/>
                                                         <ObjectNumber id="_IDGenObjectNumber8" number="{view>ProjectsVar}" state="{view>ProjectsVarState}"/>
                                                         <ObjectNumber id="_IDGenObjectNumber9" number="{path: 'view>MetricVar', formatter: '.formatter.metric'}" state="{view>MetricVarState}"/>

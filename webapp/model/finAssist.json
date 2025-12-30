@@ -1,0 +1,70 @@
+{
+  "rows": [
+    {
+      "Struct.": "Direct Financial Assistance to Infrastructure Projects",
+      "No of Project(01.04.2025 -30.11.2025)": 13,
+      "Project Cost(01.04.2025 -30.11.2025)": 500.00,
+      "Gross Sanction(01.04.2025 -30.11.2025)": 797.00,
+      "Disbursement(01.04.2025 -30.11.2025)": 500.00,
+      "No of Project(01.04.2024 -31.03.2025)": 141,
+      "Project Cost(01.04.2024 -31.03.2025)": 48153.18,
+      "Gross Sanction(01.04.2024 -31.03.2025)": 48378.62,
+      "Disbursement(01.04.2024 -31.03.2025)": 10436.91
+    },
+    {
+      "Struct.": "Under Construction Infra Projects",
+      "No of Project(01.04.2025 -30.11.2025)": 8,
+      "Project Cost(01.04.2025 -30.11.2025)": 500.00,
+      "Gross Sanction(01.04.2025 -30.11.2025)": 328.25,
+      "Disbursement(01.04.2025 -30.11.2025)": 500.00,
+      "No of Project(01.04.2024 -31.03.2025)": 107,
+      "Project Cost(01.04.2024 -31.03.2025)": 33230.49,
+      "Gross Sanction(01.04.2024 -31.03.2025)": 41116.54,
+      "Disbursement(01.04.2024 -31.03.2025)": 7150.87
+    },
+    {
+      "Struct.": "Revenue Earning Infra Projects",
+      "No of Project(01.04.2025 -30.11.2025)": 5,
+      "Project Cost(01.04.2025 -30.11.2025)": 0.00,
+      "Gross Sanction(01.04.2025 -30.11.2025)": 468.74,
+      "Disbursement(01.04.2025 -30.11.2025)": 0.00,
+      "No of Project(01.04.2024 -31.03.2025)": 30,
+      "Project Cost(01.04.2024 -31.03.2025)": 14922.57,
+      "Gross Sanction(01.04.2024 -31.03.2025)": 6108.31,
+      "Disbursement(01.04.2024 -31.03.2025)": 2130.45
+    },
+    {
+      "Struct.": "Bonds of Completed Infra Projects",
+      "No of Project(01.04.2025 -30.11.2025)": 0,
+      "Project Cost(01.04.2025 -30.11.2025)": 0.00,
+      "Gross Sanction(01.04.2025 -30.11.2025)": 0.00,
+      "Disbursement(01.04.2025 -30.11.2025)": 0.00,
+      "No of Project(01.04.2024 -31.03.2025)": 1,
+      "Project Cost(01.04.2024 -31.03.2025)": 6672.76,
+      "Gross Sanction(01.04.2024 -31.03.2025)": 99.16,
+      "Disbursement(01.04.2024 -31.03.2025)": 100.00
+    },
+    {
+      "Struct.": "Infrastructure Trust of Revenue Earning Infra Projects",
+      "No of Project(01.04.2025 -30.11.2025)": 0,
+      "Project Cost(01.04.2025 -30.11.2025)": 0.00,
+      "Gross Sanction(01.04.2025 -30.11.2025)": 0.00,
+      "Disbursement(01.04.2025 -30.11.2025)": 0.00,
+      "No of Project(01.04.2024 -31.03.2025)": 3,
+      "Project Cost(01.04.2024 -31.03.2025)": 126238.80,
+      "Gross Sanction(01.04.2024 -31.03.2025)": 1054.61,
+      "Disbursement(01.04.2024 -31.03.2025)": 1055.59
+    },
+    {
+      "Struct.": "Refinance to NBFC- Infrastructure Finance Companies",
+      "No of Project(01.04.2025 -30.11.2025)": 0,
+      "Project Cost(01.04.2025 -30.11.2025)": 0.00,
+      "Gross Sanction(01.04.2025 -30.11.2025)": 0.00,
+      "Disbursement(01.04.2025 -30.11.2025)": 0.00,
+      "No of Project(01.04.2024 -31.03.2025)": 8,
+      "Project Cost(01.04.2024 -31.03.2025)": 0.00,
+      "Gross Sanction(01.04.2024 -31.03.2025)": 17350.00,
+      "Disbursement(01.04.2024 -31.03.2025)": 3000.00
+    }
+  ]
+}
