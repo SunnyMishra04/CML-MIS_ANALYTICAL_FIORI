@@ -6,7 +6,8 @@ sap.ui.define([
     // Import Helpers
     "iifcl/cml/cmlmisapp/controller/helpers/DataHelper",
     "iifcl/cml/cmlmisapp/controller/helpers/ChartHelper",
-    "iifcl/cml/cmlmisapp/controller/helpers/FilterHelper"
+    "iifcl/cml/cmlmisapp/controller/helpers/FilterHelper",
+    "iifcl/cml/cmlmisapp/controller/helpers/ExportHelper"
 ], function (
     Controller,
     JSONModel,
@@ -14,7 +15,8 @@ sap.ui.define([
     MessageToast,
     DataHelper,
     ChartHelper,
-    FilterHelper
+    FilterHelper,
+    ExportHelper
 ) {
     "use strict";
 
@@ -27,6 +29,7 @@ sap.ui.define([
             this._dataHelper = new DataHelper(this);
             this._chartHelper = new ChartHelper(this);
             this._filterHelper = new FilterHelper(this);
+            this._exportHelper = new ExportHelper(this);
 
             // Load Report Config
             var oCfgModel = new JSONModel();
@@ -53,9 +56,20 @@ sap.ui.define([
             // Reports Model
             var oReportsModel = new JSONModel({
                 reports: [
-                    { id: "DEV_GROUP",   title: "Developer Group Report" },
+                    { id: "DEV_GROUP", title: "Developer Group Report" },
                     { id: "SECTOR_WISE", title: "Sector Wise Report" },
-                    { id: "GEO_REPORT",  title: "Geographical Report" }
+                    { id: "GEO_REPORT", title: "Geographical Report" },
+                    { id: "FIN_ASSIST", title: "Financial Assistance to Infra Projects" },
+                    { id: "BORROWER_RECOV", title: "Borrower Wise Recovery against " },
+                    { id: "PREPAYMENT", title: "Prepayment Requirements" },
+                    { id: "SECTOR_INVEST", title: "Sector Wise Investment" },
+                    { id: "SCHEME_WISE", title: "Scheme Wise Report" },
+                    { id: "COD_REPORT", title: "COD Infra projects Report" },
+                    { id: "CREDIT_RATING", title: "Credit Rating Report" },
+                    { id: "OUTSTANDING_BAL", title: "Outstanding Balance & NPA" },
+                    { id: "DISBURSEMENT_WISE", title: "Disbursement Wise Report" },
+                    { id: "NPA_REPORT", title: "NPA Report" },
+
                 ]
             });
             this.getView().setModel(oReportsModel, "reports");
@@ -120,7 +134,7 @@ sap.ui.define([
 
         _loadReport: function (sId) {
             var oCfg = this._oReportConfig[sId] || {};
-            var oVM  = this.getView().getModel("view");
+            var oVM = this.getView().getModel("view");
 
             oVM.setProperty("/currentReportId", sId);
             oVM.setProperty("/currentReportTitle", oCfg.title || sId);
@@ -143,9 +157,9 @@ sap.ui.define([
 
             // DATA HELPER: Load & Process Data
             var aRows = this._dataHelper.loadReportData(
-                sId, 
-                oCfg, 
-                oVM.getProperty("/selectedBucketKey"), 
+                sId,
+                oCfg,
+                oVM.getProperty("/selectedBucketKey"),
                 oVM.getProperty("/selectedMetricKey"),
                 oVM.getProperty("/selectedTenure")
             );
@@ -154,7 +168,7 @@ sap.ui.define([
 
             // Calculate Totals & Charts
             this._refreshAnalyticsAndGeoFromTable(true); // pass true to use full rows initially
-            
+
             // FILTER HELPER: Populate Dropdowns
             this._filterHelper.populateFilters(aRows, sId, oVM, oVM.getProperty("/col1Header"));
         },
@@ -194,16 +208,16 @@ sap.ui.define([
             if (oVM.getProperty("/currentReportId") === "GEO_REPORT") {
                 this._repaintMap(aVisibleRows);
             }
-            
+
             // Force Redraw of Charts (Fix for cut-off issue)
             this._invalidateCharts();
         },
 
-        _invalidateCharts: function() {
+        _invalidateCharts: function () {
             var charts = ["vizFrameTrend", "vizFrameComp", "vizWaterfall"];
             charts.forEach(id => {
                 var c = this.byId(id);
-                if(c && c.getVisible()) c.invalidate();
+                if (c && c.getVisible()) c.invalidate();
             });
         },
 
@@ -213,7 +227,7 @@ sap.ui.define([
         _repaintMap: function (aRowsOverride) {
             var oVM = this.getView().getModel("view");
             var aRows = aRowsOverride || (oVM.getProperty("/rows") || []);
-            
+
             if (oVM.getProperty("/currentReportId") === "GEO_REPORT") {
                 setTimeout(function () {
                     // Inject SVG if needed (omitted for brevity, assume container has it or injected here)
@@ -221,19 +235,19 @@ sap.ui.define([
                     if (oContainer && oContainer.innerHTML.trim() === "") {
                         oContainer.innerHTML = this._getIndiaSVGFull();
                     }
-                    
+
                     var oTooltip = document.getElementById("mapTooltip") || this._createTooltip();
-                    
+
                     var mDataById = this._chartHelper.renderGeoMap(aRows, this._mapConfig, oTooltip);
-                    
-                    if(mDataById) this._updateGeoChart(mDataById);
+
+                    if (mDataById) this._updateGeoChart(mDataById);
                 }.bind(this), 300);
             }
         },
 
         _updateGeoChart: function (mDataById) {
-             var mZones = { "North": 0, "South": 0, "East": 0, "West": 0, "Central": 0 };
-             var mZoneMap = {
+            var mZones = { "North": 0, "South": 0, "East": 0, "West": 0, "Central": 0 };
+            var mZoneMap = {
                 "Jammu and Kashmir": "North", "Punjab": "North", "Haryana": "North",
                 "Delhi": "North", "Uttar Pradesh": "North", "Himachal Pradesh": "North",
                 "Uttarakhand": "North", "Chandigarh": "North", "Ladakh": "North",
@@ -270,7 +284,7 @@ sap.ui.define([
         onSearch: function () {
             var oTable = this.byId("_IDGenTable");
             if (!oTable || !oTable.getBinding("items")) return;
-            
+
             // FILTER HELPER
             var aFilters = this._filterHelper.buildFiltersFromUI(this.getView().getModel("view").getProperty("/currentReportId"), this._sQuickSearch);
             oTable.getBinding("items").filter(aFilters);
@@ -291,7 +305,7 @@ sap.ui.define([
             this._refreshAnalyticsAndGeoFromTable();
         },
 
-        onTenureChange: function(oEvent) {
+        onTenureChange: function (oEvent) {
             var sTenure = oEvent.getParameter("selectedItem").getKey();
             this.getView().getModel("view").setProperty("/selectedTenure", sTenure);
             this._loadReport(this.getView().getModel("view").getProperty("/currentReportId"));
@@ -320,7 +334,7 @@ sap.ui.define([
             this._updatePeriodDisplay();
             this._loadReport(oVM.getProperty("/currentReportId"));
         },
-        
+
         onToggleSidebar: function () {
             var oVM = this.getView().getModel("view");
             oVM.setProperty("/sidebarCollapsed", !oVM.getProperty("/sidebarCollapsed"));
@@ -331,6 +345,32 @@ sap.ui.define([
                 this._repaintMap();
             }
         },
+
+        onExport: function () {
+            var oVM = this.getView().getModel("view");
+            var aRows = oVM.getProperty("/rows");
+
+            // Check if there is data to export
+            if (!aRows || aRows.length === 0) {
+                MessageToast.show("No data to export");
+                return;
+            }
+
+            // Get dynamic headers from the view model
+            var mHeaders = {
+                col1: oVM.getProperty("/col1Header"),
+                col2: oVM.getProperty("/col2Header"),
+                col3: oVM.getProperty("/col3Header"),
+                showCol3: oVM.getProperty("/showCol3"),
+                metricLabel: oVM.getProperty("/activeMetricLabel")
+            };
+
+            var sFileName = oVM.getProperty("/currentReportTitle") || "MIS_Report";
+
+            // Call Helper
+            this._exportHelper.downloadExcel(aRows, sFileName, mHeaders);
+        },
+
 
         // ============================================================
         // UI UTILS
@@ -361,11 +401,11 @@ sap.ui.define([
             return oT;
         },
 
-        
 
-   
 
-  
+
+
+
 
 
         _getIndiaSVGFull: function () {

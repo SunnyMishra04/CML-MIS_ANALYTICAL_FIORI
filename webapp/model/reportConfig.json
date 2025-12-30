@@ -107,5 +107,109 @@
         "cost": "ProjectCostPY"
       }
     }
+  },
+    "FIN_ASSIST": {
+    "title": "Financial Assistance to Infra Projects",
+    "type": "hierarchy",
+    "dataFile": "model/finAssist.json",
+    "columns": { "col1Header": "Structure", "col2Header": "", "col3Header": "" },
+    "fields": { "col1": "Struct.", "col2": "", "col3": "" },
+    "buckets": {
+      "CY": { "label": "01.04.2025 - 30.11.2025", "noProj": "No of Project(01.04.2025 -30.11.2025)", "projCost": "Project Cost(01.04.2025 -30.11.2025)", "gross": "Gross Sanction(01.04.2025 -30.11.2025)", "disb": "Disbursement(01.04.2025 -30.11.2025)", "os": "Principle O/s(30.11.2025)" },
+      "PY": { "label": "01.04.2024 -31.03.2025", "noProj": "No of Project(01.04.2024 -31.03.2025)", "projCost": "Project Cost(01.04.2024 -31.03.2025)", "gross": "Gross Sanction(01.04.2024 -31.03.2025)", "disb": "Disbursement(01.04.2024 -31.03.2025)", "os": "Principle O/s(31.03.2025)" }
+    }
+  },
+  "BORROWER_RECOV": {
+    "title": "Borrower Wise Recovery",
+    "type": "transaction",
+    "dataFile": "model/borrowerRecover.json",
+    "columns": { "col1Header": "Borrower Name", "col2Header": "Contract No", "col3Header": "Payment Date" },
+    "fields": { "col1": "Borrower Name", "col2": "Contract Number", "col3": "Payment Date" },
+    "buckets": {
+      "CY": { "gross": "WriteOff Rec(01.04.2025 -30.11.2025)" },
+      "PY": { "gross": "WriteOff Rec(01.04.2024 -31.03.2025)" }
+    }
+  },
+  "PREPAYMENT": {
+    "title": "Prepayment Requirements",
+    "type": "standard",
+    "columns": { "col1Header": "Borrower Name", "col2Header": "Contract No", "col3Header": "" },
+    "fields": { "col1": "Borrower Name", "col2": "Contract Number", "col3": "" },
+    "buckets": {
+      "CY": { "gross": "Prepayment Received(01.04.2025 -30.11.2025)" },
+      "PY": { "gross": "Prepayment Received(01.04.2024 -31.03.2025)" }
+    }
+  },
+  "SECTOR_INVEST": {
+  "title": "Sector Wise Interest Income",
+    "type": "standard",
+    "dataFile": "model/sectorInvest.json",
+    "columns": { "col1Header": "Sector Name", "col2Header": "", "col3Header": "" },
+    "fields": { "col1": "Sector Name", "col2": "", "col3": "" },
+    "buckets": {
+      "CY": { "gross": "Interest Income(01.04.2025 -30.11.2025)" },
+      "PY": { "gross": "Interest Income(01.04.2024 -31.03.2025)" }
+    }
+  },
+  "SCHEME_WISE": {
+    "title": "Scheme Wise Sector Wise Report",
+    "type": "standard",
+    "dataFile": "model/schemeWise.json",
+   "columns": { "col1Header": "Scheme", "col2Header": "Sector", "col3Header": "" },
+    "fields": { "col1": "Scheme", "col2": "Sector Name", "col3": "" },
+    "buckets": {
+      "CY": { "noProj": "No of Project(01.04.2025 -30.11.2025)", "projCost": "Project Cost(01.04.2025 -30.11.2025)", "gross": "Gross Sanction(01.04.2025 -30.11.2025)", "disb": "Disbursement(01.04.2025 -30.11.2025)", "os": "Principle O/s(30.11.2025)" },
+      "PY": { "noProj": "No of Project(01.04.2024 -31.03.2025)", "projCost": "Project Cost(01.04.2024 -31.03.2025)", "gross": "Gross Sanction(01.04.2024 -31.03.2025)", "disb": "Disbursement(01.04.2024 -31.03.2025)", "os": "Principle O/s(31.03.2025)" }
+    }
+  },
+  "LEAD_BANK": {
+    "title": "Lead Bank Wise Report",
+    "type": "standard",
+    "columns": { "col1Header": "Lead Bank", "col2Header": "", "col3Header": "" },
+    "fields": { "col1": "Lead Bank", "col2": "", "col3": "" },
+    "buckets": {
+      "CY": { "noProj": "No of Project(01.04.2025 -30.11.2025)", "gross": "Gross Sanction(01.04.2025 -30.11.2025)" },
+      "PY": { "noProj": "No of Project(01.04.2024 -31.03.2025)", "gross": "Gross Sanction(01.04.2024 -31.03.2025)" }
+    }
+  },
+  "CREDIT_RATING": {
+    "title": "Credit Rating Report",
+    "type": "standard",
+    "columns": { "col1Header": "Credit Rating", "col2Header": "", "col3Header": "" },
+    "fields": { "col1": "Credit Rating", "col2": "", "col3": "" },
+    "buckets": {
+      "CY": { "noProj": "No of Project(01.04.2025 -30.11.2025)", "gross": "Gross Sanction(01.04.2025 -30.11.2025)" },
+      "PY": { "noProj": "No of Project(01.04.2024 -31.03.2025)", "gross": "Gross Sanction(01.04.2024 -31.03.2025)" }
+    }
+  },
+   "OUTSTANDING_BAL": {
+    "title": "Outstanding Balance & NPA",
+    "type": "standard",
+    "dataFile": "model/outstanding.json",
+    "columns": { "col1Header": "Category", "col2Header": "", "col3Header": "" },
+    "fields": { "col1": "Category", "col2": "", "col3": "" },
+    "buckets": {
+      "CY": { "gross": "Outstanding Balance" }}
+  },
+  "DISBURSEMENT_WISE": {
+    "title": "Disbursement Wise Report",
+    "type": "standard",
+    "columns": { "col1Header": "Disbursement Category", "col2Header": "", "col3Header": "" },
+    "fields": { "col1": "Category", "col2": "", "col3": "" },
+    "buckets": {
+      "CY": { "gross": "Disbursement(01.04.2025 -30.11.2025)" },
+      "PY": { "gross": "Disbursement(01.04.2024 -31.03.2025)" }
+    }
+  },
+  "NPA_REPORT": {
+    "title": "NPA Report",
+    "type": "standard",
+    "columns": { "col1Header": "Borrower Name", "col2Header": "Asset Classification", "col3Header": "" },
+    "fields": { "col1": "Borrower Name", "col2": "Asset Classification", "col3": "" },
+    "buckets": {
+      "CY": { "gross": "Principal O/s(30.11.2025)" },
+      "PY": { "gross": "Principal O/s(31.03.2025)" }
+    }
   }
 }
+
