@@ -1,19 +1,7 @@
-{
-  "rows": [
-    {
-      "Category": "Private Sector",
-      "Disbursement(01.04.2025 -30.11.2025)": 450.00,
-      "Disbursement(01.04.2024 -31.03.2025)": 3200.00
-    },
-    {
-      "Category": "Public Sector",
-      "Disbursement(01.04.2025 -30.11.2025)": 850.00,
-      "Disbursement(01.04.2024 -31.03.2025)": 5500.00
-    },
-    {
-      "Category": "PPP",
-      "Disbursement(01.04.2025 -30.11.2025)": 600.00,
-      "Disbursement(01.04.2024 -31.03.2025)": 4100.00
-    }
-  ]
-}
+[
+  {
+    "Structure": "Direct Financial Assistance",
+    "ProjectsCY": 436, "DisbursementCY": 796.99, "GrossSanctionCY": 160, "PrincipalOsCY": 48378.61, "ExposureCY": 112758.91,
+    "ProjectsPY": 436, "DisbursementPY": 10436.91, "GrossSanctionPY": 0, "PrincipalOsPY": 47683.93, "ExposurePY": 112834.77
+  }
+]
