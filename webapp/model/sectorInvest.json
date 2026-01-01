@@ -1,0 +1,12 @@
+[
+  {
+    "SectorName": "ENERGY",
+    "InterestReceiptCY": 6.75, "PrincipalOsCY": 11363.98,
+    "InterestReceiptPY": 351.66, "PrincipalOsPY": 10878.44
+  },
+  {
+    "SectorName": "TRANSPORT",
+    "InterestReceiptCY": 105.45, "PrincipalOsCY": 12155.76,
+    "InterestReceiptPY": 509.41, "PrincipalOsPY": 12043.40
+  }
+]

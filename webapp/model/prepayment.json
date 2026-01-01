@@ -1,0 +1,10 @@
+[
+  {
+    "PrepaymentDate": "03.04.2024", "SectorName": "ENERGY", "ExternalRating": "#",
+    "PrepaymentAmountCY": 0, "PrepaymentAmountPY": 310.10
+  },
+  {
+    "PrepaymentDate": "25.04.2025", "SectorName": "TRANSPORT", "ExternalRating": "#",
+    "PrepaymentAmountCY": 140.19, "PrepaymentAmountPY": 0
+  }
+]

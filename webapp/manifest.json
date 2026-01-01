@@ -14,18 +14,23 @@
       "id": "@sap/generator-fiori:basic",
       "version": "1.20.0",
       "toolsId": "b62ece70-185d-4fec-98bb-52e89aed9efc"
+    },
+    
+    "dataSources": {
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/ZCML_MIS_ANALYTICS_SRV/", 
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
     }
+    
   },
   "sap.ui": {
     "technology": "UI5",
-    "icons": {
-      "icon": "",
-      "favIcon": "",
-      "phone": "",
-      "phone@2": "",
-      "tablet": "",
-      "tablet@2": ""
-    },
     "deviceTypes": {
       "desktop": true,
       "tablet": true,
@@ -41,9 +46,8 @@
         "sap.ui.core": {},
         "sap.f": {},
         "sap.ui.layout": {},
-        "sap.viz": {} ,
+        "sap.viz": {},
         "sap.ui.export": {}
-
       }
     },
     "contentDensities": {
@@ -56,7 +60,17 @@
         "settings": {
           "bundleName": "iifcl.cml.cmlmisapp.i18n.i18n"
         }
+      },
+    
+      "": {
+        "dataSource": "mainService",
+        "settings": {
+          "defaultOperationMode": "Server",
+          "defaultBindingMode": "TwoWay",
+          "defaultCountMode": "Inline"
+        }
       }
+      
     },
     "resources": {
       "css": [

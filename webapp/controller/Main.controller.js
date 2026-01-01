@@ -60,15 +60,15 @@ sap.ui.define([
                     { id: "SECTOR_WISE", title: "Sector Wise Report" },
                     { id: "GEO_REPORT", title: "Geographical Report" },
                     { id: "FIN_ASSIST", title: "Financial Assistance to Infra Projects" },
-                    { id: "BORROWER_RECOV", title: "Borrower Wise Recovery against " },
+                    { id: "BORROWER_RECOV", title: "Borrower Wise Recovery against Written-off" },
                     { id: "PREPAYMENT", title: "Prepayment Requirements" },
-                    { id: "SECTOR_INVEST", title: "Sector Wise Investment" },
-                    { id: "SCHEME_WISE", title: "Scheme Wise Report" },
+                    { id: "SECTOR_INVEST", title: "Sector Wise Interest Income" },
+                    { id: "SCHEME_WISE", title: "Scheme Wise Sector Wise Report" },
                     { id: "COD_REPORT", title: "COD Infra projects Report" },
-                    { id: "CREDIT_RATING", title: "Credit Rating Report" },
-                    { id: "OUTSTANDING_BAL", title: "Outstanding Balance & NPA" },
-                    { id: "DISBURSEMENT_WISE", title: "Disbursement Wise Report" },
-                    { id: "NPA_REPORT", title: "NPA Report" },
+                    { id: "CATEGORY_MODE", title: "Category/Mode-wise Report" },
+                    { id: "NPA_ANALYSIS", title: "Outstanding Balance & NPA Analysis by Lending" },
+                    { id: "DISBURSEMENT_WISE", title: "Annual Sanctions-Disbursements Overview" },
+                    { id: "NPA_REPORT", title: "NPA as on month-end – Scheme and Sector wise" },
 
                 ]
             });
