@@ -583,3 +583,15 @@ COMPARISON MODE STYLES
     font-family: "72", "72full", Arial, Helvetica, sans-serif;
     font-size: 12px;
 }
+
+/* Force UI5 VizFrames to respect the container width */
+.sapVizFrame {
+    width: 100% !important;
+}
+
+/* Ensure the card content area expands */
+.sapFCardContent {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}

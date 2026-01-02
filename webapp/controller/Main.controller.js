@@ -120,12 +120,18 @@ sap.ui.define([
                 isGeoReport: false,
                 chartData: [],
                 waterfallData: [],
-                geoData: []
+                geoData: [],
+              
+compChartType: "column",   // Default chart type for comparison
+trendChartType: "bar",     // Default chart type for trend
+isChartFiltered: false,    // Controls the "Clear Filter" button
+busy: false                // Controls loading indicators,
             });
             this.getView().setModel(oViewModel, "view");
 
             // Initial Load
             this._loadReport("DEV_GROUP");
+            this._setChartConfigs();
         },
 
         // ============================================================
@@ -204,6 +210,8 @@ sap.ui.define([
                 oVM.setProperty("/waterfallData", aWaterfall);
             }
 
+
+            
             // CHART HELPER: Geo
             if (oVM.getProperty("/currentReportId") === "GEO_REPORT") {
                 this._repaintMap(aVisibleRows);
@@ -220,6 +228,25 @@ sap.ui.define([
                 if (c && c.getVisible()) c.invalidate();
             });
         },
+
+_setChartConfigs: function() {
+    var oVizFrameComp = this.byId("vizFrameComp");
+    var oVizFrameTrend = this.byId("vizFrameTrend");
+
+    var oProps = {
+        plotArea: {
+            dataLabel: { visible: true, showTotal: true },
+            window: { start: "firstDataPoint", end: "lastDataPoint" }
+        },
+        tooltip: { visible: true },
+        title: { visible: false },
+        interaction: { selectability: { mode: "single" } }
+    };
+
+    if (oVizFrameComp) { oVizFrameComp.setVizProperties(oProps); }
+    if (oVizFrameTrend) { oVizFrameTrend.setVizProperties(oProps); }
+},
+
 
         // ============================================================
         // MAP (Delegated to Helper)
@@ -245,6 +272,10 @@ sap.ui.define([
             }
         },
 
+
+
+
+        
         _updateGeoChart: function (mDataById) {
             var mZones = { "North": 0, "South": 0, "East": 0, "West": 0, "Central": 0 };
             var mZoneMap = {
@@ -266,7 +297,9 @@ sap.ui.define([
                 mZones[zone] += mDataById[id].val;
             }.bind(this));
             var aData = Object.keys(mZones).map(function (z) {
-                return { Zone: z, Value: parseFloat((mZones[z] / 10000000).toFixed(2)) };
+                
+        // return { Zone: z, Value: parseFloat((mZones[z] / 10000000).toFixed(2)) };
+        return { Zone: z, Value: parseFloat(mZones[z].toFixed(2)) };
             });
             this.byId("geoVizFrame").setModel(new JSONModel({ items: aData }), "geoData");
         },
@@ -344,6 +377,12 @@ sap.ui.define([
             if (oEvent.getParameter("key") === "geo") {
                 this._repaintMap();
             }
+            if (sKey === "analytics") {
+        // Give the UI a millisecond to render the tab, then force charts to resize
+        setTimeout(function() {
+            this._invalidateCharts();
+        }.bind(this), 100);
+    }
         },
 
         onExport: function () {
@@ -402,7 +441,108 @@ sap.ui.define([
         },
 
 
+// Handler for clicking a bar/segment in the chart
+// onChartSelectData: function (oEvent) {
+//     var aData = oEvent.getParameter("data");
+//     if (aData && aData.length > 0) {
+//         var oSelected = aData[0].data;
+//         var sDim = oSelected.Dimension;
+        
+//         // Handle both Comparison and Trend field names
+//         var fValCY = oSelected["Current Year"] || oSelected.Value;
+//         var fValPY = oSelected["Previous Year"] || 0;
 
+//         // Apply Filter to Table
+//         var oTable = this.byId("_IDGenTable");
+//         var oBinding = oTable.getBinding("items");
+//         oBinding.filter([new sap.ui.model.Filter("DisplayCol1", "EQ", sDim)]);
+        
+//         this.getView().getModel("view").setProperty("/isChartFiltered", true);
+
+//         // SHOW VALUES ON CLICK
+//         var sMsg = sDim + "\n------------------\n";
+//         sMsg += "Current Year: " + fValCY + " Cr";
+//         if (fValPY > 0) { sMsg += "\nPrevious Year: " + fValPY + " Cr"; }
+        
+//         sap.m.MessageToast.show(sMsg, { duration: 4000 });
+
+//         this._refreshAnalyticsAndGeoFromTable();
+//     }
+// },
+
+onChartSelectData: function (oEvent) {
+    var aData = oEvent.getParameter("data");
+    if (aData && aData.length > 0) {
+        // 1. Get the Dimension Name (e.g. "ENERGY")
+        var sDimValue = aData[0].data.Dimension; 
+        
+        // 2. Find the full data object in your model to get "Unused" fields
+        var aAllChartData = this.getView().getModel("view").getProperty("/chartData");
+        var oFullRecord = aAllChartData.find(item => item.Dimension === sDimValue);
+
+        // 3. Apply Filter to Table
+        var oTable = this.byId("_IDGenTable");
+        oTable.getBinding("items").filter([new sap.ui.model.Filter("DisplayCol1", "EQ", sDimValue)]);
+        this.getView().getModel("view").setProperty("/isChartFiltered", true);
+
+        // 4. Show "Extensive" Metrics in a message
+        var sMsg = "Selected: " + sDimValue + "\n";
+        sMsg += "Metric (CY): " + oFullRecord.CY + " Cr\n";
+        sMsg += "Metric (PY): " + oFullRecord.PY + " Cr\n";
+        sMsg += "Variance: " + (oFullRecord.Variance || "N/A") + " Cr\n";
+        sMsg += "Projects: " + oFullRecord.Projects;
+
+        sap.m.MessageToast.show(sMsg, { duration: 5000, width: "20em" });
+
+        this._refreshAnalyticsAndGeoFromTable();
+    }
+},
+onClearChartFilter: function () {
+    var oTable = this.byId("_IDGenTable");
+    oTable.getBinding("items").filter([]);
+    this.getView().getModel("view").setProperty("/isChartFiltered", false);
+    this._refreshAnalyticsAndGeoFromTable(true);
+},
+
+onChartTypeChange: function (oEvent) {
+    // The binding {view>/compChartType} handles the VizFrame switch automatically
+    sap.m.MessageToast.show("Updating Visualization...");
+    setTimeout(function() {
+        this._invalidateCharts();
+    }.bind(this), 100);
+},
+
+_invalidateCharts: function () {
+    var aCharts = ["vizFrameTrend", "vizFrameComp", "vizWaterfall"];
+    aCharts.forEach(function(sId) {
+        var oChart = this.byId(sId);
+        // Force the chart to recalculate its layout and type
+        if (oChart) {
+            oChart.invalidate(); 
+        }
+    }.bind(this));
+},
+
+
+// Simple Sorting Handler
+onOpenViewSettings: function () {
+    if (!this._oSettingsDialog) {
+        this._oSettingsDialog = sap.ui.xmlfragment("iifcl.cml.cmlmisapp.view.fragments.ViewSettingsDialog", this);
+        this.getView().addDependent(this._oSettingsDialog);
+    }
+    this._oSettingsDialog.open();
+},
+
+onConfirmViewSettings: function (oEvent) {
+    var oTable = this.byId("_IDGenTable");
+    var mParams = oEvent.getParameters();
+    var oBinding = oTable.getBinding("items");
+
+    // Handle Sort
+    var sPath = mParams.sortItem.getKey();
+    var bDescending = mParams.sortDescending;
+    oBinding.sort(new sap.ui.model.Sorter(sPath, bDescending));
+},
 
 
 
