@@ -25,6 +25,9 @@
 
                     <!-- CONTENT AREA -->
                     <VBox id="ContentBox" width="100%" class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
+                        <layoutData>
+        <FlexItemData growFactor="1" />
+    </layoutData>
                         <items>
                             <!-- TOOLBAR -->
                             <OverflowToolbar id="_IDGenOverflowToolbar" class="customHeaderToolbar sapUiSmallMarginTop">
@@ -101,11 +104,60 @@
                                 </items>
                             </HBox>
 
-                            <IconTabBar id="tabBar" select=".onTabSelect" expandable="false" class="sapUiNoContentPadding">
+
+
+<fb:FilterBar id="filterBar" search=".onSearch" showRestoreButton="true" clear=".onResetFilters" class="sapUiSmallMarginBottom">
+    <fb:filterGroupItems>
+    <fb:FilterGroupItem id="fgiScheme" groupName="G1" name="Scheme" label="Scheme" visibleInFilterBar="true">
+                                                    <fb:control>
+                                                        <ComboBox id="fbScheme" items="{view>/filterSchemes}" placeholder="Select Scheme" selectionChange=".onSearch">
+                                                            <core:Item id="_IDGenItem1" key="{view>key}" text="{view>text}"/>
+                                                        </ComboBox>
+                                                    </fb:control>
+                                                </fb:FilterGroupItem>
+
+                                                <fb:FilterGroupItem id="fgiBorrowerGroup" groupName="G1" name="BorrowerGroup" label="Borrower Group" visibleInFilterBar="true" visible="{view>/showBorrowerGroupFilter}">
+                                                    <fb:control>
+                                                        <ComboBox id="fbBorrowerGroup" items="{view>/filterBorrowerGroups}" placeholder="Select Borrower Group" selectionChange=".onSearch">
+                                                            <core:Item id="_IDGenItem2" key="{view>key}" text="{view>text}"/>
+                                                        </ComboBox>
+                                                    </fb:control>
+                                                </fb:FilterGroupItem>
+
+                                                <fb:FilterGroupItem id="fgiBorrowerName" groupName="G1" name="BorrowerName" label="Borrower Group Name" visibleInFilterBar="true" visible="{view>/showBorrowerNameFilter}">
+                                                    <fb:control>
+                                                        <ComboBox id="fbBorrowerName" items="{view>/filterBorrowerNames}" placeholder="Select Borrower Name" selectionChange=".onSearch">
+                                                            <core:Item id="_IDGenItem3" key="{view>key}" text="{view>text}"/>
+                                                        </ComboBox>
+                                                    </fb:control>
+                                                </fb:FilterGroupItem>
+
+                                                <fb:FilterGroupItem id="fgiDimension" groupName="G1" name="Dimension" label="{view>/filterLabel}" visibleInFilterBar="true" visible="{view>/showDimensionFilter}">
+                                                    <fb:control>
+                                                        <ComboBox id="fbDimension" items="{view>/filterDimensions}" placeholder="{view>/filterPlaceholder}" selectionChange=".onSearch">
+                                                            <core:Item id="_IDGenItem4" key="{view>key}" text="{view>text}"/>
+                                                        </ComboBox>
+                                                    </fb:control>
+                                                </fb:FilterGroupItem>
+
+                                                <fb:FilterGroupItem id="fgiQuickSearch" groupName="G1" name="QuickSearch" label="Search" visibleInFilterBar="true">
+                                                    <fb:control>
+                                                        <SearchField id="fbQuickSearch" liveChange=".onQuickSearch" placeholder="Search..." width="200px"/>
+                                                    </fb:control>
+                                                </fb:FilterGroupItem>
+        </fb:filterGroupItems>
+</fb:FilterBar>
+
+<OverflowToolbar id="globalChartFilterToolbar" visible="{view>/isChartFiltered}" design="Transparent">
+    <ToolbarSpacer/>
+    <Button id="btnGlobalClear" icon="sap-icon://clear-filter" text="Clear Chart Selection" press=".onClearChartFilter" type="Reject"/>
+</OverflowToolbar>
+
+                            <IconTabBar id="tabBar" select=".onTabSelect" expandable="false" stretchContentHeight="true" class="sapUiNoContentPadding">
                                 <items>
                                     <!-- DATA TABLE TAB -->
                                     <IconTabFilter id="_IDGenIconTabFilter" key="data" text="Data Table" icon="sap-icon://table-view">
-                                        <fb:FilterBar id="filterBar" search=".onSearch" showRestoreButton="true" clear=".onResetFilters">
+                                        <!-- <fb:FilterBar id="filterBar" search=".onSearch" showRestoreButton="true" clear=".onResetFilters">
                                             <fb:filterGroupItems>
                                                 <fb:FilterGroupItem id="fgiScheme" groupName="G1" name="Scheme" label="Scheme" visibleInFilterBar="true">
                                                     <fb:control>
@@ -145,11 +197,22 @@
                                                     </fb:control>
                                                 </fb:FilterGroupItem>
                                             </fb:filterGroupItems>
-                                        </fb:FilterBar>
+                                        </fb:FilterBar> -->
 
-                                        <Table id="_IDGenTable" items="{view>/rows}" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="20" class="customCard sapUiMediumMarginTop">
+                                        <Table id="_IDGenTable" items="{view>/rows}" sticky="ColumnHeaders,HeaderToolbar" growing="true" growingThreshold="20">
+    <!-- <headerToolbar>
+        <OverflowToolbar id="_IDGenOverflowToolbarTable">
+            <Title id="_IDGenTitleTable" text="Details List"/>
+            <ToolbarSpacer id="_IDGenToolbarSpacerTable"/>
+            <Button id="btnClearChartFilter" icon="sap-icon://clear-filter" text="Clear Chart Filter" 
+                    visible="{view>/isChartFiltered}" press=".onClearChartFilter" type="Transparent"/>
+            <Button id="btnSort" icon="sap-icon://sort" press=".onOpenViewSettings" type="Transparent"/>
+        </OverflowToolbar>
+    </headerToolbar> -->
                                             <columns>
-                                                <Column id="_IDGenColumn" width="12rem"><Text id="_IDGenText3" text="{view>/col1Header}"/></Column>
+                                              <Column id="_IDGenColumn" width="12rem" hAlign="Begin">
+            <header><Text id="_IDGenText2" text="{view>/col1Header}"/></header>
+        </Column>
                                                 <Column id="_IDGenColumn1" width="10rem"><Text id="_IDGenText4" text="{view>/col2Header}"/></Column>
                                                 <Column id="_IDGenColumn2" width="12rem" visible="{view>/showCol3}"><Text id="_IDGenText5" text="{view>/col3Header}"/></Column>
                                                 <Column id="_IDGenColumn3" hAlign="End"><Text id="_IDGenText6" text="Projects (CY)"/></Column>
@@ -185,7 +248,7 @@
 
                                     <!-- ANALYTICS TAB -->
                                     <IconTabFilter id="_IDGenIconTabFilter1" key="analytics" text="Analytics" icon="sap-icon://line-chart">
-                                        <VBox id="_IDGenVBox" class="sapUiMediumMarginTop">
+                                        <VBox id="_IDGenVBox" width="100%" class="sapUiMediumMarginTop">
                                             <items>
                                                 <!-- KPI CARDS -->
                                                 <HBox id="_IDGenHBox3" width="100%" height="220px" class="sapUiSmallMarginBottom">
@@ -253,56 +316,94 @@
                                                 <VBox id="chartContainer" width="100%">
                                                     <items>
                                                         <!-- COMPARISON CHART CARD -->
-                                                        <f:Card id="cardComparison" width="100%" visible="{view>/showComparisonChart}" class="chartCard sapUiSmallMarginBottom">
-                                                            <f:header>
-                                                                <card:Header id="_IDGenHeader" title="Top 10 Entities: CY vs PY Comparison" subtitle="{view>/activeMetricLabel} (Amount in Cr)" iconSrc="sap-icon://compare"/>
-                                                            </f:header>
-                                                            <f:content>
-                                                                <viz:VizFrame id="vizFrameComp" vizType="column" width="100%" height="450px" uiConfig="{applicationSet:'fiori'}">
-                                                                    <viz:dataset>
-                                                                        <vizData:FlattenedDataset id="_IDGenFlattenedDataset" data="{view>/chartData}">
-                                                                            <vizData:dimensions>
-                                                                                <vizData:DimensionDefinition id="_IDGenDimensionDefinition" name="Dimension" value="{view>Dimension}"/>
-                                                                            </vizData:dimensions>
-                                                                            <vizData:measures>
-                                                                                <vizData:MeasureDefinition id="_IDGenMeasureDefinition" name="CY" value="{view>CY}"/>
-                                                                                <vizData:MeasureDefinition id="_IDGenMeasureDefinition1" name="PY" value="{view>PY}"/>
-                                                                            </vizData:measures>
-                                                                        </vizData:FlattenedDataset>
-                                                                    </viz:dataset>
-                                                                    <viz:feeds>
-                                                                        <vizFeeds:FeedItem id="_IDGenFeedItem" uid="valueAxis" type="Measure" values="CY,PY"/>
-                                                                        <vizFeeds:FeedItem id="_IDGenFeedItem1" uid="categoryAxis" type="Dimension" values="Dimension"/>
-                                                                    </viz:feeds>
-                                                                </viz:VizFrame>
-                                                            </f:content>
-                                                        </f:Card>
+                                                <f:Card id="cardComparison" width="100%" visible="{view>/showComparisonChart}" class="chartCard sapUiSmallMarginBottom">
+    <f:header>
+        <card:Header id="_IDGenHeader" title="Top 10 Entities: CY vs PY Comparison" subtitle="{view>/activeMetricLabel} (Amount in Cr)" iconSrc="sap-icon://compare"/>
+    </f:header>
+    <f:content>
+        <VBox id="_IDGenVBoxComp" width="100%">
+            <Toolbar id="_IDGenToolbarComp" design="Transparent" class="sapUiTinyMarginBottom">
+                <ToolbarSpacer id="_IDGenSpacerComp"/>
+                <SegmentedButton selectedKey="{view>/compChartType}" selectionChange=".onChartTypeChange">
+                    <items>
+                        <SegmentedButtonItem key="column" icon="sap-icon://vertical-bar-chart" tooltip="Column Chart"/>
+                        <SegmentedButtonItem key="line" icon="sap-icon://line-chart" tooltip="Line Chart"/>
+                        <SegmentedButtonItem key="stacked_column" icon="sap-icon://stacked-column-chart" tooltip="Stacked Chart"/>
+                    </items>
+                </SegmentedButton>
+            </Toolbar>
+            
+            <viz:VizFrame id="vizFrameComp" 
+                          vizType="{view>/compChartType}" 
+                          selectData=".onChartSelectData" 
+                          width="100%" height="450px" uiConfig="{applicationSet:'fiori'}">
+                <viz:dataset>
+                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset" data="{view>/chartData}">
+                        <vizData:dimensions>
+                            <vizData:DimensionDefinition name="Dimension" value="{view>Dimension}"/>
+                        </vizData:dimensions>
+                        <vizData:measures>
+                            <vizData:MeasureDefinition name="CY" value="{view>CY}"/>
+                            <vizData:MeasureDefinition name="PY" value="{view>PY}"/>
+                        </vizData:measures>
+                    </vizData:FlattenedDataset>
+                </viz:dataset>
+                <viz:feeds>
+                    <vizFeeds:FeedItem uid="valueAxis" type="Measure" values="CY,PY"/>
+                    <vizFeeds:FeedItem uid="categoryAxis" type="Dimension" values="Dimension"/>
+                </viz:feeds>
+           
+    
+  
+</viz:VizFrame>
+        </VBox>
+    </f:content>
+</f:Card>
 
                                                         <!-- TREND CHART CARD -->
-                                                        <f:Card id="cardTrend" width="100%" visible="{= !${view>/showComparisonChart} }" class="chartCard sapUiSmallMarginBottom">
-                                                            <f:header>
-                                                                <card:Header id="_IDGenHeader1" title="Top 10 Entities: {view>/activeMetricLabel}" subtitle="Current Year Performance" iconSrc="sap-icon://bar-chart"/>
-                                                            </f:header>
-                                                            <f:content>
-                                                                <viz:VizFrame id="vizFrameTrend" vizType="bar" width="100%" height="450px" uiConfig="{applicationSet:'fiori'}">
-                                                                    <viz:dataset>
-                                                                        <vizData:FlattenedDataset id="_IDGenFlattenedDataset1" data="{view>/chartData}">
-                                                                            <vizData:dimensions>
-                                                                                <vizData:DimensionDefinition id="_IDGenDimensionDefinition1" name="Dimension" value="{view>Dimension}"/>
-                                                                            </vizData:dimensions>
-                                                                            <vizData:measures>
-                                                                                <vizData:MeasureDefinition id="_IDGenMeasureDefinition3" name="Value" value="{view>Value}"/>
-                                                                            </vizData:measures>
-                                                                        </vizData:FlattenedDataset>
-                                                                    </viz:dataset>
-                                                                    <viz:feeds>
-                                                                        <vizFeeds:FeedItem id="_IDGenFeedItem2" uid="valueAxis" type="Measure" values="Value"/>
-                                                                        <vizFeeds:FeedItem id="_IDGenFeedItem3" uid="categoryAxis" type="Dimension" values="Dimension"/>
-                                                                    </viz:feeds>
-                                                                </viz:VizFrame>
-                                                            </f:content>
-                                                        </f:Card>
-                                                        
+<!-- TREND CHART CARD -->
+<f:Card id="cardTrend" width="100%" visible="{= !${view>/showComparisonChart} }" class="chartCard sapUiSmallMarginBottom">
+    <f:header>
+        <!-- REMOVED THE INVALID TOOLBAR FROM HEADER -->
+        <card:Header id="_IDGenHeader1" title="Top 10 Entities: {view>/activeMetricLabel}" subtitle="{view>/activeMetricLabel} (Cr)" iconSrc="sap-icon://compare"/>
+    </f:header>
+    <f:content>
+        <!-- MOVED TOOLBAR INSIDE CONTENT (Wrapped in VBox with VizFrame) -->
+        <VBox>
+            <Toolbar design="Transparent" class="sapUiTinyMarginBottom">
+                <ToolbarSpacer/>
+                <SegmentedButton selectedKey="{view>/trendChartType}" selectionChange=".onChartTypeChange">
+                    <items>
+                        <SegmentedButtonItem key="column" icon="sap-icon://vertical-bar-chart" tooltip="Column Chart"/>
+                        <SegmentedButtonItem key="line" icon="sap-icon://line-chart" tooltip="Line Chart"/>
+                        <SegmentedButtonItem key="stacked_column" icon="sap-icon://stacked-column-chart" tooltip="Stacked Chart"/>
+                    </items>
+                </SegmentedButton>
+            </Toolbar>
+            
+            <viz:VizFrame id="vizFrameTrend" 
+                vizType="{view>/trendChartType}" 
+                selectData=".onChartSelectData" 
+                width="100%" height="450px" uiConfig="{applicationSet:'fiori'}">
+                <viz:dataset>
+                    <vizData:FlattenedDataset id="_IDGenFlattenedDataset1" data="{view>/chartData}">
+                        <vizData:dimensions>
+                            <vizData:DimensionDefinition id="_IDGenDimensionDefinition1" name="Dimension" value="{view>Dimension}"/>
+                        </vizData:dimensions>
+                        <vizData:measures>
+                            <vizData:MeasureDefinition id="_IDGenMeasureDefinition3" name="Value" value="{view>Value}"/>
+                        </vizData:measures>
+                    </vizData:FlattenedDataset>
+                </viz:dataset>
+                <viz:feeds>
+                    <vizFeeds:FeedItem id="_IDGenFeedItem2" uid="valueAxis" type="Measure" values="Value"/>
+                    <vizFeeds:FeedItem id="_IDGenFeedItem3" uid="categoryAxis" type="Dimension" values="Dimension"/>
+                </viz:feeds>
+            </viz:VizFrame>
+        </VBox>
+    </f:content>
+</f:Card>
+
                                                         <!-- WATERFALL CHART -->
                                                         <f:Card id="cardWaterfall" width="100%" visible="{view>/showComparisonChart}" class="chartCard sapUiSmallMarginBottom">
                                                             <f:header>
@@ -381,5 +482,6 @@
                 </HBox>
             </content>
         </Page>
-    </App>
+     </App>
 </mvc:View>
+ 

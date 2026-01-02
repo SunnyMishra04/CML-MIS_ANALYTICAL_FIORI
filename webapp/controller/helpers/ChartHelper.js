@@ -10,33 +10,28 @@ sap.ui.define([
             this._controller = oController;
         },
 
-        prepareComparisonChartData: function (aRows, bComparisonMode) {
-            var aTopRows = aRows.slice()
-                .sort(function (a, b) { return b.MetricCY - a.MetricCY; })
-                .slice(0, 10);
+        /**
+         * Prepares data for both Comparison and Trend charts
+         */
+       prepareComparisonChartData: function (aRows, bComparisonMode) {
+    var aTopRows = aRows.slice()
+        .sort(function (a, b) { 
+            return (parseFloat(b.MetricCY) || 0) - (parseFloat(a.MetricCY) || 0); 
+        })
+        .slice(0, 10);
 
-            if (!bComparisonMode) {
-                return aTopRows.map(function (r) {
-                    return {
-                        Dimension: r.GenericDim,
-                        Value: r.MetricCY,
-                        Projects: r.ProjectsCY
-                    };
-                });
-            } else {
-                return aTopRows.map(function (r) {
-                    return {
-                        Dimension: r.GenericDim,
-                        CY: r.MetricCY,
-                        PY: r.MetricPY,
-                        Variance: r.MetricVar,
-                        VariancePct: r.MetricVarPct,
-                        ProjectsCY: r.ProjectsCY,
-                        ProjectsPY: r.ProjectsPY
-                    };
-                });
-            }
-        },
+    return aTopRows.map(function (r) {
+        return {
+            Dimension: r.DisplayCol1 || "N/A", 
+            CY: parseFloat(r.MetricCY) || 0,
+            PY: parseFloat(r.MetricPY) || 0,
+            Value: parseFloat(r.MetricCY) || 0, // Current Year value
+            Variance: parseFloat(r.MetricVar) || 0,
+            Projects: r.ProjectsCY || 0,
+            ProjectsPY: r.ProjectsPY || 0
+        };
+    });
+},
 
         prepareWaterfallData: function (aRows, fTotalMetricPY, fTotalMetric) {
             var aPositive = aRows
@@ -57,7 +52,7 @@ sap.ui.define([
 
             aPositive.forEach(function (r) {
                 aWaterfallData.push({
-                    Category: r.GenericDim + " ▲",
+                    Category: (r.DisplayCol1 || "Increase") + " ▲",
                     Value: r.MetricVar,
                     Type: "Increase"
                 });
@@ -65,7 +60,7 @@ sap.ui.define([
 
             aNegative.forEach(function (r) {
                 aWaterfallData.push({
-                    Category: r.GenericDim + " ▼",
+                    Category: (r.DisplayCol1 || "Decrease") + " ▼",
                     Value: Math.abs(r.MetricVar),
                     Type: "Decrease"
                 });
@@ -83,9 +78,6 @@ sap.ui.define([
             var oContainer = document.getElementById("indiaMapContainer");
             if (!oContainer) return null;
             
-            // Note: SVG string should be managed here or fetched
-            // Assuming oContainer already has SVG or we inject it
-            
             var mDataById = {};
             var that = this;
 
@@ -96,10 +88,10 @@ sap.ui.define([
                 });
                 if (sId) {
                     if (!mDataById[sId]) {
-                        mDataById[sId] = { val: 0, count: 0, row: row };
+                        mDataById[sId] = { val: 0, count: 0 };
                     }
-                    mDataById[sId].val += row.CurrentMetric || 0;
-                    mDataById[sId].count += row.ProjectsCY || 0;
+                    mDataById[sId].val += parseFloat(row.MetricCY || 0);
+                    mDataById[sId].count += parseInt(row.ProjectsCY || 0);
                 }
             });
 
@@ -120,11 +112,11 @@ sap.ui.define([
                     path.style.fill = "rgba(10, 110, 209, " + (0.3 + (0.7 * (oInfo.val / fMaxVal))) + ")";
                     
                     path.onmousemove = function (e) {
-                         // Tooltip logic
                          if(oTooltip) {
                              oTooltip.innerHTML = 
                                 "<div class='tooltip-header'>" + mConfig[sId] + "</div>" +
-                                "<div class='tooltip-row'><span>Amount</span><span><strong>" + (oInfo.val / 10000000).toFixed(2) + " Cr</strong></span></div>" +
+                                // REMOVED the division by 10,000,000 because your DataHelper already scales to Cr
+                                "<div class='tooltip-row'><span>Amount</span><span><strong>" + oInfo.val.toFixed(2) + " Cr</strong></span></div>" +
                                 "<div class='tooltip-row'><span>Projects</span><span><strong>" + oInfo.count + "</strong></span></div>";
                              oTooltip.style.display = "block";
                              oTooltip.style.left = (e.pageX + 20) + "px";
@@ -137,7 +129,7 @@ sap.ui.define([
                 }
             });
 
-            return mDataById; // Return for Geo Chart
+            return mDataById;
         },
 
         _normalizeStateName: function (sName) {
