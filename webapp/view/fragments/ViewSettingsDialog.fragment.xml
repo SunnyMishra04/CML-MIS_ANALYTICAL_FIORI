@@ -1,0 +1,17 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <ViewSettingsDialog id="_IDGenViewSettingsDialog" confirm=".onConfirmViewSettings">
+        <sortItems>
+            <ViewSettingsItem id="_IDGenViewSettingsItem1" text="Entity Name" key="DisplayCol1" />
+            <ViewSettingsItem id="_IDGenViewSettingsItem2" text="Current Year Amount" key="MetricCY" />
+            <ViewSettingsItem id="_IDGenViewSettingsItem3" text="Previous Year Amount" key="MetricPY" />
+            <ViewSettingsItem id="_IDGenViewSettingsItem4" text="Project Count" key="ProjectsCY" />
+            <ViewSettingsItem id="_IDGenViewSettingsItem5" text="Variance" key="MetricVar" />
+        </sortItems>
+        <groupItems>
+            <ViewSettingsItem id="_IDGenViewSettingsItem6" text="Scheme" key="DisplayCol2" />
+        </groupItems>
+    </ViewSettingsDialog>
+</core:FragmentDefinition>
+
+
+
