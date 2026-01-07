@@ -132,7 +132,10 @@ busy: false                // Controls loading indicators,
             // Initial Load
             this._loadReport("DEV_GROUP");
             this._setChartConfigs();
-        },
+            this.byId("vizFrameComp").setVizProperties({
+    plotArea: { dataLabel: { visible: true } },
+    title: { visible: false }
+        })},
 
         // ============================================================
         // CORE LOGIC (Using Helpers)
@@ -247,7 +250,21 @@ _setChartConfigs: function() {
     if (oVizFrameTrend) { oVizFrameTrend.setVizProperties(oProps); }
 },
 
+_setChartConfigs: function() {
+    var oVizFrameComp = this.byId("vizFrameComp");
+    var oVizFrameTrend = this.byId("vizFrameTrend");
 
+    var oProps = {
+        plotArea: {
+            dataLabel: { visible: true, showTotal: true }
+        },
+        title: { visible: false },
+        interaction: { selectability: { mode: "single" } }
+    };
+
+    if (oVizFrameComp) { oVizFrameComp.setVizProperties(oProps); }
+    if (oVizFrameTrend) { oVizFrameTrend.setVizProperties(oProps); }
+},
         // ============================================================
         // MAP (Delegated to Helper)
         // ============================================================
@@ -373,17 +390,30 @@ _setChartConfigs: function() {
             oVM.setProperty("/sidebarCollapsed", !oVM.getProperty("/sidebarCollapsed"));
         },
 
-        onTabSelect: function (oEvent) {
-            if (oEvent.getParameter("key") === "geo") {
-                this._repaintMap();
-            }
-            if (sKey === "analytics") {
-        // Give the UI a millisecond to render the tab, then force charts to resize
-        setTimeout(function() {
+    //     onTabSelect: function (oEvent) {
+    //         if (oEvent.getParameter("key") === "geo") {
+    //             this._repaintMap();
+    //         }
+    //         if (sKey === "analytics") {
+    //     // Give the UI a millisecond to render the tab, then force charts to resize
+    //     setTimeout(function() {
+    //         this._invalidateCharts();
+    //     }.bind(this), 100);
+    // }
+    //     },
+
+    onTabSelect: function (oEvent) {
+    var sKey = oEvent.getParameter("key");
+
+    if (sKey === "geo") {
+        this._repaintMap();
+    }
+    if (sKey === "analytics") {
+        setTimeout(function () {
             this._invalidateCharts();
         }.bind(this), 100);
     }
-        },
+},
 
         onExport: function () {
             var oVM = this.getView().getModel("view");
@@ -441,34 +471,6 @@ _setChartConfigs: function() {
         },
 
 
-// Handler for clicking a bar/segment in the chart
-// onChartSelectData: function (oEvent) {
-//     var aData = oEvent.getParameter("data");
-//     if (aData && aData.length > 0) {
-//         var oSelected = aData[0].data;
-//         var sDim = oSelected.Dimension;
-        
-//         // Handle both Comparison and Trend field names
-//         var fValCY = oSelected["Current Year"] || oSelected.Value;
-//         var fValPY = oSelected["Previous Year"] || 0;
-
-//         // Apply Filter to Table
-//         var oTable = this.byId("_IDGenTable");
-//         var oBinding = oTable.getBinding("items");
-//         oBinding.filter([new sap.ui.model.Filter("DisplayCol1", "EQ", sDim)]);
-        
-//         this.getView().getModel("view").setProperty("/isChartFiltered", true);
-
-//         // SHOW VALUES ON CLICK
-//         var sMsg = sDim + "\n------------------\n";
-//         sMsg += "Current Year: " + fValCY + " Cr";
-//         if (fValPY > 0) { sMsg += "\nPrevious Year: " + fValPY + " Cr"; }
-        
-//         sap.m.MessageToast.show(sMsg, { duration: 4000 });
-
-//         this._refreshAnalyticsAndGeoFromTable();
-//     }
-// },
 
 onChartSelectData: function (oEvent) {
     var aData = oEvent.getParameter("data");
@@ -538,12 +540,25 @@ onConfirmViewSettings: function (oEvent) {
     var mParams = oEvent.getParameters();
     var oBinding = oTable.getBinding("items");
 
-    // Handle Sort
-    var sPath = mParams.sortItem.getKey();
-    var bDescending = mParams.sortDescending;
-    oBinding.sort(new sap.ui.model.Sorter(sPath, bDescending));
-},
+    // 1. Handle Sorting
+    if (mParams.sortItem) {
+        var sPath = mParams.sortItem.getKey();
+        var bDescending = mParams.sortDescending;
+        oBinding.sort(new sap.ui.model.Sorter(sPath, bDescending));
+    }
 
+    // 2. Handle Grouping
+    if (mParams.groupItem) {
+        var sGroupPath = mParams.groupItem.getKey();
+        oBinding.sort(new sap.ui.model.Sorter(sGroupPath, false, true));
+    } else if (mParams.groupReset) {
+        oBinding.sort([]); // Clear grouping
+    }
+    // 3. GLOBAL SYNC: Trigger refresh for Charts, KPIs, and Map
+    // This ensures that sorting by "Previous Year" in the dialog 
+    // actually updates the charts to show the new top 10.
+    this._refreshAnalyticsAndGeoFromTable();
+},
 
 
 

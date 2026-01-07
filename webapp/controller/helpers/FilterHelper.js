@@ -45,26 +45,47 @@ sap.ui.define([
             var sQuery = (sText || "").trim();
             var oView = this._controller.getView();
 
-            // 1. Common Filter: Scheme
-            var sScheme = oView.byId("fbScheme") ? oView.byId("fbScheme").getSelectedKey() : "";
-            if (sScheme) {
-                var sSchemeField = (sReportId === "DEV_GROUP") ? "DisplayCol1" : "DisplayCol2";
-                aFilters.push(new Filter(sSchemeField, FilterOperator.EQ, sScheme));
-            }
+            // Helper function to create filters from MultiComboBox
+            var fnAddMultiFilters = function(sControlId, sFieldName) {
+                var oControl = oView.byId(sControlId);
+                if (oControl) {
+                    var aKeys = oControl.getSelectedKeys();
+                    if (aKeys.length > 0) {
+                        var aMultiFilters = aKeys.map(function(sKey) {
+                            return new Filter(sFieldName, FilterOperator.EQ, sKey);
+                        });
+                        // Use 'false' for 'and' parameter to create an OR condition for multi-select
+                        aFilters.push(new Filter({ filters: aMultiFilters, and: false }));
+                    }
+                }
+            };
 
-            // 2. Report Specific Filters
+            // 1. Common Filter: Scheme (Multi-select support)
+            var sSchemeField = (sReportId === "DEV_GROUP") ? "DisplayCol1" : "DisplayCol2";
+            fnAddMultiFilters("fbScheme", sSchemeField);
+
+            // 2. Report Specific Filters (Multi-select support)
             if (sReportId === "DEV_GROUP") {
-                var sGroup = oView.byId("fbBorrowerGroup") ? oView.byId("fbBorrowerGroup").getSelectedKey() : "";
-                var sName = oView.byId("fbBorrowerName") ? oView.byId("fbBorrowerName").getSelectedKey() : "";
-                
-                if (sGroup) aFilters.push(new Filter("DisplayCol2", FilterOperator.EQ, sGroup));
-                if (sName) aFilters.push(new Filter("BorrowerGroupName", FilterOperator.EQ, sName));
+                fnAddMultiFilters("fbBorrowerGroup", "DisplayCol2");
+                fnAddMultiFilters("fbBorrowerName", "BorrowerGroupName");
             } else {
-                var sDim = oView.byId("fbDimension") ? oView.byId("fbDimension").getSelectedKey() : "";
-                if (sDim) aFilters.push(new Filter("DisplayCol1", FilterOperator.EQ, sDim));
+                fnAddMultiFilters("fbDimension", "DisplayCol1");
             }
 
-            // 3. Quick Search
+            // 3. NEW: Date Range Filter (Reporting Period)
+            var oDateRange = oView.byId("fbDateRange");
+            if (oDateRange && oDateRange.getDateValue() && oDateRange.getSecondDateValue()) {
+                aFilters.push(new Filter("ReportingDate", FilterOperator.BT, oDateRange.getDateValue(), oDateRange.getSecondDateValue()));
+            }
+
+            // 4. NEW: Min Amount Filter (StepInput)
+            var oMinAmt = oView.byId("fbMinAmount");
+            if (oMinAmt && oMinAmt.getValue() > 0) {
+                // Filters rows where MetricCY is Greater Than or Equal to Input
+                aFilters.push(new Filter("MetricCY", FilterOperator.GE, oMinAmt.getValue()));
+            }
+
+            // 5. Quick Search (Enhanced to include all fields)
             if (sQuery) {
                 aFilters.push(new Filter({
                     filters: [
@@ -79,10 +100,26 @@ sap.ui.define([
         },
 
         resetFilters: function () {
+            var oView = this._controller.getView();
+            
+            // Reset MultiComboBoxes
             ["fbScheme", "fbDimension", "fbBorrowerGroup", "fbBorrowerName"].forEach(id => {
-                if(this._controller.byId(id)) this._controller.byId(id).setSelectedKey("");
+                var oControl = oView.byId(id);
+                if(oControl) oControl.setSelectedKeys([]);
             });
-            if (this._controller.byId("fbQuickSearch")) this._controller.byId("fbQuickSearch").setValue("");
+
+            // Reset DateRange
+            if (oView.byId("fbDateRange")) oView.byId("fbDateRange").setValue("");
+
+            // Reset StepInput (Numeric)
+            var oMinAmt = oView.byId("fbMinAmount");
+if (oMinAmt) {
+    oMinAmt.setValue(0);
+}
+
+
+            // Reset Search
+            if (oView.byId("fbQuickSearch")) oView.byId("fbQuickSearch").setValue("");
         }
     });
 });
