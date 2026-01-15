@@ -26,11 +26,12 @@ sap.ui.define([
 
         // Initialize Helpers
         onInit: function () {
+            
             this._dataHelper = new DataHelper(this);
             this._chartHelper = new ChartHelper(this);
             this._filterHelper = new FilterHelper(this);
             this._exportHelper = new ExportHelper(this);
-
+            
             // Load Report Config
             var oCfgModel = new JSONModel();
             oCfgModel.loadData("model/reportConfig.json", null, false);
@@ -52,7 +53,6 @@ sap.ui.define([
                 "tryjs34": "Assam", "tryjs35": "Arunachal Pradesh", "tryjs36": "Andhra Pradesh",
                 "tryjs37": "Andaman and Nicobar Islands"
             };
-
             // Reports Model
             var oReportsModel = new JSONModel({
                 reports: [
@@ -89,6 +89,7 @@ sap.ui.define([
                 showComparisonPeriod: false,
                 activeMetricLabel: "Gross Sanction",
                 rows: [],
+                backendData: [],
                 col1Header: "Dimension",
                 col2Header: "Sub-Dimension",
                 col3Header: "Details",
@@ -129,14 +130,73 @@ busy: false                // Controls loading indicators,
             });
             this.getView().setModel(oViewModel, "view");
 
-            // Initial Load
-            this._loadReport("DEV_GROUP");
-            this._setChartConfigs();
-            this.byId("vizFrameComp").setVizProperties({
-    plotArea: { dataLabel: { visible: true } },
-    title: { visible: false }
-        })},
+// FIX: Start by fetching OData. The report load happens in the callback.
+   
+    this._setChartConfigs();
+    //  Start Data Loading (Attempts OData first)
+ this.getRequest(); 
 
+        },
+// ============================================================
+        // ODATA / BACKEND LOGIC
+        // ============================================================
+
+           getRequest: function()   {
+                var that = this;
+               var oVM = this.getView().getModel("view");
+                // Show busy indicator while "trying" to fetch OData
+
+    sap.ui.core.BusyIndicator.show(0);
+               // 1. Get the OData Model properly
+    var oModel = this.getOwnerComponent().getModel(); 
+    var sPath = "/ZMIS_AnalyticSet";
+
+    // Helper to Load Local JSONs (Unlock UI)
+            var fnLoadLocalFallback = function(sMsg) {
+                console.warn(sMsg || "Switching to Local JSONs...");
+                sap.ui.core.BusyIndicator.hide(); // UNLOCK SCREEN
+                that._loadReport("DEV_GROUP");    // Load Data
+            };
+
+            // If OData Model is missing, fallback immediately
+            if (!oModel) {
+                fnLoadLocalFallback("OData Model not found.");
+                return;
+            }
+
+            // SAFETY TIMER: If backend doesn't reply in 3 seconds, FORCE UNLOCK
+            var bDataLoaded = false;
+            setTimeout(function() {
+                if (!bDataLoaded) {
+                    fnLoadLocalFallback("Backend timed out (3s). Forcing Local Data.");
+                }
+            }, 3000);
+               
+    // Attempt Metadata Load first
+            oModel.metadataLoaded().then(function() {
+                var mParameter = {
+                    urlParameters: { "$top": 10000 },
+                    success: function (oData, oRes) {
+                        bDataLoaded = true; // Mark as success
+                        sap.ui.core.BusyIndicator.hide(); // Unlock
+                        
+                        var aResults = (oData && oData.results) ? oData.results : [];
+                        oVM.setProperty("/backendData", aResults);
+                        
+                        that._loadReport("DEV_GROUP");
+                        MessageToast.show("Backend Data Loaded");
+                    },
+                    error: function (oError) {
+                        bDataLoaded = true;
+                        fnLoadLocalFallback("OData Read Failed.");
+                    }
+                };
+                oModel.read(sPath, mParameter);
+            }).catch(function() {
+                bDataLoaded = true;
+                fnLoadLocalFallback("Metadata Load Failed.");
+            });
+        },
         // ============================================================
         // CORE LOGIC (Using Helpers)
         // ============================================================
@@ -145,9 +205,21 @@ busy: false                // Controls loading indicators,
             var oCfg = this._oReportConfig[sId] || {};
             var oVM = this.getView().getModel("view");
 
+
+
+            // Check if the report config has an exposure bucket
+    var bShowExposure = !!(oCfg.buckets && oCfg.buckets.CY && oCfg.buckets.CY.exposure);
+    oVM.setProperty("/showExposureMetric", bShowExposure);
+
+
             oVM.setProperty("/currentReportId", sId);
             oVM.setProperty("/currentReportTitle", oCfg.title || sId);
             oVM.setProperty("/isGeoReport", sId === "GEO_REPORT");
+
+// If switching to a report without Exposure while it was selected, reset to Gross
+    if (!bShowExposure && oVM.getProperty("/selectedMetricKey") === "exposure") {
+        oVM.setProperty("/selectedMetricKey", "gross");
+    }
 
             // Config Buckets & Columns
             if (oCfg.buckets) {
@@ -165,12 +237,18 @@ busy: false                // Controls loading indicators,
             this._updatePeriodDisplay();
 
             // DATA HELPER: Load & Process Data
+
+//  DATA LOADING (Hybrid: OData -> JSON)
+    // We pass the raw backend data we fetched in getRequest
+    var aBackendRows = oVM.getProperty("/backendData") || [];
+
             var aRows = this._dataHelper.loadReportData(
                 sId,
                 oCfg,
                 oVM.getProperty("/selectedBucketKey"),
                 oVM.getProperty("/selectedMetricKey"),
-                oVM.getProperty("/selectedTenure")
+                oVM.getProperty("/selectedTenure"),
+                aBackendRows // <----PASSING BACKEND DATA HERE
             );
 
             oVM.setProperty("/rows", aRows);
@@ -182,56 +260,62 @@ busy: false                // Controls loading indicators,
             this._filterHelper.populateFilters(aRows, sId, oVM, oVM.getProperty("/col1Header"));
         },
 
-        _refreshAnalyticsAndGeoFromTable: function (bForceAll) {
-            var oTable = this.byId("_IDGenTable");
-            var oVM = this.getView().getModel("view");
-            var aVisibleRows = [];
 
-            if (bForceAll) {
-                aVisibleRows = oVM.getProperty("/rows");
-            } else if (oTable && oTable.getBinding("items")) {
-                var aContexts = oTable.getBinding("items").getCurrentContexts();
-                aVisibleRows = aContexts.map(c => c.getObject());
-            } else {
-                return;
-            }
-
-            // DATA HELPER: KPIs
-            var oKPIs = this._dataHelper.calculateTotalKPIs(aVisibleRows, oVM.getProperty("/comparisonMode"));
-            for (var key in oKPIs) {
-                oVM.setProperty("/" + key, oKPIs[key]);
-            }
-
-            // CHART HELPER: Comparison/Trend
-            var aChartData = this._chartHelper.prepareComparisonChartData(aVisibleRows, oVM.getProperty("/comparisonMode"));
-            oVM.setProperty("/chartData", aChartData);
-            oVM.setProperty("/showComparisonChart", oVM.getProperty("/comparisonMode"));
-
-            // CHART HELPER: Waterfall
-            if (oVM.getProperty("/comparisonMode")) {
-                var aWaterfall = this._chartHelper.prepareWaterfallData(aVisibleRows, oKPIs.totalMetricPY, oKPIs.totalMetric);
-                oVM.setProperty("/waterfallData", aWaterfall);
-            }
-
-
-            
-            // CHART HELPER: Geo
-            if (oVM.getProperty("/currentReportId") === "GEO_REPORT") {
-                this._repaintMap(aVisibleRows);
-            }
-
-            // Force Redraw of Charts (Fix for cut-off issue)
-            this._invalidateCharts();
+         _invalidateCharts: function () {
+            var aCharts = ["vizFrameTrend", "vizFrameComp", "vizWaterfall"];
+            aCharts.forEach(function (sId) {
+                var oChart = this.byId(sId);
+                if (oChart) {
+                    oChart.invalidate();
+                }
+            }.bind(this));
         },
 
-        _invalidateCharts: function () {
-            var charts = ["vizFrameTrend", "vizFrameComp", "vizWaterfall"];
-            charts.forEach(id => {
-                var c = this.byId(id);
-                if (c && c.getVisible()) c.invalidate();
-            });
-        },
+      _refreshAnalyticsAndGeoFromTable: function (bForceAll) {
+    var oTable = this.byId("_IDGenTable");
+    var oVM = this.getView().getModel("view");
+    var aVisibleRows = [];
 
+    if (bForceAll) {
+        // Initial Load or Reset
+        aVisibleRows = oVM.getProperty("/rows") || [];
+    } else if (oTable && oTable.getBinding("items")) {
+        // FILTER APPLIED: Get ALL matching rows
+        var oBinding = oTable.getBinding("items");
+        // FIX: Ensure we get contexts even if not physically rendered
+        var iLength = oBinding.getLength(); 
+        if (iLength > 0) {
+            var aContexts = oBinding.getContexts(0, iLength);
+            aVisibleRows = aContexts.map(function(c) { return c.getObject(); });
+        }
+    }
+
+    // Guard Clause: If filtering removes all rows, don't crash
+    if (!aVisibleRows || aVisibleRows.length === 0) {
+        oVM.setProperty("/chartData", []);
+        oVM.setProperty("/geoData", []); // Clear map
+        return;
+    }
+
+    // 1. Update KPIs
+    var oKPIs = this._dataHelper.calculateTotalKPIs(aVisibleRows, oVM.getProperty("/comparisonMode"));
+    for (var key in oKPIs) {
+        oVM.setProperty("/" + key, oKPIs[key]);
+    }
+
+    // 2. Update Charts
+    var aChartData = this._chartHelper.prepareComparisonChartData(aVisibleRows, oVM.getProperty("/comparisonMode"));
+    oVM.setProperty("/chartData", aChartData);
+    oVM.setProperty("/showComparisonChart", oVM.getProperty("/comparisonMode"));
+
+    // 3. Update Map (Regional Distribution)
+    if (oVM.getProperty("/currentReportId") === "GEO_REPORT") {
+        this._repaintMap(aVisibleRows);
+    }
+
+    this._invalidateCharts();
+},
+  
 _setChartConfigs: function() {
     var oVizFrameComp = this.byId("vizFrameComp");
     var oVizFrameTrend = this.byId("vizFrameTrend");
@@ -250,21 +334,7 @@ _setChartConfigs: function() {
     if (oVizFrameTrend) { oVizFrameTrend.setVizProperties(oProps); }
 },
 
-_setChartConfigs: function() {
-    var oVizFrameComp = this.byId("vizFrameComp");
-    var oVizFrameTrend = this.byId("vizFrameTrend");
 
-    var oProps = {
-        plotArea: {
-            dataLabel: { visible: true, showTotal: true }
-        },
-        title: { visible: false },
-        interaction: { selectability: { mode: "single" } }
-    };
-
-    if (oVizFrameComp) { oVizFrameComp.setVizProperties(oProps); }
-    if (oVizFrameTrend) { oVizFrameTrend.setVizProperties(oProps); }
-},
         // ============================================================
         // MAP (Delegated to Helper)
         // ============================================================
@@ -272,6 +342,9 @@ _setChartConfigs: function() {
             var oVM = this.getView().getModel("view");
             var aRows = aRowsOverride || (oVM.getProperty("/rows") || []);
 
+
+                   // Get the Comparison Mode Flag
+    var bComparisonMode = oVM.getProperty("/comparisonMode");
             if (oVM.getProperty("/currentReportId") === "GEO_REPORT") {
                 setTimeout(function () {
                     // Inject SVG if needed (omitted for brevity, assume container has it or injected here)
@@ -282,7 +355,7 @@ _setChartConfigs: function() {
 
                     var oTooltip = document.getElementById("mapTooltip") || this._createTooltip();
 
-                    var mDataById = this._chartHelper.renderGeoMap(aRows, this._mapConfig, oTooltip);
+                    var mDataById = this._chartHelper.renderGeoMap(aRows, this._mapConfig, oTooltip , bComparisonMode);
 
                     if (mDataById) this._updateGeoChart(mDataById);
                 }.bind(this), 300);
@@ -335,11 +408,15 @@ _setChartConfigs: function() {
             var oTable = this.byId("_IDGenTable");
             if (!oTable || !oTable.getBinding("items")) return;
 
-            // FILTER HELPER
-            var aFilters = this._filterHelper.buildFiltersFromUI(this.getView().getModel("view").getProperty("/currentReportId"), this._sQuickSearch);
-            oTable.getBinding("items").filter(aFilters);
-            this._refreshAnalyticsAndGeoFromTable();
-        },
+         // ✅ FIX: Pass the search query to FilterHelper
+    var aFilters = this._filterHelper.buildFiltersFromUI(
+        this.getView().getModel("view").getProperty("/currentReportId"),
+        this._sQuickSearch || ""  // ← Ensure it's always a string
+    );
+
+    oTable.getBinding("items").filter(aFilters);
+    this._refreshAnalyticsAndGeoFromTable();
+},
 
         onQuickSearch: function (oEvent) {
             var sValue = oEvent.getParameter("newValue") || oEvent.getParameter("query") || "";
@@ -376,14 +453,33 @@ _setChartConfigs: function() {
             this._loadReport(this.getView().getModel("view").getProperty("/currentReportId"));
         },
 
-        onComparisonToggle: function (oEvent) {
-            var bMode = oEvent.getParameter("pressed");
-            var oVM = this.getView().getModel("view");
-            oVM.setProperty("/comparisonMode", bMode);
-            if (bMode) oVM.setProperty("/selectedBucketKey", "CY");
-            this._updatePeriodDisplay();
-            this._loadReport(oVM.getProperty("/currentReportId"));
-        },
+     onComparisonToggle: function (oEvent) {
+    var bMode = oEvent.getParameter("pressed");
+    var oVM = this.getView().getModel("view");
+    
+    oVM.setProperty("/comparisonMode", bMode);
+    oVM.setProperty("/selectedBucketKey", "CY"); // Lock to CY in comparison mode
+    
+    //  CRITICAL: Refresh chart data for waterfall
+    this._refreshAnalyticsAndGeoFromTable();
+    
+    //  Prepare waterfall data when comparison is enabled
+    if (bMode) {
+        var aRows = oVM.getProperty("/rows") || [];
+        var fTotalMetricPY = oVM.getProperty("/totalMetricPY") || 0;
+        var fTotalMetric = oVM.getProperty("/totalMetric") || 0;
+        
+        var aWaterfallData = this._chartHelper.prepareWaterfallData(
+            aRows,
+            fTotalMetricPY,
+            fTotalMetric
+        );
+        oVM.setProperty("/waterfallData", aWaterfallData);
+    }
+    
+    this._invalidateCharts();
+},
+
 
         onToggleSidebar: function () {
             var oVM = this.getView().getModel("view");
@@ -446,7 +542,7 @@ _setChartConfigs: function() {
         // ============================================================
         _updatePeriodDisplay: function () {
             var oVM = this.getView().getModel("view");
-            var sBucketKey = oVM.getProperty("/selectedBucketKey");
+            var sBucketKey = oVM.getProperty("/selectedBucketKey"); // CY or PY
             var bComparisonMode = oVM.getProperty("/comparisonMode");
             var sPeriodCY = oVM.getProperty("/periodLabelCY");
             var sPeriodPY = oVM.getProperty("/periodLabelPY");
@@ -454,14 +550,52 @@ _setChartConfigs: function() {
             var sText = bComparisonMode ? sPeriodCY : ((sBucketKey === "CY") ? sPeriodCY : sPeriodPY);
             oVM.setProperty("/periodDisplayText", sText);
             oVM.setProperty("/showComparisonPeriod", bComparisonMode);
+            // RE-TRIGGER Label Update to ensure (CY) / (PY) text refreshes in Table Header
+        var sReportId = oVM.getProperty("/currentReportId");
+        var oCfg = this._oReportConfig[sReportId];
+        if(oCfg) this._applyMeasureLabel(oCfg, oVM);
         },
 
-        _applyMeasureLabel: function (oCfg, oVM) {
-            var sMetricKey = oVM.getProperty("/selectedMetricKey");
-            var mLabels = { "gross": "Gross Sanction", "disb": "Disbursement", "net": "Net Sanction", "os": "Principal O/S" };
-            oVM.setProperty("/activeMetricLabel", mLabels[sMetricKey] || "Amount");
-        },
+        // _applyMeasureLabel: function (oCfg, oVM) {
+        //     var sMetricKey = oVM.getProperty("/selectedMetricKey");
+        //     var mLabels = { "gross": "Gross Sanction", "disb": "Disbursement", "net": "Net Sanction", "os": "Principal O/S" };
+        //     oVM.setProperty("/activeMetricLabel", mLabels[sMetricKey] || "Amount");
+        // },
 
+
+_applyMeasureLabel: function (oCfg, oVM) {
+    var sReportId = oVM.getProperty("/currentReportId");
+    
+    // Check if the current report has specific metrics like recovery
+    var oBucket = oCfg.buckets ? oCfg.buckets.CY : {};
+
+    if (oBucket.recovery) {
+        oVM.setProperty("/activeMetricLabel", "Write-off Recovery");
+    } else if (oBucket.interest) {
+        oVM.setProperty("/activeMetricLabel", mLabels[sMetricKey] || "Amount");
+    } else {
+        // Standard Metric Labels
+        var sMetricKey = oVM.getProperty("/selectedMetricKey");
+        var mLabels = { "gross": "Gross Sanction", "disb": "Disbursement", "net": "Net Sanction", "os": "Principal O/S", "exposure": "Exposure Amount"};
+       var sBaseLabel = mLabels[sMetricKey] || "Amount";
+
+        // OVERRIDES for Specific Reports
+        var oBucket = oCfg.buckets ? oCfg.buckets.CY : {};
+        
+        if (oBucket.recovery) {
+            sBaseLabel = "Write-off Recovery";
+        } else if (oBucket.amount) {
+            sBaseLabel = "Prepayment Amount";
+        } else if (oBucket.interest) {
+            sBaseLabel = "Interest Income";
+        }
+
+        // Set the clean label (e.g. "Write-off Recovery")
+        // The View XML adds the (CY)/(PY) suffix dynamically via binding
+        oVM.setProperty("/activeMetricLabel", sBaseLabel);
+
+    }
+},
         _createTooltip: function () {
             var oT = document.createElement("div");
             oT.id = "mapTooltip";
