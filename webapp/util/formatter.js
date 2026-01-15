@@ -88,6 +88,10 @@ sap.ui.define([], function () {
             if (!value || isNaN(value)) return "0.00 INR";
             var base = this.metricCompact ? this.metricCompact(value) : parseFloat(value).toFixed(2);
             return base + " INR";
-        }
+        },
+
+and: function(a, b) {
+    return a && b;
+}
     };
 });

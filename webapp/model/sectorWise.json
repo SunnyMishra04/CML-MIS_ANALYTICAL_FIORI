@@ -20,7 +20,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": 0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+"ExposureCY": 5000,
+      "ExposurePY": 4000
     },
     {
       "SectorName": "ENERGY",
@@ -42,7 +44,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": 0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 5500,
+      "ExposurePY": 8000
     },
     {
       "SectorName": "ENERGY",
@@ -64,7 +68,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -99.98,
       "DisbursementVarPct": 3478.25,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 66000,
+      "ExposurePY": 44000
     },
     {
       "SectorName": "ENERGY",
@@ -86,7 +92,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": 0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 5000,
+      "ExposurePY": 4000
     },
     {
       "SectorName": "ENERGY",
@@ -108,7 +116,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": -100.0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+    "ExposureCY": 105000,
+      "ExposurePY": 54000
     },
     {
       "SectorName": "OTHERS",
@@ -130,7 +140,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": 0,
       "DisbursementVarPct": 0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 15000,
+      "ExposurePY": 24000
     },
     {
       "SectorName": "OTHERS",
@@ -152,7 +164,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": 0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 5000,
+      "ExposurePY": 4000
     },
     {
       "SectorName": "TRANSPORT",
@@ -174,7 +188,9 @@
       "GrossSanctionVar": 160.0,
       "ProjectsVarPct": -99.88,
       "DisbursementVarPct": 2481.49,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 12000,
+      "ExposurePY": 8000
     },
     {
       "SectorName": "TRANSPORT",
@@ -196,7 +212,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": 0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 5000,
+      "ExposurePY": 4000
     },
     {
       "SectorName": "TRANSPORT",
@@ -218,7 +236,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": 0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 5000,
+      "ExposurePY": 4000
     },
     {
       "SectorName": "TRANSPORT",
@@ -240,7 +260,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -99.99,
       "DisbursementVarPct": -95.63,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 15000,
+      "ExposurePY": 2000
     },
     {
       "SectorName": "TRANSPORT",
@@ -262,7 +284,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": -100.0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 7500,
+      "ExposurePY": 3000
     },
     {
       "SectorName": "WATER SANITATION",
@@ -284,7 +308,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": -100.0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 10000,
+      "ExposurePY": 4000
     },
     {
       "SectorName": "WATER SANITATION",
@@ -306,7 +332,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -100.0,
       "DisbursementVarPct": 0,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+    "ExposureCY": 5000,
+      "ExposurePY": 8000
     },
     {
       "SectorName": "#",
@@ -328,7 +356,9 @@
       "GrossSanctionVar": 0.0,
       "ProjectsVarPct": -99.99,
       "DisbursementVarPct": 348.9,
-      "GrossSanctionVarPct": 0
+      "GrossSanctionVarPct": 0,
+      "ExposureCY": 2000,
+      "ExposurePY": 7000
     }
   ]
 }

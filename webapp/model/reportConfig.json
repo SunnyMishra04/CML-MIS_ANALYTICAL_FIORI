@@ -57,7 +57,8 @@
         "gross": "GrossSanctionCY",
         "net": "NetSanctionCY",
         "os": "PrincipalOsCY",
-        "cost": "ProjectCostCY"
+        "cost": "ProjectCostCY",
+        "exposure": "ExposureCY"
       },
       "PY": {
         "label": "01.04.2024 - 31.03.2025",
@@ -67,7 +68,8 @@
         "gross": "GrossSanctionPY",
         "net": "NetSanctionPY",
         "os": "PrincipalOsPY",
-        "cost": "ProjectCostPY"
+        "cost": "ProjectCostPY",
+        "exposure": "ExposurePY"
       }
     }
   },
@@ -144,29 +146,29 @@
     }
   },
   "BORROWER_RECOV": {
-    "title": "Borrower Wise Recovery against Written-off",
-    "dataFile": "model/borrowerRecov.json",
-    "columns": {
-      "col1Header": "Contract Number",
-      "col2Header": "Payment Date",
-      "col3Header": "Borrower Name"
-    },
-    "fields": {
-      "col1": "ContractNumber",
-      "col2": "PaymentDate",
-      "col3": "BorrowerName"
-    },
-    "buckets": {
-      "CY": {
-        "label": "01.04.2025 - 30.11.2025",
-        "recovery": "WriteOffRecCY"
-      },
-      "PY": {
-        "label": "01.04.2024 - 31.03.2025",
-        "recovery": "WriteOffRecPY"
-      }
-    }
+  "title": "Borrower Wise Recovery against Written-off",
+  "dataFile": "model/borrowRecov.json",
+  "columns": {
+    "col1Header": "Contract Number",
+    "col2Header": "Payment Date",
+    "col3Header": "Borrower Name"
   },
+  "fields": {
+    "col1": "ContractNumber",
+    "col2": "PaymentDate",
+    "col3": "BorrowerName"
+  },
+  "buckets": {
+    "CY": {
+      "label": "01.04.2025 - 30.11.2025",
+      "recovery": "WriteOff Rec(01.04.2025 -30.11.2025)"
+    },
+    "PY": {
+      "label": "01.04.2024 - 31.03.2025",
+      "recovery": "WriteOff Rec(01.04.2024 -31.03.2025)"
+    }
+  }
+},
   "PREPAYMENT": {
     "title": "Prepayment Requirements",
     "dataFile": "model/prepayment.json",
