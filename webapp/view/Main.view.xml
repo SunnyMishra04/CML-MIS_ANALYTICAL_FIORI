@@ -41,6 +41,16 @@
                                 <ToolbarSpacer id="_IDGenToolbarSpacer"/>
                                 <Button id="globalSortButton" icon="sap-icon://sort" tooltip="Sort/Group Data" press=".onOpenViewSettings" type="Transparent"/>
 
+
+                                    <!-- Dark Mode Toggle Button  -->
+<Button
+  id="darkModeToggle"
+  icon="sap-icon://moon"
+  tooltip="Toggle Dark Mode"
+  press=".onToggleDarkMode"
+  type="Transparent"
+class="darkModeButton"
+/>
                                 <!-- Tenure Selector -->
                                 <Label id="lblTenure" text="Tenure:" design="Bold" class="headerLabel sapUiSmallMarginBegin"/>
                                 <Select id="tenureSelector" change=".onTenureChange" selectedKey="{view>/selectedTenure}" width="120px" class="customSelect">

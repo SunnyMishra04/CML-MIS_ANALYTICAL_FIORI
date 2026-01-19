@@ -32,6 +32,7 @@ sap.ui.define([
             this._filterHelper = new FilterHelper(this);
             this._exportHelper = new ExportHelper(this);
             
+            
             // Load Report Config
             var oCfgModel = new JSONModel();
             oCfgModel.loadData("model/reportConfig.json", null, false);
@@ -135,7 +136,7 @@ busy: false                // Controls loading indicators,
     this._setChartConfigs();
     //  Start Data Loading (Attempts OData first)
  this.getRequest(); 
-
+this._initializeDarkMode();
         },
 // ============================================================
         // ODATA / BACKEND LOGIC
@@ -330,10 +331,22 @@ _setChartConfigs: function() {
         interaction: { selectability: { mode: "single" } }
     };
 
+    // Add Dark Mode specific properties
+  var sTheme = document.documentElement.getAttribute("data-theme") || "light";
+  if (sTheme === "dark") {
+    oProps.general = {
+      background: { color: "#1e293b" }  // Match your card background
+    };
+    oProps.categoryAxis = {
+      label: { color: "#cbd5e1" }
+    };
+    oProps.valueAxis = {
+      label: { color: "#cbd5e1" }
+    };
+  }
     if (oVizFrameComp) { oVizFrameComp.setVizProperties(oProps); }
     if (oVizFrameTrend) { oVizFrameTrend.setVizProperties(oProps); }
 },
-
 
         // ============================================================
         // MAP (Delegated to Helper)
@@ -408,7 +421,7 @@ _setChartConfigs: function() {
             var oTable = this.byId("_IDGenTable");
             if (!oTable || !oTable.getBinding("items")) return;
 
-         // ✅ FIX: Pass the search query to FilterHelper
+         //  Pass the search query to FilterHelper
     var aFilters = this._filterHelper.buildFiltersFromUI(
         this.getView().getModel("view").getProperty("/currentReportId"),
         this._sQuickSearch || ""  // ← Ensure it's always a string
@@ -743,6 +756,36 @@ onConfirmViewSettings: function (oEvent) {
 
                     </g>
             </svg>`;
-        }
+        
+        
+        
+},
+// ============================================================
+// DARK MODE
+// ============================================================
+
+_initializeDarkMode: function() {
+  var sSavedTheme = localStorage.getItem("cmlMisTheme");
+  if (sSavedTheme) {
+    this._applyTheme(sSavedTheme);
+  } else {
+    var bPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    this._applyTheme(bPrefersDark ? "dark" : "light");
+  }
+},
+
+_applyTheme: function(sTheme) {
+  document.documentElement.setAttribute("data-theme", sTheme === "dark" ? "dark" : "");
+  var oButton = this.byId("darkModeToggle");
+  if (oButton) oButton.setIcon(sTheme === "dark" ? "sap-icon://sun" : "sap-icon://moon");
+  localStorage.setItem("cmlMisTheme", sTheme);
+},
+
+onToggleDarkMode: function() {
+  var sTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  this._applyTheme(sTheme);
+  sap.m.MessageToast.show("Switched to " + (sTheme === "dark" ? "Dark" : "Light") + " Mode");
+},
+
     });
 });
