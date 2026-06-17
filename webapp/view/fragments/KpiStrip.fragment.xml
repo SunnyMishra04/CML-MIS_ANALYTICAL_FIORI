@@ -1,0 +1,51 @@
+<!-- KpiStrip.fragment.xml
+     Reusable KPI card strip — binds to viewModel>/kpis (array of {title,value,unit,delta,deltaState,icon})
+     deltaState: "Good" | "Critical" | "None"  → maps to ObjectNumber state
+     Rendered above the IconTabBar on every report view.
+-->
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout">
+
+    <ScrollContainer
+        id="kpiScrollContainer"
+        horizontal="true"
+        vertical="false"
+        width="100%"
+        class="cmlKpiStrip">
+
+        <FlexBox
+            id="kpiFlexBox"
+            wrap="NoWrap"
+            alignItems="Stretch"
+            class="cmlKpiFlexBox">
+
+            <!-- Rendered dynamically from JS: _renderKpiStrip() in UiHelper.js -->
+            <!-- Placeholder panel — replaced at runtime -->
+            <GenericTile
+                id="kpiTilePlaceholder"
+                visible="false"
+                header="Placeholder"
+                frameType="TwoByOne"
+                class="cmlKpiTile">
+                <tileContent>
+                    <TileContent
+                        unit="₹ Cr"
+                        footer="CY vs PY">
+                        <content>
+                            <NumericContent
+                                value="0"
+                                scale="K"
+                                indicator="None"
+                                valueColor="Neutral"
+                                withMargin="false"/>
+                        </content>
+                    </TileContent>
+                </tileContent>
+            </GenericTile>
+
+        </FlexBox>
+    </ScrollContainer>
+
+</core:FragmentDefinition>

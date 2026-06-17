@@ -1,0 +1,199 @@
+<!-- ContractDetailDialog.fragment.xml
+     Row-click drill-down dialog.
+     Binds to model "contractDetail" (set in UiHelper.openContractDetail()).
+     Sections:
+       1. Header ObjectHeader  — BorrowerGroupName, Scheme, status
+       2. Financial Summary    — Sanction / Disbursed / PrincipalOs CY vs PY
+       3. Variance Analysis    — DisbursementVar, GrossSanctionVar, PrincipalOs delta
+       4. Project Activity     — ProjectsCY, ProjectsPY, ProjectsVar%
+-->
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form">
+
+    <Dialog
+        id="contractDetailDialog"
+        title="Loan Group Detail"
+        contentWidth="620px"
+        contentHeight="auto"
+        resizable="true"
+        draggable="true"
+        class="cmlDetailDialog">
+
+        <customHeader>
+            <Bar>
+                <contentLeft>
+                    <Title
+                        text="{contractDetail>/BorrowerGroupName}"
+                        level="H4"/>
+                </contentLeft>
+                <contentMiddle>
+                    <ObjectStatus
+                        text="{contractDetail>/Scheme}"
+                        state="Information"
+                        icon="sap-icon://tag"/>
+                </contentMiddle>
+                <contentRight>
+                    <Button
+                        icon="sap-icon://decline"
+                        type="Transparent"
+                        press=".onCloseContractDetail"
+                        tooltip="Close"/>
+                </contentRight>
+            </Bar>
+        </customHeader>
+
+        <content>
+            <VBox class="cmlDialogContent">
+
+                <!-- ── Section 1 · Identifiers ─────────────────────────── -->
+                <Title text="Identifiers" level="H5" class="cmlSectionTitle"/>
+                <f:SimpleForm
+                    editable="false"
+                    layout="ResponsiveGridLayout"
+                    labelSpanL="4" labelSpanM="4"
+                    emptySpanL="0" emptySpanM="0"
+                    columnsL="2" columnsM="2">
+                    <f:content>
+                        <Label text="Borrower Group ID"/>
+                        <Text text="{contractDetail>/BorrowerGroup}"/>
+                        <Label text="Borrower Name"/>
+                        <Text text="{contractDetail>/BorrowerGroupName}"/>
+                        <Label text="Scheme"/>
+                        <Text text="{contractDetail>/Scheme}"/>
+                    </f:content>
+                </f:SimpleForm>
+
+                <core:HTML content="&lt;hr class='cmlDivider'/&gt;"/>
+
+                <!-- ── Section 2 · Financial Summary ─────────────────── -->
+                <Title text="Financial Summary (₹ Cr)" level="H5" class="cmlSectionTitle"/>
+                <f:SimpleForm
+                    editable="false"
+                    layout="ResponsiveGridLayout"
+                    labelSpanL="4" labelSpanM="4"
+                    emptySpanL="0" emptySpanM="0"
+                    columnsL="2" columnsM="2">
+                    <f:content>
+
+                        <Label text="Gross Sanction CY"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/GrossSanctionCY', formatter:'.fmt.crore'}"
+                            unit="Cr"
+                            state="{path:'contractDetail>/GrossSanctionCY', formatter:'.fmt.positiveState'}"/>
+
+                        <Label text="Gross Sanction PY"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/GrossSanctionPY', formatter:'.fmt.crore'}"
+                            unit="Cr"/>
+
+                        <Label text="Disbursement CY"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/DisbursementCY', formatter:'.fmt.crore'}"
+                            unit="Cr"
+                            state="{path:'contractDetail>/DisbursementCY', formatter:'.fmt.positiveState'}"/>
+
+                        <Label text="Disbursement PY"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/DisbursementPY', formatter:'.fmt.crore'}"
+                            unit="Cr"/>
+
+                        <Label text="Principal O/S CY"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/PrincipalOsCY', formatter:'.fmt.crore'}"
+                            unit="Cr"
+                            emphasized="true"/>
+
+                        <Label text="Principal O/S PY"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/PrincipalOsPY', formatter:'.fmt.crore'}"
+                            unit="Cr"/>
+
+                    </f:content>
+                </f:SimpleForm>
+
+                <core:HTML content="&lt;hr class='cmlDivider'/&gt;"/>
+
+                <!-- ── Section 3 · Variance Analysis ─────────────────── -->
+                <Title text="Variance (CY vs PY)" level="H5" class="cmlSectionTitle"/>
+                <f:SimpleForm
+                    editable="false"
+                    layout="ResponsiveGridLayout"
+                    labelSpanL="5" labelSpanM="5"
+                    emptySpanL="0" emptySpanM="0"
+                    columnsL="2" columnsM="2">
+                    <f:content>
+
+                        <Label text="Disbursement Δ"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/DisbursementVar', formatter:'.fmt.crore'}"
+                            unit="Cr"
+                            state="{path:'contractDetail>/DisbursementVar', formatter:'.fmt.varState'}"/>
+
+                        <Label text="Disbursement Δ%"/>
+                        <ObjectNumber
+                            number="{contractDetail>/DisbursementVarPct}"
+                            unit="%"
+                            state="{path:'contractDetail>/DisbursementVarPct', formatter:'.fmt.varState'}"/>
+
+                        <Label text="Gross Sanction Δ"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/GrossSanctionVar', formatter:'.fmt.crore'}"
+                            unit="Cr"
+                            state="{path:'contractDetail>/GrossSanctionVar', formatter:'.fmt.varState'}"/>
+
+                        <Label text="Projects Δ"/>
+                        <ObjectNumber
+                            number="{contractDetail>/ProjectsVar}"
+                            state="{path:'contractDetail>/ProjectsVar', formatter:'.fmt.varState'}"/>
+
+                        <Label text="Projects Δ%"/>
+                        <ObjectNumber
+                            number="{contractDetail>/ProjectsVarPct}"
+                            unit="%"
+                            state="{path:'contractDetail>/ProjectsVarPct', formatter:'.fmt.varState'}"/>
+
+                    </f:content>
+                </f:SimpleForm>
+
+                <core:HTML content="&lt;hr class='cmlDivider'/&gt;"/>
+
+                <!-- ── Section 4 · Project Activity ───────────────────── -->
+                <Title text="Project Activity" level="H5" class="cmlSectionTitle"/>
+                <f:SimpleForm
+                    editable="false"
+                    layout="ResponsiveGridLayout"
+                    labelSpanL="4" labelSpanM="4"
+                    emptySpanL="0" emptySpanM="0"
+                    columnsL="2" columnsM="2">
+                    <f:content>
+                        <Label text="Active Projects CY"/>
+                        <ObjectNumber number="{contractDetail>/ProjectsCY}"/>
+                        <Label text="Active Projects PY"/>
+                        <ObjectNumber number="{contractDetail>/ProjectsPY}"/>
+                        <Label text="Net Project Cost CY (₹ Cr)"/>
+                        <ObjectNumber
+                            number="{path:'contractDetail>/ProjectCostCY', formatter:'.fmt.crore'}"
+                            unit="Cr"/>
+                    </f:content>
+                </f:SimpleForm>
+
+            </VBox>
+        </content>
+
+        <buttons>
+            <Button
+                text="Export Row"
+                type="Transparent"
+                icon="sap-icon://download"
+                press=".onExportContractRow"/>
+            <Button
+                text="Close"
+                type="Emphasized"
+                press=".onCloseContractDetail"/>
+        </buttons>
+
+    </Dialog>
+
+</core:FragmentDefinition>

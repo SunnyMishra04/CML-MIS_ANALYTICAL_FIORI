@@ -1,0 +1,55 @@
+<!-- SchemeTabHeader.fragment.xml
+     Sticky sub-header strip shown when report data is grouped by Scheme.
+     Contains:
+       - Scheme filter chips (Direct Lending / Take Out Finance / Others / All)
+       - Active scheme indicator label
+       - Record count badge
+     Binds to viewModel>/schemeFilter and viewModel>/activeScheme
+-->
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <Toolbar
+        id="schemeTabHeaderToolbar"
+        class="cmlSchemeHeader"
+        style="Solid">
+
+        <Label
+            text="Scheme:"
+            class="cmlSchemeLabel"/>
+
+        <!-- Scheme chips — populated dynamically by UiHelper._renderSchemeChips() -->
+        <SegmentedButton
+            id="schemeSegBtn"
+            selectedKey="{viewModel>/activeScheme}"
+            selectionChange=".onSchemeChange">
+            <items>
+                <SegmentedButtonItem key="ALL"  text="All Schemes"/>
+                <SegmentedButtonItem key="DL"   text="Direct Lending"/>
+                <SegmentedButtonItem key="TOF"  text="Take Out Finance"/>
+                <SegmentedButtonItem key="OTH"  text="Others"/>
+            </items>
+        </SegmentedButton>
+
+        <ToolbarSpacer/>
+
+        <!-- Record count -->
+        <ObjectStatus
+            id="schemeRecordCount"
+            text="{= ${viewModel>/filteredRowCount} + ' records'}"
+            state="Information"
+            icon="sap-icon://list"/>
+
+        <!-- Zero-row warning -->
+        <MessageStrip
+            id="schemeEmptyWarning"
+            visible="{= ${viewModel>/filteredRowCount} === 0}"
+            text="No data matches current filters. Try changing the Scheme or clearing filters."
+            type="Warning"
+            showCloseButton="false"
+            class="cmlEmptyWarning"/>
+
+    </Toolbar>
+
+</core:FragmentDefinition>
