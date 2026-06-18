@@ -1,0 +1,86 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout">
+
+    <!-- Step 7: AI Copilot Panel — collapsible, hidden by default -->
+    <Panel id="aiInsightPanel"
+           headerText="AI Analysis — Gemini"
+           expandable="true"
+           expanded="true"
+           visible="{viewModel>/aiPanelVisible}"
+           class="sapUiSmallMarginBottom">
+
+        <headerToolbar>
+            <OverflowToolbar id="aiPanelToolbar">
+                <core:Icon id="aiPanelIcon" src="sap-icon://ai" size="1.25rem" color="#6366f1" class="sapUiTinyMarginEnd"/>
+                <Title id="aiPanelTitle" text="AI Analysis — Gemini" level="H5"/>
+                <ToolbarSpacer id="aiPanelSpacer"/>
+                <Button id="btnAiRefresh"
+                        icon="sap-icon://refresh"
+                        text="Refresh Analysis"
+                        press=".onAskAi"
+                        type="Emphasized"
+                        enabled="{= !${viewModel>/aiBusy} }"/>
+                <Button id="btnAiClose"
+                        icon="sap-icon://decline"
+                        tooltip="Close AI Panel"
+                        press=".onToggleAiPanel"
+                        type="Transparent"/>
+            </OverflowToolbar>
+        </headerToolbar>
+
+        <content>
+            <VBox id="aiContentBox" class="sapUiSmallMargin">
+
+                <!-- AI Response Area -->
+                <FormattedText id="aiResponseText"
+                               htmlText="{viewModel>/aiResponseHtml}"
+                               visible="{= !${viewModel>/aiBusy} &amp;&amp; ${viewModel>/aiResponse} !== '' }"
+                               class="sapUiSmallMarginBottom"/>
+
+                <!-- Busy Indicator while AI is thinking -->
+                <VBox id="aiBusyBox"
+                      visible="{viewModel>/aiBusy}"
+                      alignItems="Center"
+                      justifyContent="Center"
+                      class="sapUiMediumMargin">
+                    <BusyIndicator id="aiBusyIndicator" size="Medium"/>
+                    <Text id="aiBusyText" text="Analyzing data with Gemini..." class="sapUiSmallMarginTop"/>
+                </VBox>
+
+                <!-- Empty state -->
+                <IllustratedMessage id="aiEmptyState"
+                                    illustrationType="sapIllus-SimpleBalloon"
+                                    title="Ready for Analysis"
+                                    description="Click 'Refresh Analysis' to analyze the current report data with AI."
+                                    visible="{= !${viewModel>/aiBusy} &amp;&amp; ${viewModel>/aiResponse} === '' }"/>
+
+                <!-- Follow-up question input -->
+                <HBox id="aiQueryBox"
+                      alignItems="Center"
+                      width="100%"
+                      visible="{= !${viewModel>/aiBusy} &amp;&amp; ${viewModel>/aiResponse} !== '' }"
+                      class="sapUiSmallMarginTop">
+                    <Input id="aiQueryInput"
+                           placeholder="Ask a follow-up question about this data..."
+                           value="{viewModel>/aiQuery}"
+                           submit=".onAiQuerySubmit"
+                           width="100%"
+                           class="sapUiTinyMarginEnd">
+                        <layoutData>
+                            <FlexItemData id="aiQueryFlex" growFactor="1"/>
+                        </layoutData>
+                    </Input>
+                    <Button id="btnAiQuery"
+                            icon="sap-icon://feeder-arrow"
+                            tooltip="Send Question"
+                            press=".onAiQuerySubmit"
+                            type="Emphasized"/>
+                </HBox>
+
+            </VBox>
+        </content>
+    </Panel>
+
+</core:FragmentDefinition>

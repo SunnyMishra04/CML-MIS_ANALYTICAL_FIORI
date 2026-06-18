@@ -1,0 +1,19 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/sap/opu/odata/sap/ZCML_MIS_ANALYTICS_SRV/(.*)$",
+      "target": "/sap/opu/odata/sap/ZCML_MIS_ANALYTICS_SRV/$1",
+      "destination": "ZCML_MIS_ANALYTICS",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^(.*)$",
+      "target": "$1",
+      "service": "html5-apps-repo-rt",
+      "authenticationType": "xsuaa"
+    }
+  ]
+}

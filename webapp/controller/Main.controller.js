@@ -7,7 +7,10 @@ sap.ui.define([
     "iifcl/cml/cmlmisapp/controller/helpers/DataHelper",
     "iifcl/cml/cmlmisapp/controller/helpers/ChartHelper",
     "iifcl/cml/cmlmisapp/controller/helpers/FilterHelper",
-    "iifcl/cml/cmlmisapp/controller/helpers/ExportHelper"
+    "iifcl/cml/cmlmisapp/controller/helpers/ExportHelper",
+    "iifcl/cml/cmlmisapp/controller/helpers/UiHelper",
+    "iifcl/cml/cmlmisapp/service/ReportDataService",
+    "iifcl/cml/cmlmisapp/util/AiContextBuilder"
 ], function (
     Controller,
     JSONModel,
@@ -16,7 +19,10 @@ sap.ui.define([
     DataHelper,
     ChartHelper,
     FilterHelper,
-    ExportHelper
+    ExportHelper,
+    UiHelper,
+    ReportDataService,
+    AiContextBuilder
 ) {
     "use strict";
 
@@ -31,7 +37,30 @@ sap.ui.define([
             this._chartHelper = new ChartHelper(this);
             this._filterHelper = new FilterHelper(this);
             this._exportHelper = new ExportHelper(this);
-            
+            this._dataService = new ReportDataService(this.getOwnerComponent());
+
+            // Mixin UiHelper methods (KPI, insights, scheme filter, contract detail)
+            Object.assign(this, UiHelper);
+            this.attachFormatters();
+
+            // viewModel — state store for Step 2 fragments (KPI, Scheme, Insights)
+            var oFragmentViewModel = new JSONModel({
+                activeScheme:     "ALL",
+                filteredRowCount: 0,
+                kpis:             [],
+                insights:         [],
+                schemeFilter: {
+                    ALL: true, DL: false, TOF: false, OTH: false
+                },
+                // Step 7: AI Copilot state
+                aiPanelVisible:  false,
+                aiBusy:          false,
+                aiResponse:      "",
+                aiResponseHtml:  "",
+                aiQuery:         ""
+            });
+            this.getView().setModel(oFragmentViewModel, "viewModel");
+
             // Load Report Config
             var oCfgModel = new JSONModel();
             oCfgModel.loadData("model/reportConfig.json", null, false);
@@ -141,87 +170,59 @@ busy: false                // Controls loading indicators,
         // ODATA / BACKEND LOGIC
         // ============================================================
 
-           getRequest: function()   {
-                var that = this;
-               var oVM = this.getView().getModel("view");
-                // Show busy indicator while "trying" to fetch OData
+        /**
+         * Initial data load — delegates to ReportDataService.
+         * In mock mode: resolves immediately, per-report loading happens in _loadReport.
+         * In live mode: bulk-fetches from /ZMIS_AnalyticSet with timeout safety net.
+         */
+        getRequest: function () {
+            var that = this;
+            var oVM = this.getView().getModel("view");
 
-    sap.ui.core.BusyIndicator.show(0);
-               // 1. Get the OData Model properly
-    var oModel = this.getOwnerComponent().getModel(); 
-    var sPath = "/ZMIS_AnalyticSet";
+            sap.ui.core.BusyIndicator.show(0);
 
-    // Helper to Load Local JSONs (Unlock UI)
-            var fnLoadLocalFallback = function(sMsg) {
-                console.warn(sMsg || "Switching to Local JSONs...");
-                sap.ui.core.BusyIndicator.hide(); // UNLOCK SCREEN
-                that._loadReport("DEV_GROUP");    // Load Data
-            };
-
-            // If OData Model is missing, fallback immediately
-            if (!oModel) {
-                fnLoadLocalFallback("OData Model not found.");
-                return;
-            }
-
-            // SAFETY TIMER: If backend doesn't reply in 3 seconds, FORCE UNLOCK
-            var bDataLoaded = false;
-            setTimeout(function() {
-                if (!bDataLoaded) {
-                    fnLoadLocalFallback("Backend timed out (3s). Forcing Local Data.");
+            this._dataService.fetchAllData().then(function (aResults) {
+                sap.ui.core.BusyIndicator.hide();
+                oVM.setProperty("/backendData", aResults);
+                that._loadReport("DEV_GROUP");
+                if (aResults.length > 0) {
+                    MessageToast.show("Backend Data Loaded");
                 }
-            }, 3000);
-               
-    // Attempt Metadata Load first
-            oModel.metadataLoaded().then(function() {
-                var mParameter = {
-                    urlParameters: { "$top": 10000 },
-                    success: function (oData, oRes) {
-                        bDataLoaded = true; // Mark as success
-                        sap.ui.core.BusyIndicator.hide(); // Unlock
-                        
-                        var aResults = (oData && oData.results) ? oData.results : [];
-                        oVM.setProperty("/backendData", aResults);
-                        
-                        that._loadReport("DEV_GROUP");
-                        MessageToast.show("Backend Data Loaded");
-                    },
-                    error: function (oError) {
-                        bDataLoaded = true;
-                        fnLoadLocalFallback("OData Read Failed.");
-                    }
-                };
-                oModel.read(sPath, mParameter);
-            }).catch(function() {
-                bDataLoaded = true;
-                fnLoadLocalFallback("Metadata Load Failed.");
+            }).catch(function () {
+                sap.ui.core.BusyIndicator.hide();
+                console.warn("[Main] fetchAllData failed — loading default report with local data.");
+                that._loadReport("DEV_GROUP");
             });
         },
         // ============================================================
         // CORE LOGIC (Using Helpers)
         // ============================================================
 
+        /**
+         * Load and display a report.
+         * Step 4: Data fetching is delegated to ReportDataService.
+         *         DataHelper.processReportRows handles transformation only.
+         *         All post-load UI updates happen inside the .then() callback.
+         *
+         * @param {string} sId - Report ID (e.g. "DEV_GROUP")
+         */
         _loadReport: function (sId) {
+            var that = this;
             var oCfg = this._oReportConfig[sId] || {};
             var oVM = this.getView().getModel("view");
 
+            // --- Synchronous UI config (safe before data arrives) ---
 
-
-            // Check if the report config has an exposure bucket
-    var bShowExposure = !!(oCfg.buckets && oCfg.buckets.CY && oCfg.buckets.CY.exposure);
-    oVM.setProperty("/showExposureMetric", bShowExposure);
-
-
+            var bShowExposure = !!(oCfg.buckets && oCfg.buckets.CY && oCfg.buckets.CY.exposure);
+            oVM.setProperty("/showExposureMetric", bShowExposure);
             oVM.setProperty("/currentReportId", sId);
             oVM.setProperty("/currentReportTitle", oCfg.title || sId);
             oVM.setProperty("/isGeoReport", sId === "GEO_REPORT");
 
-// If switching to a report without Exposure while it was selected, reset to Gross
-    if (!bShowExposure && oVM.getProperty("/selectedMetricKey") === "exposure") {
-        oVM.setProperty("/selectedMetricKey", "gross");
-    }
+            if (!bShowExposure && oVM.getProperty("/selectedMetricKey") === "exposure") {
+                oVM.setProperty("/selectedMetricKey", "gross");
+            }
 
-            // Config Buckets & Columns
             if (oCfg.buckets) {
                 oVM.setProperty("/periodLabelCY", oCfg.buckets.CY && oCfg.buckets.CY.label || "Current Year");
                 oVM.setProperty("/periodLabelPY", oCfg.buckets.PY && oCfg.buckets.PY.label || "Previous Year");
@@ -236,30 +237,210 @@ busy: false                // Controls loading indicators,
             this._applyMeasureLabel(oCfg, oVM);
             this._updatePeriodDisplay();
 
-            // DATA HELPER: Load & Process Data
+            // --- Async data fetch via ReportDataService ---
 
-//  DATA LOADING (Hybrid: OData -> JSON)
-    // We pass the raw backend data we fetched in getRequest
-    var aBackendRows = oVM.getProperty("/backendData") || [];
+            this._dataService.fetchReportData(sId, oCfg).then(function (aRawRows) {
+                // DataHelper transforms raw rows (column mapping, metrics, variances)
+                var aRows = that._dataHelper.processReportRows(
+                    aRawRows,
+                    oCfg,
+                    oVM.getProperty("/selectedBucketKey"),
+                    oVM.getProperty("/selectedMetricKey"),
+                    oVM.getProperty("/selectedTenure")
+                );
 
-            var aRows = this._dataHelper.loadReportData(
-                sId,
+                // Store processed rows and cache raw rows for scheme filtering
+                oVM.setProperty("/rows", aRows);
+                oVM.setProperty("/currentRawRows", aRawRows);
+
+                // Step 3: refresh fragment-level KPIs & insights
+                that.refreshUiMetrics(aRows);
+                var oFlexBox = that.byId("kpiFlexBox");
+                if (oFlexBox) {
+                    var oFVM = that.getView().getModel("viewModel");
+                    that.renderKpiTiles(oFlexBox, oFVM.getProperty("/kpis"));
+                }
+
+                // Calculate Totals & Charts
+                that._refreshAnalyticsAndGeoFromTable(true);
+
+                // Populate filter dropdowns
+                that._filterHelper.populateFilters(aRows, sId, oVM, oVM.getProperty("/col1Header"));
+
+                // Reset scheme filter to ALL on report switch
+                var oFVM2 = that.getView().getModel("viewModel");
+                if (oFVM2) {
+                    oFVM2.setProperty("/activeScheme", "ALL");
+                }
+            }).catch(function (oError) {
+                console.error("[Main] _loadReport failed for " + sId, oError);
+                oVM.setProperty("/rows", []);
+                that._refreshAnalyticsAndGeoFromTable(true);
+            });
+        },
+
+        /**
+         * Handler: Scheme SegmentedButton changed.
+         * Filters the current report's processed rows client-side (no re-fetch).
+         * Step 4: Uses cached currentRawRows + DataHelper.processReportRows
+         *         instead of re-fetching from the service.
+         */
+        onSchemeChange: function (oEvent) {
+            var sKey = oEvent.getParameter("item").getKey();
+            var oVM  = this.getView().getModel("view");
+            var oFVM = this.getView().getModel("viewModel");
+
+            oFVM.setProperty("/activeScheme", sKey);
+
+            // Re-process cached raw rows and apply scheme filter client-side
+            var aRawRows    = oVM.getProperty("/currentRawRows") || [];
+            var sReportId   = oVM.getProperty("/currentReportId");
+            var oCfg        = this._oReportConfig[sReportId] || {};
+
+            var aProcessed = this._dataHelper.processReportRows(
+                aRawRows,
                 oCfg,
                 oVM.getProperty("/selectedBucketKey"),
                 oVM.getProperty("/selectedMetricKey"),
-                oVM.getProperty("/selectedTenure"),
-                aBackendRows // <----PASSING BACKEND DATA HERE
+                oVM.getProperty("/selectedTenure")
             );
+            var aFiltered = this.applySchemeFilter(aProcessed, sKey);
+            oVM.setProperty("/rows", aFiltered);
 
-            oVM.setProperty("/rows", aRows);
+            // Refresh fragment-level metrics
+            this.refreshUiMetrics(aFiltered);
+            var oFlexBox = this.byId("kpiFlexBox");
+            if (oFlexBox) {
+                this.renderKpiTiles(oFlexBox, oFVM.getProperty("/kpis"));
+            }
 
-            // Calculate Totals & Charts
-            this._refreshAnalyticsAndGeoFromTable(true); // pass true to use full rows initially
-
-            // FILTER HELPER: Populate Dropdowns
-            this._filterHelper.populateFilters(aRows, sId, oVM, oVM.getProperty("/col1Header"));
+            // Refresh analytics from filtered rows
+            this._refreshAnalyticsAndGeoFromTable(true);
+            this._filterHelper.populateFilters(
+                aFiltered,
+                sReportId,
+                oVM,
+                oVM.getProperty("/col1Header")
+            );
         },
 
+        /**
+         * Handler: Table row pressed → open Contract Detail dialog.
+         * Reads the bound data object and passes to UiHelper.openContractDetail().
+         */
+        onTableRowPress: function (oEvent) {
+            var oItem = oEvent.getSource();
+            var oCtx  = oItem.getBindingContext("view");
+            if (oCtx) {
+                var oRow = oCtx.getObject();
+                this.openContractDetail(oRow);
+            }
+        },
+
+        // ============================================================
+        // AI COPILOT (Step 7)
+        // ============================================================
+
+        /**
+         * Toggle AI analysis panel visibility.
+         */
+        onToggleAiPanel: function () {
+            var oFVM = this.getView().getModel("viewModel");
+            var bVisible = oFVM.getProperty("/aiPanelVisible");
+            oFVM.setProperty("/aiPanelVisible", !bVisible);
+
+            // Auto-trigger analysis on first open if no response exists
+            if (!bVisible && !oFVM.getProperty("/aiResponse")) {
+                this.onAskAi();
+            }
+        },
+
+        /**
+         * Trigger AI analysis of the current report data.
+         * Builds context from app state, calls Gemini, displays result.
+         */
+        onAskAi: function () {
+            var that = this;
+            var oFVM = this.getView().getModel("viewModel");
+
+            oFVM.setProperty("/aiBusy", true);
+            oFVM.setProperty("/aiResponse", "");
+            oFVM.setProperty("/aiResponseHtml", "");
+
+            AiContextBuilder.analyze(this).then(function (sText) {
+                oFVM.setProperty("/aiResponse", sText);
+                oFVM.setProperty("/aiResponseHtml", that._markdownToHtml(sText));
+                oFVM.setProperty("/aiBusy", false);
+            }).catch(function (oError) {
+                console.error("[Main] AI analysis failed:", oError);
+                var sErrorMsg = "AI analysis failed: " + (oError.message || "Unknown error");
+                oFVM.setProperty("/aiResponse", sErrorMsg);
+                oFVM.setProperty("/aiResponseHtml", "<p>" + sErrorMsg + "</p>");
+                oFVM.setProperty("/aiBusy", false);
+            });
+        },
+
+        /**
+         * Handle user follow-up question submission.
+         */
+        onAiQuerySubmit: function () {
+            var that = this;
+            var oFVM = this.getView().getModel("viewModel");
+            var sQuery = oFVM.getProperty("/aiQuery");
+
+            if (!sQuery || !sQuery.trim()) {
+                MessageToast.show("Please enter a question.");
+                return;
+            }
+
+            oFVM.setProperty("/aiBusy", true);
+            oFVM.setProperty("/aiQuery", "");
+
+            AiContextBuilder.analyze(this, sQuery.trim()).then(function (sText) {
+                oFVM.setProperty("/aiResponse", sText);
+                oFVM.setProperty("/aiResponseHtml", that._markdownToHtml(sText));
+                oFVM.setProperty("/aiBusy", false);
+            }).catch(function (oError) {
+                console.error("[Main] AI follow-up failed:", oError);
+                oFVM.setProperty("/aiResponse", "Follow-up failed: " + oError.message);
+                oFVM.setProperty("/aiResponseHtml", "<p>Follow-up failed: " + oError.message + "</p>");
+                oFVM.setProperty("/aiBusy", false);
+            });
+        },
+
+        /**
+         * Convert basic markdown to safe HTML for sap.m.FormattedText.
+         * Handles: headers, bold, italic, bullet lists, code blocks, line breaks.
+         * @param {string} sMd - markdown text
+         * @returns {string} HTML string
+         * @private
+         */
+        _markdownToHtml: function (sMd) {
+            if (!sMd) { return ""; }
+            var sHtml = sMd
+                // Code blocks (```...```)
+                .replace(/```[\s\S]*?```/g, function (match) {
+                    var code = match.replace(/```\w*\n?/, "").replace(/```$/, "");
+                    return "<pre>" + code + "</pre>";
+                })
+                // Headers
+                .replace(/^### (.+)$/gm, "<h5>$1</h5>")
+                .replace(/^## (.+)$/gm, "<h4>$1</h4>")
+                .replace(/^# (.+)$/gm, "<h3>$1</h3>")
+                // Bold + Italic
+                .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
+                .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\*(.+?)\*/g, "<em>$1</em>")
+                // Bullet lists
+                .replace(/^[\-\*] (.+)$/gm, "<li>$1</li>")
+                // Wrap consecutive <li> in <ul>
+                .replace(/(<li>.*<\/li>\n?)+/g, function (match) {
+                    return "<ul>" + match + "</ul>";
+                })
+                // Line breaks (but not after block elements)
+                .replace(/(?<!>)\n(?!<)/g, "<br/>");
+            return sHtml;
+        },
 
          _invalidateCharts: function () {
             var aCharts = ["vizFrameTrend", "vizFrameComp", "vizWaterfall"];
@@ -301,6 +482,14 @@ busy: false                // Controls loading indicators,
     var oKPIs = this._dataHelper.calculateTotalKPIs(aVisibleRows, oVM.getProperty("/comparisonMode"));
     for (var key in oKPIs) {
         oVM.setProperty("/" + key, oKPIs[key]);
+    }
+
+    // Step 3: also refresh fragment KPIs/insights for visible rows
+    this.refreshUiMetrics(aVisibleRows);
+    var oFlexBox = this.byId("kpiFlexBox");
+    if (oFlexBox) {
+        var oFVM = this.getView().getModel("viewModel");
+        this.renderKpiTiles(oFlexBox, oFVM.getProperty("/kpis"));
     }
 
     // 2. Update Charts
