@@ -1,0 +1,55 @@
+<!-- InsightStrip.fragment.xml
+     Auto-generated insight bar rendered below the KPI strip.
+     Populated by UiHelper._buildInsights() which scans the current dataset
+     and emits plain-language callouts.
+
+     Each insight is a MessageStrip with icon, type (Warning/Success/Information)
+     and a short sentence. Max 3 shown per render cycle.
+
+     Hidden when viewModel>/insights is empty.
+-->
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <VBox
+        id="insightStripContainer"
+        visible="{= ${viewModel>/insights/length} > 0}"
+        class="cmlInsightStrip">
+
+        <!-- Rendered dynamically by UiHelper._renderInsights() -->
+        <!-- Three template MessageStrips — cloned/replaced at runtime -->
+
+        <MessageStrip
+            id="insight0"
+            visible="{= ${viewModel>/insights/length} > 0}"
+            text="{viewModel>/insights/0/text}"
+            type="{viewModel>/insights/0/type}"
+            showIcon="true"
+            showCloseButton="true"
+            close=".onDismissInsight"
+            class="cmlInsightItem"/>
+
+        <MessageStrip
+            id="insight1"
+            visible="{= ${viewModel>/insights/length} > 1}"
+            text="{viewModel>/insights/1/text}"
+            type="{viewModel>/insights/1/type}"
+            showIcon="true"
+            showCloseButton="true"
+            close=".onDismissInsight"
+            class="cmlInsightItem"/>
+
+        <MessageStrip
+            id="insight2"
+            visible="{= ${viewModel>/insights/length} > 2}"
+            text="{viewModel>/insights/2/text}"
+            type="{viewModel>/insights/2/type}"
+            showIcon="true"
+            showCloseButton="true"
+            close=".onDismissInsight"
+            class="cmlInsightItem"/>
+
+    </VBox>
+
+</core:FragmentDefinition>
