@@ -30,11 +30,11 @@
                 frameType="TwoByOne"
                 class="cmlKpiTile">
                 <tileContent>
-                    <TileContent
+                    <TileContent id="_IDGenTileContent1"
                         unit="₹ Cr"
                         footer="CY vs PY">
                         <content>
-                            <NumericContent
+                            <NumericContent id="_IDGenNumericContent"
                                 value="0"
                                 scale="Cr"
                                 indicator="None"
@@ -45,7 +45,7 @@
                 </tileContent>
             </GenericTile>
 
-        </FlexBox>
+        </HBox>
     </ScrollContainer>
 
 </core:FragmentDefinition>
