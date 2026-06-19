@@ -43,7 +43,8 @@ sap.ui.define([
             // Developers: place your key in webapp/config/aiConfig.json
             // Production: use BTP destination with server-side auth instead
             var oAiCfg = new JSONModel();
-            oAiCfg.loadData("config/aiConfig.json", null, false);
+            var sAiConfigPath = sap.ui.require.toUrl("iifcl/cml/cmlmisapp/config/aiConfig.json");
+            oAiCfg.loadData(sAiConfigPath, null, false);
             var sApiKey = (oAiCfg.getData() && oAiCfg.getData().GEMINI_API_KEY) || "";
             AiContextBuilder.setApiKey(sApiKey);
 
