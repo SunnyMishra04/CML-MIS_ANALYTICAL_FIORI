@@ -1,8 +1,8 @@
 {
-  "aiEnabled": true,
-  "provider": "gemini",
-  "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-  "GEMINI_API_KEY": "",
-  "model": "gemini-2.0-flash",
-  "systemPrompt": "You are a SAP FICO and FS-CML consultant"
+  "aiEnabled": false,
+  "provider": "none",
+  "endpoint": "",
+  "apiKey": "",
+  "model": "",
+  "systemPrompt": "You are a CML MIS analytics assistant for IIFCL."
 }

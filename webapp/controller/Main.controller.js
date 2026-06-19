@@ -94,19 +94,26 @@ sap.ui.define([
             // Reports Model
             var oReportsModel = new JSONModel({
                 reports: [
+                    { isGroupHeader: true, title: "LENDING PORTFOLIO" },
                     { id: "DEV_GROUP", title: "Developer Group Report" },
                     { id: "SECTOR_WISE", title: "Sector Wise Report" },
-                    { id: "GEO_REPORT", title: "Geographical Report" },
-                    { id: "FIN_ASSIST", title: "Financial Assistance to Infra Projects" },
                     { id: "BORROWER_RECOV", title: "Borrower Wise Recovery against Written-off" },
-                    { id: "PREPAYMENT", title: "Prepayment Requirements" },
-                    { id: "SECTOR_INVEST", title: "Sector Wise Interest Income" },
                     { id: "SCHEME_WISE", title: "Scheme Wise Sector Wise Report" },
+                    
+                    { isGroupHeader: true, title: "SANCTIONS & DISBURSEMENTS" },
+                    { id: "FIN_ASSIST", title: "Financial Assistance to Infra Projects" },
+                    { id: "PREPAYMENT", title: "Prepayment Requirements" },
                     { id: "COD_REPORT", title: "COD Infra projects Report" },
-                    { id: "CATEGORY_MODE", title: "Category/Mode-wise Report" },
-                    { id: "NPA_ANALYSIS", title: "Outstanding Balance & NPA Analysis by Lending" },
                     { id: "DISBURSEMENT_WISE", title: "Annual Sanctions-Disbursements Overview" },
+                    
+                    { isGroupHeader: true, title: "INCOME & NPA" },
+                    { id: "SECTOR_INVEST", title: "Sector Wise Interest Income" },
                     { id: "NPA_REPORT", title: "NPA as on month-end – Scheme and Sector wise" },
+                    { id: "NPA_ANALYSIS", title: "Outstanding Balance & NPA Analysis by Lending" },
+                    
+                    { isGroupHeader: true, title: "OTHER REPORTS" },
+                    { id: "GEO_REPORT", title: "Geographical Distribution" },
+                    { id: "CATEGORY_MODE", title: "Category/Mode-wise Report" }
 
                 ]
             });
@@ -171,8 +178,15 @@ busy: false                // Controls loading indicators,
 // FIX: Start by fetching OData. The report load happens in the callback.
    
     this._setChartConfigs();
+
+    // Check dark mode preference
+    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (prefersDark) {
+        document.documentElement.setAttribute("data-theme", "dark");
+    }
+
     //  Start Data Loading (Attempts OData first)
- this.getRequest(); 
+    this.getRequest(); 
 
         },
 // ============================================================
@@ -596,8 +610,29 @@ _setChartConfigs: function() {
         // EVENT HANDLERS
         // ============================================================
 
+        createReportListItem: function(sId, oContext) {
+            var bGroup = oContext.getProperty("isGroupHeader");
+            if (bGroup) {
+                return new sap.m.GroupHeaderListItem({
+                    title: "{reports>title}"
+                }).addStyleClass("sapMGHLI");
+            } else {
+                return new sap.m.StandardListItem({
+                    title: "{reports>title}",
+                    type: "Active",
+                    icon: "sap-icon://chart-vertical-bar"
+                }).addStyleClass("customListItem");
+            }
+        },
+
         onReportSelect: function (oEvent) {
-            var sId = oEvent.getParameter("listItem").getBindingContext("reports").getProperty("id");
+            var oItem = oEvent.getParameter("listItem");
+            if (oItem.isA("sap.m.GroupHeaderListItem") || oItem.getBindingContext("reports").getProperty("isGroupHeader")) {
+                // If it's a group header, just clear selection and ignore
+                oEvent.getSource().removeSelections(true);
+                return;
+            }
+            var sId = oItem.getBindingContext("reports").getProperty("id");
             this.onResetFilters();
             this._loadReport(sId);
         },
@@ -649,6 +684,9 @@ _setChartConfigs: function() {
 
         onMetricToggle: function () {
             this._loadReport(this.getView().getModel("view").getProperty("/currentReportId"));
+            // Force KPI refresh
+            var oVM = this.getView().getModel("view");
+            if (this.refreshUiMetrics) this.refreshUiMetrics(oVM.getProperty("/rows"));
         },
 
      onComparisonToggle: function (oEvent) {
@@ -657,6 +695,9 @@ _setChartConfigs: function() {
     
     oVM.setProperty("/comparisonMode", bMode);
     oVM.setProperty("/selectedBucketKey", "CY"); // Lock to CY in comparison mode
+    
+    // Force KPI refresh
+    if (this.refreshUiMetrics) this.refreshUiMetrics(oVM.getProperty("/rows"));
     
     //  CRITICAL: Refresh chart data for waterfall
     this._refreshAnalyticsAndGeoFromTable();
@@ -682,6 +723,17 @@ _setChartConfigs: function() {
         onToggleSidebar: function () {
             var oVM = this.getView().getModel("view");
             oVM.setProperty("/sidebarCollapsed", !oVM.getProperty("/sidebarCollapsed"));
+        },
+
+        onToggleDarkMode: function () {
+            var html = document.documentElement;
+            var isDark = html.getAttribute("data-theme") === "dark";
+            html.setAttribute("data-theme", isDark ? "light" : "dark");
+            var btn = this.byId("btnDarkMode");
+            if (btn) {
+                btn.setIcon(isDark ? "sap-icon://lightbulb" : "sap-icon://night-cycle");
+                btn.setTooltip(isDark ? "Switch to Dark Mode" : "Switch to Light Mode");
+            }
         },
 
     //     onTabSelect: function (oEvent) {
