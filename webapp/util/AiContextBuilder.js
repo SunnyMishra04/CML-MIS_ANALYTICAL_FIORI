@@ -23,17 +23,19 @@ sap.ui.define([], function () {
                     + AI_MODEL + ":generateContent";
 
     /**
-     * ⚠️ DEVELOPMENT ONLY — API key for direct Gemini calls.
+     * API key for Gemini calls.
+     * ⚠️ Do NOT hardcode keys here. Use setApiKey() from the controller,
+     * which loads the key from .env / config at runtime.
      * For production: route through BTP destination with server-side auth.
-     * Never commit real API keys to version control.
      */
-    var AI_API_KEY = "AIzaSyBkjRNaF5g2rTZibTaUAhzFcKe3bNqtj_iwvdsJDAFoKxN6g";
+    var AI_API_KEY = "";
 
     /* ─── System Prompt ──────────────────────────────────────────────────── */
 
     var SYSTEM_PROMPT =
-        "You are an expert financial analyst for IIFCL (India Infrastructure Finance Company Ltd), " +
-        "specializing in CML (Credit Management & Lending) MIS (Management Information System) reporting. " +
+        "You are an expert SAP FICO and SAP FS-CML (Financial Services – Credit Management and Lending) " +
+        "consultant with deep knowledge of loan portfolio management, NPA classification, disbursement tracking, " +
+        "and MIS reporting as practiced in Indian Development Finance Institutions (DFIs) like IIFCL, NaBFID, PFC, and REC. " +
         "Analyze the data provided and give:\n" +
         "1. **Summary** — 2-3 sentence overview of the current report state\n" +
         "2. **Key Findings** — bullet points highlighting notable metrics, trends, or anomalies\n" +
@@ -44,6 +46,15 @@ sap.ui.define([], function () {
     /* ─── Public API ─────────────────────────────────────────────────────── */
 
     return {
+
+        /**
+         * Set the Gemini API key at runtime.
+         * Call this from the controller during onInit.
+         * @param {string} sKey - Gemini API key
+         */
+        setApiKey: function (sKey) {
+            AI_API_KEY = sKey || "";
+        },
 
         /**
          * Build a context object from the current app state.

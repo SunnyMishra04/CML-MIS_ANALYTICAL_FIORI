@@ -39,6 +39,14 @@ sap.ui.define([
             this._exportHelper = new ExportHelper(this);
             this._dataService = new ReportDataService(this.getOwnerComponent());
 
+            // Load Gemini API key from runtime config (gitignored)
+            // Developers: place your key in webapp/config/aiConfig.json
+            // Production: use BTP destination with server-side auth instead
+            var oAiCfg = new JSONModel();
+            oAiCfg.loadData("config/aiConfig.json", null, false);
+            var sApiKey = (oAiCfg.getData() && oAiCfg.getData().GEMINI_API_KEY) || "";
+            AiContextBuilder.setApiKey(sApiKey);
+
             // Mixin UiHelper methods (KPI, insights, scheme filter, contract detail)
             Object.assign(this, UiHelper);
             this.attachFormatters();
