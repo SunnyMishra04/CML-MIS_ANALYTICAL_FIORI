@@ -762,35 +762,34 @@ _setChartConfigs: function() {
 
 _applyMeasureLabel: function (oCfg, oVM) {
     var sReportId = oVM.getProperty("/currentReportId");
-    
+    var sMetricKey = oVM.getProperty("/selectedMetricKey");
+    var mLabels = {
+        "gross": "Gross Sanction",
+        "disb": "Disbursement",
+        "net": "Net Sanction",
+        "os": "Principal O/S",
+        "exposure": "Exposure Amount"
+    };
+
     // Check if the current report has specific metrics like recovery
     var oBucket = oCfg.buckets ? oCfg.buckets.CY : {};
 
     if (oBucket.recovery) {
         oVM.setProperty("/activeMetricLabel", "Write-off Recovery");
     } else if (oBucket.interest) {
-        oVM.setProperty("/activeMetricLabel", mLabels[sMetricKey] || "Amount");
+        oVM.setProperty("/activeMetricLabel", "Interest Income");
     } else {
         // Standard Metric Labels
-        var sMetricKey = oVM.getProperty("/selectedMetricKey");
-        var mLabels = { "gross": "Gross Sanction", "disb": "Disbursement", "net": "Net Sanction", "os": "Principal O/S", "exposure": "Exposure Amount"};
-       var sBaseLabel = mLabels[sMetricKey] || "Amount";
+        var sBaseLabel = mLabels[sMetricKey] || "Amount";
 
         // OVERRIDES for Specific Reports
-        var oBucket = oCfg.buckets ? oCfg.buckets.CY : {};
-        
-        if (oBucket.recovery) {
-            sBaseLabel = "Write-off Recovery";
-        } else if (oBucket.amount) {
+        if (oBucket.amount) {
             sBaseLabel = "Prepayment Amount";
-        } else if (oBucket.interest) {
-            sBaseLabel = "Interest Income";
         }
 
-        // Set the clean label (e.g. "Write-off Recovery")
+        // Set the clean label (e.g. "Gross Sanction")
         // The View XML adds the (CY)/(PY) suffix dynamically via binding
         oVM.setProperty("/activeMetricLabel", sBaseLabel);
-
     }
 },
         _createTooltip: function () {
