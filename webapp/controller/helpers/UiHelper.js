@@ -56,54 +56,90 @@ sap.ui.define([
     };
 
     /* ─── KPI computation from dataset rows ─────────────────────────────── */
-    function _computeKpis(aRows, bCompare) {
+    function _computeKpis(aRows) {
         var totals = {
+            disbCY: 0, disbPY: 0,
             sanctCY: 0, sanctPY: 0,
-            disbCY: 0,  disbPY: 0,
-            netCY: 0,   netPY: 0,
-            osCY: 0,    osPY: 0
+            posCY: 0,  posPY: 0,
+            projCY: 0, projPY: 0,
+            costCY: 0
         };
 
-        var CRORE = 10000000;
-
         aRows.forEach(function (r) {
-            totals.sanctCY += r.GrossSanctionCY || 0;
-            totals.sanctPY += r.GrossSanctionPY || 0;
             totals.disbCY  += r.DisbursementCY  || 0;
             totals.disbPY  += r.DisbursementPY  || 0;
-            totals.netCY   += r.PrincipalOsCY || 0; // Using PrincipalOs for Net
-            totals.netPY   += r.PrincipalOsPY || 0;
-            totals.osCY    += r.OutstandingBalanceCY || r.PrincipalOsCY || 0; // Fallback
-            totals.osPY    += r.OutstandingBalancePY || r.PrincipalOsPY || 0;
+            totals.sanctCY += r.GrossSanctionCY || 0;
+            totals.sanctPY += r.GrossSanctionPY || 0;
+            // PrincipalOs might be raw units — normalise
+            var posCY = r.PrincipalOsCY || 0;
+            var posPY = r.PrincipalOsPY || 0;
+            totals.posCY  += Math.abs(posCY) > 1000000 ? posCY / CRORE : posCY;
+            totals.posPY  += Math.abs(posPY) > 1000000 ? posPY / CRORE : posPY;
+            totals.projCY += r.ProjectsCY || 0;
+            totals.projPY += r.ProjectsPY || 0;
+            totals.costCY += r.ProjectCostCY || 0;
         });
 
-        function buildCard(title, cy, py) {
-            var valCY = Math.abs(cy) > 1000000 ? cy / CRORE : cy;
-            var valPY = Math.abs(py) > 1000000 ? py / CRORE : py;
-            
-            var delta = valCY - valPY;
-            // delta % = (CY - PY) / PY * 100
-            var pct = valPY !== 0 ? (delta / Math.abs(valPY)) * 100 : 0;
-            
-            var bUp = delta >= 0;
-            var sDeltaText = (bUp ? "+" : "") + delta.toFixed(2) + " Cr (" + (bUp ? "+" : "") + pct.toFixed(1) + "%)";
-
-            return {
-                title: title,
-                value: valCY.toFixed(2),
-                pyValue: valPY.toFixed(2),
-                unit: "Cr",
-                deltaText: sDeltaText,
-                isUp: bUp,
-                showCompare: bCompare
-            };
-        }
+        var disbVar  = totals.disbCY  - totals.disbPY;
+        var posVar   = totals.posCY   - totals.posPY;
+        var projVar  = totals.projCY  - totals.projPY;
 
         return [
-            buildCard("Gross Sanction", totals.sanctCY, totals.sanctPY),
-            buildCard("Total Disbursement", totals.disbCY, totals.disbPY),
-            buildCard("Net Principal O/S", totals.netCY, totals.netPY),
-            buildCard("Outstanding Balance", totals.osCY, totals.osPY)
+            {
+                title: "Total Disbursement",
+                value: totals.disbCY.toFixed(2),
+                unit: "₹ Cr",
+                footer: "CY",
+                delta: disbVar.toFixed(2),
+                deltaState: disbVar > 0 ? "Good" : (disbVar < 0 ? "Critical" : "Neutral"),
+                indicator: disbVar > 0 ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down,
+                valueColor: disbVar > 0 ? MLib.ValueColor.Good : MLib.ValueColor.Critical,
+                icon: "sap-icon://money-bills"
+            },
+            {
+                title: "Gross Sanction",
+                value: totals.sanctCY.toFixed(2),
+                unit: "₹ Cr",
+                footer: "CY",
+                delta: (totals.sanctCY - totals.sanctPY).toFixed(2),
+                deltaState: (totals.sanctCY - totals.sanctPY) >= 0 ? "Good" : "Critical",
+                indicator: (totals.sanctCY - totals.sanctPY) >= 0 ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down,
+                valueColor: MLib.ValueColor.Neutral,
+                icon: "sap-icon://approvals"
+            },
+            {
+                title: "Net Principal O/S",
+                value: totals.posCY.toFixed(2),
+                unit: "₹ Cr",
+                footer: "CY",
+                delta: posVar.toFixed(2),
+                deltaState: posVar >= 0 ? "Good" : "Critical",
+                indicator: posVar >= 0 ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down,
+                valueColor: MLib.ValueColor.Neutral,
+                icon: "sap-icon://account"
+            },
+            {
+                title: "Active Projects",
+                value: totals.projCY.toString(),
+                unit: "projects",
+                footer: "CY",
+                delta: projVar.toString(),
+                deltaState: projVar >= 0 ? "Good" : "Critical",
+                indicator: projVar >= 0 ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down,
+                valueColor: projVar >= 0 ? MLib.ValueColor.Good : MLib.ValueColor.Critical,
+                icon: "sap-icon://portfolio"
+            },
+            {
+                title: "Project Cost CY",
+                value: totals.costCY.toFixed(2),
+                unit: "₹ Cr",
+                footer: "CY",
+                delta: "0",
+                deltaState: "Neutral",
+                indicator: MLib.DeviationIndicator.None,
+                valueColor: MLib.ValueColor.Neutral,
+                icon: "sap-icon://paid-leave"
+            }
         ];
     }
 
@@ -176,11 +212,8 @@ sap.ui.define([
          * @param {Array} aRows - normalised data rows
          */
         refreshUiMetrics: function (aRows) {
-            var oViewModel = this.getView().getModel("view");
-            if (!oViewModel) return;
-            var bCompare = oViewModel.getProperty("/comparisonMode") === true;
-            
-            var kpis     = _computeKpis(aRows || [], bCompare);
+            var oViewModel = this.getView().getModel("viewModel");
+            var kpis     = _computeKpis(aRows || []);
             var insights = _buildInsights(aRows || []);
             oViewModel.setProperty("/kpis",     kpis);
             oViewModel.setProperty("/insights", insights);
@@ -199,32 +232,25 @@ sap.ui.define([
             oFlexBox.destroyItems();
 
             aKpis.forEach(function (kpi) {
-                var sInd = kpi.showCompare ? (kpi.isUp ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down) : MLib.DeviationIndicator.None;
-                var sColor = kpi.showCompare ? (kpi.isUp ? MLib.ValueColor.Good : MLib.ValueColor.Critical) : MLib.ValueColor.Neutral;
-                var sFooter = kpi.showCompare ? kpi.deltaText : "";
-                var sSubheader = kpi.showCompare ? ("PY: " + kpi.pyValue + " " + kpi.unit) : "";
-
                 var oTile = new GenericTile({
                     header:    kpi.title,
-                    subheader: sSubheader,
-                    frameType: "TwoByOne",
+                    frameType: "OneByOne",
+                    press:     function () { /* future: drill-down */ },
                     tileContent: [
                         new TileContent({
                             unit:   kpi.unit,
-                            footer: sFooter,
+                            footer: kpi.footer,
                             content: new NumericContent({
                                 value:          kpi.value,
                                 scale:          "Cr",
-                                truncateValueTo: 6,
-                                indicator:      sInd,
-                                valueColor:     sColor,
+                                indicator:      kpi.indicator,
+                                valueColor:     kpi.valueColor,
                                 withMargin:     false,
                                 adaptiveFontSize: true
                             })
                         })
                     ]
                 });
-                
                 var sClassName = "cmlKpiTile";
                 if (sClassName) {
                     sClassName.split(" ").filter(Boolean).forEach(function(c) {

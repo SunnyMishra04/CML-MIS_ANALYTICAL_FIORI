@@ -1,165 +1,113 @@
-:root {
-  /* Light mode (default) */
-  --cml-bg:           #F9F9F9;
-  --cml-surface:      #FFFFFF;
-  --cml-surface-2:    #F2F2F2;
-  --cml-sidebar-bg:   #FFFFFF;
-  --cml-border:       rgba(0,0,0,0.10);
-  --cml-text:         #0F0F0F;
-  --cml-text-muted:   #606060;
-  --cml-text-faint:   #AAAAAA;
-  --cml-accent:       #0A6ED1;
-  --cml-accent-hover: #085DB8;
-  --cml-good:         #107E3E;
-  --cml-critical:     #BB0000;
-  --cml-warning:      #DF6E0C;
-  --cml-chip-bg:      #F2F2F2;
-  --cml-chip-active:  #0A6ED1;
-  --cml-chip-active-text: #FFFFFF;
-  --cml-shadow:       0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
-  --cml-radius-card:  12px;
-  --cml-radius-chip:  20px;
-  --cml-radius-btn:   8px;
-}
-
-[data-theme="dark"] {
-  --cml-bg:           #0F0F0F;
-  --cml-surface:      #1A1A1A;
-  --cml-surface-2:    #272727;
-  --cml-sidebar-bg:   #0F0F0F;
-  --cml-border:       rgba(255,255,255,0.10);
-  --cml-text:         #F1F1F1;
-  --cml-text-muted:   #AAAAAA;
-  --cml-text-faint:   #606060;
-  --cml-accent:       #4A9EE0;
-  --cml-accent-hover: #65B0EB;
-  --cml-good:         #6AAB4E;
-  --cml-critical:     #F28B82;
-  --cml-warning:      #FFA94D;
-  --cml-chip-bg:      #272727;
-  --cml-chip-active:  #4A9EE0;
-  --cml-chip-active-text: #0F0F0F;
-  --cml-shadow:       0 1px 4px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
-}
-
-body, .sapUiBody { background: var(--cml-bg) !important; color: var(--cml-text) !important; }
-.sapMPage, .sapUiView { background: var(--cml-bg) !important; }
-
 /* ===== APP BACKGROUND ===== */
 .appBackground {
-    background: var(--cml-bg) !important;
+    background-color: #f5f7fa !important;
     min-height: 100vh;
 }
 
-/* ===== SIDEBAR THEME ===== */
+/* ===== SIDEBAR DARK THEME (FIXED - FULL HEIGHT) ===== */
 .customSidebar {
-    background: var(--cml-sidebar-bg) !important;
+    background-color: #1a202c !important;
     min-height: 100vh !important;
     height: 100% !important;
     position: relative;
-    border-right: 1px solid var(--cml-border);
+    border-right: 1px solid #2d3748;
     transition: width 0.3s ease;
     z-index: 10;
 }
 
 .sidebarTitle {
-    color: var(--cml-text) !important;
+    color: #ffffff !important;
     font-weight: 300;
     letter-spacing: 1.5px;
     font-size: 0.9rem;
 }
 
-/* Sidebar StandardListItem Text */
+/* STRONGER SELECTORS FOR SIDEBAR TEXT - FORCE WHITE COLOR */
 .customSidebar .sapMSLI .sapMSLITitleOnly,
 .customSidebar .sapMSLITitleOnly,
 .customSidebar .sapMSLITitle,
 .customListItem .sapMSLITitle,
 .customListItem .sapMSLITitleOnly {
-    color: var(--cml-text) !important;
+    color: #ffffff !important;
     font-weight: 500 !important;
     font-size: 0.95rem !important;
 }
 
-.customListItem .sapMSLIIcon {
-    color: var(--cml-text-muted) !important;
-}
-
-/* Sidebar Selected State */
-.customListItem.sapMLIBSelected {
-    background: color-mix(in srgb, var(--cml-accent) 12%, transparent) !important;
-    border-left: 4px solid var(--cml-accent) !important;
-}
-
+/* Ensure selected items also have white text */
 .customListItem.sapMLIBSelected .sapMSLITitle,
 .customListItem.sapMLIBSelected .sapMSLITitleOnly {
-    font-weight: 600 !important;
-    color: var(--cml-accent) !important;
-}
-.customListItem.sapMLIBSelected .sapMSLIIcon {
-    color: var(--cml-accent) !important;
+    color: #ffffff !important;
 }
 
-/* Sidebar Hover State */
+/* Ensure hovered items also have white text */
+.customListItem:hover .sapMSLITitle,
+.customListItem:hover .sapMSLITitleOnly {
+    color: #ffffff !important;
+}
+
+.customListItem .sapMSLIIcon {
+    color: #3182ce !important;
+}
+
+.customListItem.sapMLIBSelected {
+    background-color: #2d3748 !important;
+    border-left: 4px solid #3182ce !important;
+}
+
 .customListItem:hover {
-    background: color-mix(in srgb, var(--cml-accent) 6%, transparent) !important;
-    transition: background 150ms ease;
-}
-
-/* Sidebar Group Headers */
-.customSidebar .sapMGHLI {
-    background: transparent !important;
-    border: none !important;
-    padding-top: 1rem !important;
-    padding-bottom: 0.25rem !important;
-}
-.customSidebar .sapMGHLITitle {
-    font-size: 0.7rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--cml-text-muted) !important;
+    background-color: #2d3748 !important;
 }
 
 /* ===== HEADER TOOLBAR ===== */
-.customHeaderToolbar, .sapMIBar.sapMHeader-CTX {
-    background: var(--cml-surface) !important;
+.customHeaderToolbar {
+    background-color: #ffffff !important;
     border-radius: 8px;
-    border-bottom: 1px solid var(--cml-border) !important;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     padding: 0.5rem 1rem;
 }
 
 .pageTitle {
-    color: var(--cml-text);
+    color: #1a202c;
     font-weight: 600;
 }
 
 .headerLabel {
-    color: var(--cml-text-muted);
+    color: #4a5568;
     font-size: 0.85rem;
     margin-left: 1rem;
     margin-right: 0.5rem;
 }
 
 .customSegmented .sapMSegBBtn {
-    background-color: var(--cml-surface-2);
+    background-color: #edf2f7;
     border-radius: 6px;
-    color: var(--cml-text);
 }
 
 .customSegmented .sapMSegBBtnSelected {
-    background-color: var(--cml-accent) !important;
+    background-color: #3182ce !important;
     color: #ffffff !important;
 }
 
 /* ===== CARDS ===== */
-.sapMGT, .sapFCard, .sapMPanel,
 .customCard,
-.chartCard {
-    background: var(--cml-surface) !important;
-    border-radius: var(--cml-radius-card) !important;
-    box-shadow: var(--cml-shadow) !important;
-    border: 1px solid var(--cml-border) !important;
+.chartCard,
+.kpiCard {
+    background: #ffffff !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    border: none !important;
+}
+
+/* KPI cards */
+.kpiCard, .cmlKpiTile {
+    height: 220px !important;
+    transition: height 0.3s ease;
+    overflow: visible !important;
+    margin-right: 1rem !important;
+}
+.cmlKpiTile {
+    width: 19% !important;
+    min-width: 160px !important;
 }
 
 /* Chart cards - FORCE FULL WIDTH */
@@ -167,30 +115,13 @@ body, .sapUiBody { background: var(--cml-bg) !important; color: var(--cml-text) 
     width: 100% !important;
     margin-bottom: 1rem !important;
     min-height: 500px;
-    display: block !important;
-}
-
-/* KPI Tiles specifically */
-.cmlKpiTile {
-    background: var(--cml-surface) !important;
-    border-radius: var(--cml-radius-card) !important;
-    box-shadow: var(--cml-shadow) !important;
-    border: 1px solid var(--cml-border) !important;
-    transition: box-shadow 150ms ease, transform 150ms ease;
-    height: 220px !important;
-    width: 19% !important;
-    min-width: 160px !important;
-    margin-right: 1rem !important;
-}
-.cmlKpiTile:hover {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
-    transform: translateY(-2px);
+    display: block !important; /* Ensure block layout */
 }
 
 /* ===== KPI NUMBERS ===== */
 .subtleTitle {
     font-size: 0.75rem;
-    color: var(--cml-text-muted);
+    color: #718096;
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -201,17 +132,17 @@ body, .sapUiBody { background: var(--cml-bg) !important; color: var(--cml-text) 
 .bigKpiNumber .sapMObjectNumberText {
     font-size: 2.25rem !important;
     line-height: 1.1 !important;
-    color: var(--cml-accent);
+    color: #2c5282;
     font-weight: 300;
 }
 
 .bigKpiNumber .sapMObjectNumberUnit {
     font-size: 1rem !important;
-    color: var(--cml-text-muted);
+    color: #718096;
 }
 
 /* Prevent KPI number overflow */
-.cmlKpiTile .sapMObjectNumber {
+.kpiCard .sapMObjectNumber {
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -219,21 +150,17 @@ body, .sapUiBody { background: var(--cml-bg) !important; color: var(--cml-text) 
 
 /* ===== TABLE ===== */
 #dataTable {
-    background: var(--cml-surface);
-    border-radius: var(--cml-radius-card);
+    background: #ffffff;
+    border-radius: 10px;
 }
 #dataTable .sapMListTblHeaderCell {
-    background-color: var(--cml-surface-2);
+    background-color: #f7fafc;
     font-weight: 600;
-    color: var(--cml-text);
+    color: #2d3748;
 }
 
-#dataTable .sapMListTblRow:hover, .sapMListTblRow:hover > td {
-    background: var(--cml-surface-2) !important;
-}
-.sapMListTbl { 
-    background: var(--cml-surface) !important; 
-    border-radius: var(--cml-radius-card) !important; 
+#dataTable .sapMListTblRow:hover {
+    background-color: #f7fafc;
 }
 
 /* ===== MAP CONTAINER (FIXED LAYOUT) ===== */
@@ -659,51 +586,6 @@ COMPARISON MODE STYLES
 .v-m-legend {
     font-family: "72", "72full", Arial, Helvetica, sans-serif;
     font-size: 12px;
-}
-
-/* Alert/insight strips */
-.cmlInsightStrip {
-  border-radius: 8px;
-  border-left: 4px solid var(--cml-warning);
-  background: color-mix(in srgb, var(--cml-warning) 8%, var(--cml-surface));
-  padding: 10px 14px;
-  margin-bottom: 6px;
-}
-.cmlInsightStrip.good { border-left-color: var(--cml-good); background: color-mix(in srgb, var(--cml-good) 8%, var(--cml-surface)); }
-.cmlInsightStrip.critical { border-left-color: var(--cml-critical); background: color-mix(in srgb, var(--cml-critical) 8%, var(--cml-surface)); }
-
-/* Scheme chip buttons */
-.cmlSchemeChip {
-  border-radius: var(--cml-radius-chip) !important;
-  background: var(--cml-chip-bg) !important;
-  color: var(--cml-text) !important;
-  border: none !important;
-  font-weight: 500;
-  transition: background 150ms ease, color 150ms ease;
-}
-.cmlSchemeChip.selected, .cmlSchemeChip:active {
-  background: var(--cml-chip-active) !important;
-  color: var(--cml-chip-active-text) !important;
-}
-
-/* Comparison Mode Active Indicator in Toolbar */
-#comparisonToggle.sapMToggleBtnPressed {
-    background-color: var(--cml-accent) !important;
-    color: var(--cml-surface) !important;
-    border-color: var(--cml-accent-hover) !important;
-}
-
-/* ===== NEW DROPDOWN STYLING (Tenure) ===== */
-.customSelect .sapMSelect {
-    border-radius: var(--cml-radius-btn);
-    border: 1px solid var(--cml-border);
-    background: var(--cml-surface-2);
-    height: 1.8rem;
-    line-height: 1.8rem;
-}
-
-.customSelect .sapMSelect:hover {
-    background: var(--cml-surface);
 }
 
 /* Force UI5 VizFrames to respect the container width */
