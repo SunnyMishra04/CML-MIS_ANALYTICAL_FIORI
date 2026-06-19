@@ -1,0 +1,8 @@
+{
+  "aiEnabled": false,
+  "provider": "none",
+  "endpoint": "",
+  "apiKey": "",
+  "model": "",
+  "systemPrompt": "You are a CML MIS analytics assistant for IIFCL."
+}

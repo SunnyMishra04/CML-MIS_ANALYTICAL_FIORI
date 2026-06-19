@@ -250,7 +250,12 @@ sap.ui.define([
                         })
                     ]
                 });
-                oTile.addStyleClass("cmlKpiTile");
+                var sClassName = "cmlKpiTile";
+                if (sClassName) {
+                    sClassName.split(" ").forEach(function(c) {
+                        if (c) { oTile.addStyleClass(c); }
+                    });
+                }
                 oFlexBox.addItem(oTile);
             });
         },
