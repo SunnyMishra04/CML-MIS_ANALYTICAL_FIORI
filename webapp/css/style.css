@@ -103,6 +103,7 @@
     height: 220px !important;
     transition: height 0.3s ease;
     overflow: visible !important;
+    margin-right: 1rem !important;
 }
 
 /* Chart cards - FORCE FULL WIDTH */

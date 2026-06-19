@@ -173,7 +173,7 @@
                                 <Button id="btnGlobalClear" icon="sap-icon://clear-filter" text="Clear Chart Selection" press=".onClearChartFilter" type="Reject"/>
                             </OverflowToolbar>
 
-                            <IconTabBar id="tabBar" select=".onTabSelect" expandable="false" stretchContentHeight="true" class="sapUiNoContentPadding">
+                            <IconTabBar id="tabBar" select=".onTabSelect" expandable="false" class="sapUiNoContentPadding">
                                 <items>
                                     <!-- DATA TABLE TAB -->
                                 <IconTabFilter id="_IDGenIconTabFilter" key="data" text="Data Table" icon="sap-icon://table-view">
@@ -239,7 +239,7 @@
                                                 <!-- KPI CARDS -->
                                                 <HBox id="_IDGenHBox3" width="100%" height="220px" class="sapUiSmallMarginBottom">
                                                     <items>
-                                                        <f:Card id="_IDGenCard" class="kpiCard sapUiSmallMarginEnd" width="320px">
+                                                        <f:Card id="_IDGenCard" class="kpiCard" width="320px">
                                                             <f:content>
                                                                 <VBox id="_IDGenVBox1" height="200px" class="sapUiSmallMargin" justifyContent="SpaceBetween">
                                                                     <items>
@@ -259,7 +259,7 @@
                                                             </f:content>
                                                         </f:Card>
 
-                                                        <f:Card id="_IDGenCard1" class="kpiCard sapUiSmallMarginEnd" width="320px">
+                                                        <f:Card id="_IDGenCard1" class="kpiCard" width="320px">
                                                             <f:content>
                                                                 <VBox id="_IDGenVBox2" height="200px" class="sapUiSmallMargin" justifyContent="SpaceBetween">
                                                                     <items>
@@ -302,7 +302,7 @@
                                                 <VBox id="chartContainer" width="100%">
                                                     <items>
                                                         <!-- COMPARISON CHART CARD -->
-                                                        <f:Card id="cardComparison" width="100%" visible="{view>/showComparisonChart}" class="chartCard sapUiSmallMarginBottom">
+                                                        <f:Card id="cardComparison" width="100%" visible="{view>/showComparisonChart}" class="chartCard">
                                                             <f:header>
                                                                 <card:Header id="_IDGenHeader" title="Top 10 Entities: CY vs PY Comparison" subtitle="{view>/activeMetricLabel} (Amount in Cr)" iconSrc="sap-icon://compare"/>
                                                             </f:header>
@@ -341,7 +341,7 @@
                                                         </f:Card>
                                                         <!-- TREND CHART CARD -->
                                                         <!-- TREND CHART CARD -->
-                                                        <f:Card id="cardTrend" width="100%" visible="{= !${view>/showComparisonChart} }" class="chartCard sapUiSmallMarginBottom">
+                                                        <f:Card id="cardTrend" width="100%" visible="{= !${view>/showComparisonChart} }" class="chartCard">
                                                             <f:header>
                                                                 <!-- REMOVED THE INVALID TOOLBAR FROM HEADER -->
                                                                 <card:Header id="_IDGenHeader1" title="Top 10 Entities: {view>/activeMetricLabel}" subtitle="{view>/activeMetricLabel} (Cr)" iconSrc="sap-icon://compare"/>
