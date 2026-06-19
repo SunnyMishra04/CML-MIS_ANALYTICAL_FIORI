@@ -217,7 +217,7 @@ sap.ui.define([], function () {
                    "### Recommendations\n" +
                    "- Review borrower groups with zero disbursement in current year\n" +
                    "- Monitor high principal outstanding positions for credit risk\n\n" +
-                   "_Configure Gemini API key for live AI analysis._";
+                   "Configure Gemini API key for live AI analysis.";
         }
     };
 });

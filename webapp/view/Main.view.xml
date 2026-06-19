@@ -29,7 +29,7 @@
                     </VBox>
 
                     <!-- CONTENT AREA -->
-                    <VBox id="ContentBox" width="100%" class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
+                    <VBox id="ContentBox" width="{= ${viewModel>/aiPanelVisible} ? '70%' : '100%' }" class="sapUiSmallMarginBegin sapUiSmallMarginEnd">
                         <layoutData>
                             <FlexItemData id="_IDGenFlexItemData" growFactor="1" />
                         </layoutData>
@@ -44,6 +44,7 @@
                                 <!-- Tenure Selector -->
                                 <Label id="lblTenure" text="Tenure:" design="Bold" class="headerLabel sapUiSmallMarginBegin"/>
                                 <Select id="tenureSelector" change=".onTenureChange" selectedKey="{view>/selectedTenure}" width="120px" class="customSelect">
+                                    <layoutData><OverflowToolbarLayoutData priority="NeverOverflow"/></layoutData>
                                     <core:Item id="itmYearly" key="Yearly" text="Yearly"/>
                                     <core:Item id="itmHalf" key="HalfYearly" text="Half-Yearly"/>
                                     <core:Item id="itmQuarter" key="Quarterly" text="Quarterly"/>
@@ -52,6 +53,7 @@
 
                                 <Label id="_IDGenLabel" text="Period:" design="Bold" class="headerLabel sapUiSmallMarginBegin"/>
                                 <SegmentedButton id="periodSelector" selectedKey="{view>/selectedBucketKey}" selectionChange=".onBucketToggle" class="customSegmented" enabled="{= !${view>/comparisonMode} }">
+                                    <layoutData><OverflowToolbarLayoutData priority="Low"/></layoutData>
                                     <items>
                                         <SegmentedButtonItem id="_IDGenSegmentedButtonItem" key="CY" text="{view>/periodLabelCY}"/>
                                         <SegmentedButtonItem id="_IDGenSegmentedButtonItem1" key="PY" text="{view>/periodLabelPY}"/>
@@ -71,7 +73,9 @@
 
                                 <!-- Comparison Toggle Button -->
                                 <ToolbarSeparator id="_IDGenToolbarSeparator"/>
-                                <ToggleButton id="comparisonToggle" text="Compare CY vs PY" icon="sap-icon://compare" pressed="{view>/comparisonMode}" press=".onComparisonToggle" type="Emphasized"/>
+                                <ToggleButton id="comparisonToggle" text="Compare CY vs PY" icon="sap-icon://compare" pressed="{view>/comparisonMode}" press=".onComparisonToggle" type="Emphasized">
+                                    <layoutData><OverflowToolbarLayoutData priority="High"/></layoutData>
+                                </ToggleButton>
 
                                 <Button id="btnExport" icon="sap-icon://excel-attachment" tooltip="Export to Excel" press=".onExport" type="Transparent"/>
 
@@ -110,8 +114,7 @@
                             <!-- Step 3: Insight Strip -->
                             <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.InsightStrip" type="XML"/>
 
-                            <!-- Step 7: AI Insight Panel -->
-                            <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.AiInsightPanel" type="XML"/>
+
 
 <fb:FilterBar id="filterBar" search=".onSearch" showRestoreButton="true" clear=".onResetFilters" showFilterConfiguration="true">
   <fb:filterGroupItems>
@@ -236,67 +239,7 @@
                                     <IconTabFilter id="_IDGenIconTabFilter1" key="analytics" text="Analytics" icon="sap-icon://line-chart">
                                         <VBox id="_IDGenVBox" width="100%" class="sapUiMediumMarginTop">
                                             <items>
-                                                <!-- KPI CARDS -->
-                                                <HBox id="_IDGenHBox3" width="100%" height="220px" class="sapUiSmallMarginBottom">
-                                                    <items>
-                                                        <f:Card id="_IDGenCard" class="kpiCard" width="320px">
-                                                            <f:content>
-                                                                <VBox id="_IDGenVBox1" height="200px" class="sapUiSmallMargin" justifyContent="SpaceBetween">
-                                                                    <items>
-                                                                        <VBox id="mainKpiProjects">
-                                                                            <Text id="_IDGenText11" text="TOTAL PROJECTS" class="subtleTitle"/>
-                                                                            <ObjectNumber id="_IDGenObjectNumber3" number="{view>/totalProjects}" class="bigKpiNumber" state="Success"/>
-                                                                        </VBox>
-                                                                        <VBox id="deltaProjects" visible="{view>/comparisonMode}" class="deltaContainer">
-                                                                            <HBox id="deltaProjRow" alignItems="Center" class="sapUiTinyMarginBottom">
-                                                                                <core:Icon id="iconProjDelta" src="{= ${view>/totalProjectsVar} >= 0 ? 'sap-icon://arrow-top' : 'sap-icon://arrow-bottom' }" size="0.9rem" color="{= ${view>/totalProjectsVar} >= 0 ? '#107e3e' : '#bb0000' }"/>
-                                                                                <Text id="txtProjDelta" text="{view>/totalProjectsVar} ({view>/totalProjectsVarPct}%)" class="deltaTextLarge"/>
-                                                                            </HBox>
-                                                                            <Text id="txtProjPY" text="PY ({view>/periodLabelPY}): {view>/totalProjectsPY}" class="pyTextLarge"/>
-                                                                        </VBox>
-                                                                    </items>
-                                                                </VBox>
-                                                            </f:content>
-                                                        </f:Card>
-
-                                                        <f:Card id="_IDGenCard1" class="kpiCard" width="320px">
-                                                            <f:content>
-                                                                <VBox id="_IDGenVBox2" height="200px" class="sapUiSmallMargin" justifyContent="SpaceBetween">
-                                                                    <items>
-                                                                        <VBox id="mainKpiCost">
-                                                                            <Text id="_IDGenText12" text="PROJECT COST (SUM)" class="subtleTitle"/>
-                                                                            <ObjectNumber id="_IDGenObjectNumber4" number="{path: 'view>/totalProjectCost', formatter: '.formatter.metricCompact'}" class="bigKpiNumber"/>
-                                                                        </VBox>
-                                                                        <VBox id="deltaCost" visible="{view>/comparisonMode}" class="deltaContainer">
-                                                                            <Text id="txtCostPY" text="PY ({view>/periodLabelPY}): {path: 'view>/totalProjectCostPY', formatter: '.formatter.metricCompact'}" class="pyTextLarge"/>
-                                                                        </VBox>
-                                                                    </items>
-                                                                </VBox>
-                                                            </f:content>
-                                                        </f:Card>
-
-                                                        <f:Card id="_IDGenCard2" class="kpiCard" width="320px">
-                                                            <f:content>
-                                                                <VBox id="_IDGenVBox3" height="200px" class="sapUiSmallMargin" justifyContent="SpaceBetween">
-                                                                    <items>
-                                                                        <VBox id="mainKpiMetric">
-                                                                            <Text id="_IDGenText13" text="{view>/activeMetricLabel}" class="subtleTitle"/>
-                                                                            <ObjectNumber id="_IDGenObjectNumber5" number="{path: 'view>/totalMetric', formatter: '.formatter.metricCompact'}" class="bigKpiNumber" state="Information"/>
-                                                                        </VBox>
-                                                                        <VBox id="deltaMetric" visible="{view>/comparisonMode}" class="deltaContainer">
-                                                                            <HBox id="deltaMetricRow" alignItems="Center" wrap="Wrap" class="sapUiTinyMarginBottom">
-                                                                                <core:Icon id="iconMetricDelta" src="{= ${view>/totalMetricVar} >= 0 ? 'sap-icon://arrow-top' : 'sap-icon://arrow-bottom' }" size="0.9rem" color="{= ${view>/totalMetricVar} >= 0 ? '#107e3e' : '#bb0000' }"/>
-                                                                                <Text id="txtMetricDeltaAmount" text="{path: 'view>/totalMetricVar', formatter: '.formatter.varianceWithSign'} " class="deltaTextLarge"/>
-                                                                                <Text id="txtMetricDeltaPct" text="({path: 'view>/totalMetricVarPct', formatter: '.formatter.percentage'}%)" class="deltaTextLarge"/>
-                                                                            </HBox>
-                                                                            <Text id="txtMetricPY" text="PY ({view>/periodLabelPY}): {path: 'view>/totalMetricPY', formatter: '.formatter.metricCompact'}" class="pyTextLarge"/>
-                                                                        </VBox>
-                                                                    </items>
-                                                                </VBox>
-                                                            </f:content>
-                                                        </f:Card>
-                                                    </items>
-                                                </HBox>
+                                                <!-- KPI CARDS REMOVED -->
 
                                                 <!-- FIXED CHART CONTAINER: VBox to Ensure Full Width -->
                                                 <VBox id="chartContainer" width="100%">
@@ -455,6 +398,8 @@
                             </IconTabBar>
                         </items>
                     </VBox>
+                    <!-- Step 7: AI Insight Panel (Slide-in Side Panel) -->
+                    <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.AiInsightPanel" type="XML"/>
                 </HBox>
             </content>
         </Page>

@@ -6,10 +6,11 @@
     <!-- Step 7: AI Copilot Panel — collapsible, hidden by default -->
     <Panel id="aiInsightPanel"
            headerText="AI Analysis — Gemini"
-           expandable="true"
-           expanded="true"
+           expandable="false"
            visible="{viewModel>/aiPanelVisible}"
-           class="sapUiSmallMarginBottom">
+           width="30%"
+           height="100%"
+           class="sapUiSmallMarginBegin">
 
         <headerToolbar>
             <OverflowToolbar id="aiPanelToolbar">

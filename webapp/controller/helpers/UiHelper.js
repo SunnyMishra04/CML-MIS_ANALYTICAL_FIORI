@@ -242,6 +242,7 @@ sap.ui.define([
                             footer: kpi.footer,
                             content: new NumericContent({
                                 value:          kpi.value,
+                                scale:          "Cr",
                                 indicator:      kpi.indicator,
                                 valueColor:     kpi.valueColor,
                                 withMargin:     false,
@@ -252,8 +253,8 @@ sap.ui.define([
                 });
                 var sClassName = "cmlKpiTile";
                 if (sClassName) {
-                    sClassName.split(" ").forEach(function(c) {
-                        if (c) { oTile.addStyleClass(c); }
+                    sClassName.split(" ").filter(Boolean).forEach(function(c) {
+                        oTile.addStyleClass(c);
                     });
                 }
                 oFlexBox.addItem(oTile);

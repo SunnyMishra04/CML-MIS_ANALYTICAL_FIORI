@@ -15,11 +15,11 @@
         width="100%"
         class="cmlKpiStrip">
 
-        <FlexBox
+        <HBox
             id="kpiFlexBox"
-            wrap="NoWrap"
-            alignItems="Stretch"
-            class="cmlKpiFlexBox">
+            justifyContent="SpaceBetween"
+            width="100%"
+            class="cmlKpiFlexBox sapUiSmallMarginBegin sapUiSmallMarginEnd">
 
             <!-- Rendered dynamically from JS: _renderKpiStrip() in UiHelper.js -->
             <!-- Placeholder panel — replaced at runtime -->
@@ -36,7 +36,7 @@
                         <content>
                             <NumericContent
                                 value="0"
-                                scale="K"
+                                scale="Cr"
                                 indicator="None"
                                 valueColor="Neutral"
                                 withMargin="false"/>
