@@ -56,7 +56,7 @@ sap.ui.define([
     };
 
     /* ─── KPI computation from dataset rows ─────────────────────────────── */
-    function _computeKpis(aRows) {
+    function _computeKpis(aRows, bCompare) {
         var totals = {
             disbCY: 0, disbPY: 0,
             sanctCY: 0, sanctPY: 0,
@@ -83,62 +83,58 @@ sap.ui.define([
         var disbVar  = totals.disbCY  - totals.disbPY;
         var posVar   = totals.posCY   - totals.posPY;
         var projVar  = totals.projCY  - totals.projPY;
+        var sanctVar = totals.sanctCY - totals.sanctPY;
 
         return [
             {
                 title: "Total Disbursement",
                 value: totals.disbCY.toFixed(2),
                 unit: "₹ Cr",
-                footer: "CY",
-                delta: disbVar.toFixed(2),
-                deltaState: disbVar > 0 ? "Good" : (disbVar < 0 ? "Critical" : "Neutral"),
-                indicator: disbVar > 0 ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down,
-                valueColor: disbVar > 0 ? MLib.ValueColor.Good : MLib.ValueColor.Critical,
-                icon: "sap-icon://money-bills"
+                footer: bCompare ? ("PY: " + totals.disbPY.toFixed(2) + " | " + disbVar.toFixed(2)) : "CY",
+                indicator: bCompare ? (disbVar > 0 ? MLib.DeviationIndicator.Up : (disbVar < 0 ? MLib.DeviationIndicator.Down : MLib.DeviationIndicator.None)) : MLib.DeviationIndicator.None,
+                valueColor: bCompare ? (disbVar > 0 ? MLib.ValueColor.Good : (disbVar < 0 ? MLib.ValueColor.Critical : MLib.ValueColor.Neutral)) : MLib.ValueColor.Neutral,
+                icon: "sap-icon://money-bills",
+                frameType: bCompare ? "TwoByOne" : "OneByOne"
             },
             {
                 title: "Gross Sanction",
                 value: totals.sanctCY.toFixed(2),
                 unit: "₹ Cr",
-                footer: "CY",
-                delta: (totals.sanctCY - totals.sanctPY).toFixed(2),
-                deltaState: (totals.sanctCY - totals.sanctPY) >= 0 ? "Good" : "Critical",
-                indicator: (totals.sanctCY - totals.sanctPY) >= 0 ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down,
-                valueColor: MLib.ValueColor.Neutral,
-                icon: "sap-icon://approvals"
+                footer: bCompare ? ("PY: " + totals.sanctPY.toFixed(2) + " | " + sanctVar.toFixed(2)) : "CY",
+                indicator: bCompare ? (sanctVar > 0 ? MLib.DeviationIndicator.Up : (sanctVar < 0 ? MLib.DeviationIndicator.Down : MLib.DeviationIndicator.None)) : MLib.DeviationIndicator.None,
+                valueColor: bCompare ? (sanctVar > 0 ? MLib.ValueColor.Good : (sanctVar < 0 ? MLib.ValueColor.Critical : MLib.ValueColor.Neutral)) : MLib.ValueColor.Neutral,
+                icon: "sap-icon://approvals",
+                frameType: bCompare ? "TwoByOne" : "OneByOne"
             },
             {
                 title: "Net Principal O/S",
                 value: totals.posCY.toFixed(2),
                 unit: "₹ Cr",
-                footer: "CY",
-                delta: posVar.toFixed(2),
-                deltaState: posVar >= 0 ? "Good" : "Critical",
-                indicator: posVar >= 0 ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down,
-                valueColor: MLib.ValueColor.Neutral,
-                icon: "sap-icon://account"
+                footer: bCompare ? ("PY: " + totals.posPY.toFixed(2) + " | " + posVar.toFixed(2)) : "CY",
+                indicator: bCompare ? (posVar > 0 ? MLib.DeviationIndicator.Up : (posVar < 0 ? MLib.DeviationIndicator.Down : MLib.DeviationIndicator.None)) : MLib.DeviationIndicator.None,
+                valueColor: bCompare ? (posVar > 0 ? MLib.ValueColor.Good : (posVar < 0 ? MLib.ValueColor.Critical : MLib.ValueColor.Neutral)) : MLib.ValueColor.Neutral,
+                icon: "sap-icon://account",
+                frameType: bCompare ? "TwoByOne" : "OneByOne"
             },
             {
                 title: "Active Projects",
                 value: totals.projCY.toString(),
                 unit: "projects",
-                footer: "CY",
-                delta: projVar.toString(),
-                deltaState: projVar >= 0 ? "Good" : "Critical",
-                indicator: projVar >= 0 ? MLib.DeviationIndicator.Up : MLib.DeviationIndicator.Down,
-                valueColor: projVar >= 0 ? MLib.ValueColor.Good : MLib.ValueColor.Critical,
-                icon: "sap-icon://portfolio"
+                footer: bCompare ? ("PY: " + totals.projPY.toString() + " | " + projVar.toString()) : "CY",
+                indicator: bCompare ? (projVar > 0 ? MLib.DeviationIndicator.Up : (projVar < 0 ? MLib.DeviationIndicator.Down : MLib.DeviationIndicator.None)) : MLib.DeviationIndicator.None,
+                valueColor: bCompare ? (projVar > 0 ? MLib.ValueColor.Good : (projVar < 0 ? MLib.ValueColor.Critical : MLib.ValueColor.Neutral)) : MLib.ValueColor.Neutral,
+                icon: "sap-icon://portfolio",
+                frameType: bCompare ? "TwoByOne" : "OneByOne"
             },
             {
                 title: "Project Cost CY",
                 value: totals.costCY.toFixed(2),
                 unit: "₹ Cr",
                 footer: "CY",
-                delta: "0",
-                deltaState: "Neutral",
                 indicator: MLib.DeviationIndicator.None,
                 valueColor: MLib.ValueColor.Neutral,
-                icon: "sap-icon://paid-leave"
+                icon: "sap-icon://paid-leave",
+                frameType: "OneByOne"
             }
         ];
     }
@@ -213,7 +209,8 @@ sap.ui.define([
          */
         refreshUiMetrics: function (aRows) {
             var oViewModel = this.getView().getModel("viewModel");
-            var kpis     = _computeKpis(aRows || []);
+            var bCompare = oViewModel.getProperty("/comparisonMode") || false;
+            var kpis     = _computeKpis(aRows || [], bCompare);
             var insights = _buildInsights(aRows || []);
             oViewModel.setProperty("/kpis",     kpis);
             oViewModel.setProperty("/insights", insights);
@@ -234,7 +231,8 @@ sap.ui.define([
             aKpis.forEach(function (kpi) {
                 var oTile = new GenericTile({
                     header:    kpi.title,
-                    frameType: "OneByOne",
+                    frameType: kpi.frameType || "OneByOne",
+                    layoutData: new sap.m.FlexItemData({ growFactor: 1 }),
                     press:     function () { /* future: drill-down */ },
                     tileContent: [
                         new TileContent({
@@ -242,7 +240,7 @@ sap.ui.define([
                             footer: kpi.footer,
                             content: new NumericContent({
                                 value:          kpi.value,
-                                scale:          "Cr",
+                                scale:          kpi.title === "Active Projects" ? "" : "Cr",
                                 indicator:      kpi.indicator,
                                 valueColor:     kpi.valueColor,
                                 withMargin:     false,

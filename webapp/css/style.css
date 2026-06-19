@@ -106,8 +106,8 @@
     margin-right: 1rem !important;
 }
 .cmlKpiTile {
-    width: 19% !important;
     min-width: 160px !important;
+    margin-right: 0.5rem !important;
 }
 
 /* Chart cards - FORCE FULL WIDTH */

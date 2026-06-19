@@ -11,7 +11,7 @@
     xmlns:fb="sap.ui.comp.filterbar">
 
     <App id="mainapp">
-        <Page id="rootPage" showHeader="false" class="appBackground">
+        <Page id="rootPage" showHeader="false" class="appBackground" enableScrolling="false">
             <content>
                 <HBox id="MainLayoutHBox" width="100%" height="100%" renderType="Bare" fitContainer="true">
 
@@ -110,6 +110,13 @@
 
                             <!-- Step 3: Scheme Tab Header -->
                             <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.SchemeTabHeader" type="XML"/>
+
+                            <ScrollContainer id="mainScrollContainer" height="100%" vertical="true" focusable="true">
+                                <layoutData>
+                                    <FlexItemData growFactor="1"/>
+                                </layoutData>
+                                <VBox width="100%">
+                                    <items>
 
                             <!-- Step 3: Insight Strip -->
                             <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.InsightStrip" type="XML"/>
@@ -396,6 +403,10 @@
                                     </IconTabFilter>
                                 </items>
                             </IconTabBar>
+
+                                    </items>
+                                </VBox>
+                            </ScrollContainer>
                         </items>
                     </VBox>
                     <!-- Step 7: AI Insight Panel (Slide-in Side Panel) -->
