@@ -45,7 +45,7 @@
                                 
                                 <ToolbarSpacer id="_IDGenToolbarSpacer"/>
                                 <Button id="btnDarkMode" icon="sap-icon://night-cycle" type="Transparent" press=".onToggleDarkMode" tooltip="Toggle Dark Mode" class="sapUiTinyMarginEnd" />
-                                <Label id="_IDGenLabel" text="Tenure:" class="headerLabel"/>
+                                <Label id="lblTenure" text="Tenure:" class="headerLabel"/>
                                 <Select id="tenureSelector" change=".onTenureChange" selectedKey="{view>/selectedTenure}" width="120px" class="customSelect">
                                     <layoutData><OverflowToolbarLayoutData priority="NeverOverflow"/></layoutData>
                                     <core:Item id="itmYearly" key="Yearly" text="Yearly"/>
