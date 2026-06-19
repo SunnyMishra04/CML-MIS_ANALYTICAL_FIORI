@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <edmx:DataServices m:DataServiceVersion="2.0" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">
+    <Schema Namespace="ZCML_MIS_ANALYTICS_SRV" xmlns="http://schemas.microsoft.com/ado/2008/09/edm"
+            sap:schema-version="1" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           Entity Types
+           ═══════════════════════════════════════════════════════════════ -->
+
+      <!-- DEV_GROUP — Borrower Group × Scheme -->
+      <EntityType Name="DevGroupType" sap:label="Developer Group" sap:content-version="1">
+        <Key>
+          <PropertyRef Name="Scheme"/>
+          <PropertyRef Name="BorrowerGroup"/>
+        </Key>
+        <Property Name="Scheme"              Type="Edm.String"  MaxLength="40"  sap:label="Scheme"/>
+        <Property Name="BorrowerGroup"       Type="Edm.Int32"                    sap:label="Borrower Group"/>
+        <Property Name="BorrowerGroupName"   Type="Edm.String"  MaxLength="100" sap:label="Borrower Group Name"/>
+        <Property Name="ProjectsCY"          Type="Edm.Int32"                    sap:label="Projects CY"/>
+        <Property Name="ProjectCostCY"       Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Project Cost CY"/>
+        <Property Name="DisbursementCY"      Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Disbursement CY"/>
+        <Property Name="GrossSanctionCY"     Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Gross Sanction CY"/>
+        <Property Name="NetSanctionCY"       Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Net Sanction CY"/>
+        <Property Name="PrincipalOsCY"       Type="Edm.Decimal" Precision="20" Scale="2" sap:label="Principal O/S CY"/>
+        <Property Name="ProjectsPY"          Type="Edm.Int32"                    sap:label="Projects PY"/>
+        <Property Name="ProjectCostPY"       Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Project Cost PY"/>
+        <Property Name="DisbursementPY"      Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Disbursement PY"/>
+        <Property Name="GrossSanctionPY"     Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Gross Sanction PY"/>
+        <Property Name="NetSanctionPY"       Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Net Sanction PY"/>
+        <Property Name="PrincipalOsPY"       Type="Edm.Decimal" Precision="20" Scale="2" sap:label="Principal O/S PY"/>
+        <Property Name="ProjectsVar"         Type="Edm.Int32"                    sap:label="Projects Variance"/>
+        <Property Name="DisbursementVar"     Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Disbursement Variance"/>
+        <Property Name="GrossSanctionVar"    Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Gross Sanction Variance"/>
+        <Property Name="ProjectsVarPct"      Type="Edm.Decimal" Precision="7"  Scale="2" sap:label="Projects Var %"/>
+        <Property Name="DisbursementVarPct"  Type="Edm.Decimal" Precision="7"  Scale="2" sap:label="Disbursement Var %"/>
+        <Property Name="GrossSanctionVarPct" Type="Edm.Decimal" Precision="7"  Scale="2" sap:label="Gross Sanction Var %"/>
+      </EntityType>
+
+      <!-- SECTOR_WISE — Sector × Sub-Sector -->
+      <EntityType Name="SectorWiseType" sap:label="Sector Wise" sap:content-version="1">
+        <Key>
+          <PropertyRef Name="SectorName"/>
+          <PropertyRef Name="SubSectorName"/>
+        </Key>
+        <Property Name="SectorName"      Type="Edm.String"  MaxLength="80"  sap:label="Sector"/>
+        <Property Name="SubSectorName"   Type="Edm.String"  MaxLength="80"  sap:label="Sub-Sector"/>
+        <Property Name="ProjectsCY"      Type="Edm.Int32"   sap:label="Projects CY"/>
+        <Property Name="ProjectCostCY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="DisbursementCY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="GrossSanctionCY" Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="NetSanctionCY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="PrincipalOsCY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+        <Property Name="ExposureCY"      Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="ProjectsPY"      Type="Edm.Int32"/>
+        <Property Name="ProjectCostPY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="DisbursementPY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="GrossSanctionPY" Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="NetSanctionPY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="PrincipalOsPY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+        <Property Name="ExposurePY"      Type="Edm.Decimal" Precision="17" Scale="2"/>
+      </EntityType>
+
+      <!-- GEO_REPORT — Geography × Scheme -->
+      <EntityType Name="GeographyType" sap:label="Geography" sap:content-version="1">
+        <Key>
+          <PropertyRef Name="StateName"/>
+          <PropertyRef Name="Scheme"/>
+        </Key>
+        <Property Name="StateName"       Type="Edm.String"  MaxLength="80"  sap:label="State"/>
+        <Property Name="Scheme"          Type="Edm.String"  MaxLength="40"  sap:label="Scheme"/>
+        <Property Name="ProjectsCY"      Type="Edm.Int32"/>
+        <Property Name="ProjectCostCY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="DisbursementCY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="GrossSanctionCY" Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="NetSanctionCY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="PrincipalOsCY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+        <Property Name="ProjectsPY"      Type="Edm.Int32"/>
+        <Property Name="ProjectCostPY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="DisbursementPY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="GrossSanctionPY" Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="NetSanctionPY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="PrincipalOsPY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+      </EntityType>
+
+      <!-- Shared lightweight type for reports with standard CY/PY metrics -->
+      <EntityType Name="StandardReportType" sap:label="Standard Report" sap:content-version="1">
+        <Key>
+          <PropertyRef Name="RowKey"/>
+        </Key>
+        <Property Name="RowKey"          Type="Edm.String"  MaxLength="120" sap:label="Row Key"/>
+        <Property Name="Dimension1"      Type="Edm.String"  MaxLength="100"/>
+        <Property Name="Dimension2"      Type="Edm.String"  MaxLength="100"/>
+        <Property Name="Dimension3"      Type="Edm.String"  MaxLength="100"/>
+        <Property Name="ProjectsCY"      Type="Edm.Int32"/>
+        <Property Name="ProjectCostCY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="DisbursementCY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="GrossSanctionCY" Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="NetSanctionCY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="PrincipalOsCY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+        <Property Name="ExposureCY"      Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="ProjectsPY"      Type="Edm.Int32"/>
+        <Property Name="ProjectCostPY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="DisbursementPY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="GrossSanctionPY" Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="NetSanctionPY"   Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="PrincipalOsPY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+        <Property Name="ExposurePY"      Type="Edm.Decimal" Precision="17" Scale="2"/>
+      </EntityType>
+
+      <!-- NPA / Delinquency -->
+      <EntityType Name="NpaDelinquencyType" sap:label="NPA Delinquency" sap:content-version="1">
+        <Key>
+          <PropertyRef Name="BorrowerGroup"/>
+          <PropertyRef Name="DPDBucket"/>
+        </Key>
+        <Property Name="BorrowerGroup"   Type="Edm.Int32"   sap:label="Borrower Group"/>
+        <Property Name="DPDBucket"       Type="Edm.String"  MaxLength="40" sap:label="DPD Bucket"/>
+        <Property Name="Scheme"          Type="Edm.String"  MaxLength="40"/>
+        <Property Name="PrincipalOsCY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+        <Property Name="DisbursementCY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="ProjectsCY"      Type="Edm.Int32"/>
+        <Property Name="PrincipalOsPY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+        <Property Name="DisbursementPY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="ProjectsPY"      Type="Edm.Int32"/>
+      </EntityType>
+
+      <!-- Bulk analytics (flat) — used by getRequest() fetchAllData -->
+      <EntityType Name="AnalyticType" sap:label="MIS Analytic" sap:content-version="1">
+        <Key>
+          <PropertyRef Name="AnalyticKey"/>
+        </Key>
+        <Property Name="AnalyticKey"     Type="Edm.String"  MaxLength="120"/>
+        <Property Name="REPORT_ID"       Type="Edm.String"  MaxLength="40"/>
+        <Property Name="Scheme"          Type="Edm.String"  MaxLength="40"/>
+        <Property Name="BorrowerGroup"   Type="Edm.Int32"/>
+        <Property Name="BorrowerGroupName" Type="Edm.String" MaxLength="100"/>
+        <Property Name="SectorName"      Type="Edm.String"  MaxLength="80"/>
+        <Property Name="StateName"       Type="Edm.String"  MaxLength="80"/>
+        <Property Name="ProjectsCY"      Type="Edm.Int32"/>
+        <Property Name="DisbursementCY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="GrossSanctionCY" Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="PrincipalOsCY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+        <Property Name="ProjectsPY"      Type="Edm.Int32"/>
+        <Property Name="DisbursementPY"  Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="GrossSanctionPY" Type="Edm.Decimal" Precision="17" Scale="2"/>
+        <Property Name="PrincipalOsPY"   Type="Edm.Decimal" Precision="20" Scale="2"/>
+      </EntityType>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           Entity Container — all entity sets
+           ═══════════════════════════════════════════════════════════════ -->
+
+      <EntityContainer Name="ZCML_MIS_ANALYTICS_SRV" m:IsDefaultEntityContainer="true"
+                       sap:supported-formats="atom json xlsx">
+
+        <!-- Bulk flat set (initial load) -->
+        <EntitySet Name="ZMIS_AnalyticSet"     EntityType="ZCML_MIS_ANALYTICS_SRV.AnalyticType"
+                   sap:searchable="true" sap:pageable="true"/>
+
+        <!-- Per-report entity sets (mapped in ReportDataService._ENTITY_MAP) -->
+        <EntitySet Name="DevGroupSet"          EntityType="ZCML_MIS_ANALYTICS_SRV.DevGroupType"
+                   sap:searchable="true"/>
+        <EntitySet Name="SectorWiseSet"        EntityType="ZCML_MIS_ANALYTICS_SRV.SectorWiseType"
+                   sap:searchable="true"/>
+        <EntitySet Name="GeographySet"         EntityType="ZCML_MIS_ANALYTICS_SRV.GeographyType"
+                   sap:searchable="true"/>
+        <EntitySet Name="FinAssistSet"         EntityType="ZCML_MIS_ANALYTICS_SRV.StandardReportType"/>
+        <EntitySet Name="BorrowerRecovSet"     EntityType="ZCML_MIS_ANALYTICS_SRV.StandardReportType"/>
+        <EntitySet Name="PrepaymentSet"        EntityType="ZCML_MIS_ANALYTICS_SRV.StandardReportType"/>
+        <EntitySet Name="SectorInvestSet"      EntityType="ZCML_MIS_ANALYTICS_SRV.StandardReportType"/>
+        <EntitySet Name="SchemeWiseSet"        EntityType="ZCML_MIS_ANALYTICS_SRV.StandardReportType"/>
+        <EntitySet Name="CodReportSet"         EntityType="ZCML_MIS_ANALYTICS_SRV.StandardReportType"/>
+        <EntitySet Name="CategoryModeSet"      EntityType="ZCML_MIS_ANALYTICS_SRV.StandardReportType"/>
+        <EntitySet Name="NpaAnalysisSet"       EntityType="ZCML_MIS_ANALYTICS_SRV.NpaDelinquencyType"/>
+        <EntitySet Name="DisbursementWiseSet"  EntityType="ZCML_MIS_ANALYTICS_SRV.StandardReportType"/>
+        <EntitySet Name="NpaReportSet"         EntityType="ZCML_MIS_ANALYTICS_SRV.NpaDelinquencyType"/>
+
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

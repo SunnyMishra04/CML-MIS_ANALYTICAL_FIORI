@@ -74,6 +74,13 @@
                                 <ToggleButton id="comparisonToggle" text="Compare CY vs PY" icon="sap-icon://compare" pressed="{view>/comparisonMode}" press=".onComparisonToggle" type="Emphasized"/>
 
                                 <Button id="btnExport" icon="sap-icon://excel-attachment" tooltip="Export to Excel" press=".onExport" type="Transparent"/>
+
+                                <!-- Step 7: AI Copilot Toggle -->
+                                <Button id="btnAiCopilot"
+                                        icon="sap-icon://ai"
+                                        tooltip="AI Analysis (Gemini)"
+                                        press=".onToggleAiPanel"
+                                        type="Transparent"/>
                             </OverflowToolbar>
 
                             <!-- INFO STRIP -->
@@ -94,8 +101,18 @@
                                 </items>
                             </HBox>
 
+                            <!-- Step 3: KPI Strip -->
+                            <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.KpiStrip" type="XML"/>
 
-                        
+                            <!-- Step 3: Scheme Tab Header -->
+                            <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.SchemeTabHeader" type="XML"/>
+
+                            <!-- Step 3: Insight Strip -->
+                            <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.InsightStrip" type="XML"/>
+
+                            <!-- Step 7: AI Insight Panel -->
+                            <core:Fragment fragmentName="iifcl.cml.cmlmisapp.view.fragments.AiInsightPanel" type="XML"/>
+
 <fb:FilterBar id="filterBar" search=".onSearch" showRestoreButton="true" clear=".onResetFilters" showFilterConfiguration="true">
   <fb:filterGroupItems>
     <fb:FilterGroupItem id="_IDGenFilterGroupItem1" groupName="G1" name="Dimension" label="{view>/filterLabel}" visibleInFilterBar="true" visible="{view>/showDimensionFilter}">
@@ -191,7 +208,7 @@
             <Column id="_IDGenColumn12" hAlign="End" visible="{view>/comparisonMode}"><header><Text id="_IDGenText16" text="Var %"/></header></Column>
         </columns>
         <items>
-            <ColumnListItem id="_IDGenColumnListItem">
+            <ColumnListItem id="_IDGenColumnListItem" type="Navigation" press=".onTableRowPress">
                 <cells>
                     <Text id="_IDGenText17" text="{view>DisplayCol1}"/>
                     <Text id="_IDGenText18" text="{view>DisplayCol2}"/>

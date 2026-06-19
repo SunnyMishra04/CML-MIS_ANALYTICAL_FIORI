@@ -13,36 +13,22 @@ sap.ui.define([
             this._controller = oController;
         },
 
-loadReportData: function (sReportId, oCfg, sBucketKey, sMetricKey, sTenure, aBackendData) {
-    var aRows = [];
+/**
+ * Process and transform pre-fetched raw rows for a report.
+ * Data fetching is handled by ReportDataService — this method
+ * only applies column mapping, metric selection, and variance calculation.
+ *
+ * @param {Array}  aRows      - pre-fetched raw data rows
+ * @param {object} oCfg       - report config from reportConfig.json
+ * @param {string} sBucketKey - "CY" or "PY"
+ * @param {string} sMetricKey - "gross", "disb", "net", "os", "exposure", etc.
+ * @param {string} sTenure    - "Yearly", "HalfYearly", "Quarterly", "Monthly"
+ * @returns {Array} processed rows with computed display/metric fields
+ */
+processReportRows: function (aRows, oCfg, sBucketKey, sMetricKey, sTenure) {
+    if (!aRows || !aRows.length) { return []; }
 
-    // --- PRIORITY 1: USE ODATA (If Available) ---
-    if (aBackendData && aBackendData.length > 0) {
-        // Filter the big backend list for just THIS report's data
-        // Assuming there is a field 'REPORT_ID' in your OData. 
-        // If not, it returns nothing and falls back to JSON below.
-        aRows = aBackendData.filter(function(item) {
-            return item.REPORT_ID === sReportId; 
-        });
-        
-        // If filter returns empty (e.g. backend has data but not for this report yet),
-        // we reset aRows so it falls back to JSON.
-        if (aRows.length === 0) aRows = []; 
-    }
-
-    // --- PRIORITY 2: USE LOCAL JSON (Fallback) ---
-    if (aRows.length === 0 && oCfg && oCfg.dataFile) {
-        var oJson = new JSONModel();
-        oJson.loadData(oCfg.dataFile, null, false);
-        var oData = oJson.getData();
-        if (Array.isArray(oData)) {
-            aRows = oData;
-        } else if (oData && Array.isArray(oData.rows)) {
-            aRows = oData.rows;
-        }
-    }
-
-    // --- COMMON PROCESSING (Works for both OData and JSON) ---
+    // --- COMMON PROCESSING ---
     var sField1 = oCfg.fields && oCfg.fields.col1 || "";
     var sField2 = oCfg.fields && oCfg.fields.col2 || "";
     var sField3 = oCfg.fields && oCfg.fields.col3 || "";

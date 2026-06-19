@@ -10,6 +10,10 @@ server:
       afterMiddleware: compression
       configuration:
         ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        backend:
+          - path: /sap/opu/odata/sap/ZCML_MIS_ANALYTICS_SRV
+            url: https://your-abap-system.sap.corp  # TODO: Replace with actual ABAP system URL
+            destination: ZCML_MIS_ANALYTICS
         ui5:
           path:
             - /resources

@@ -2,6 +2,7 @@ node_modules/
 dist/
 .scp/
 .env
+webapp/config/aiConfig.json
 Makefile*.mta
 mta_archives
 mta-*
