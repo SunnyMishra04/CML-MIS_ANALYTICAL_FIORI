@@ -13,7 +13,7 @@
     <Toolbar
         id="schemeTabHeaderToolbar"
         class="cmlSchemeHeader"
-        style="Solid">
+        style="Standard">
 
         <Label
             text="Scheme:"
