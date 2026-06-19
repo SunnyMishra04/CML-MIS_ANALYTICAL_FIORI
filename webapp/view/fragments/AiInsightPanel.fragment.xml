@@ -45,7 +45,7 @@
                       alignItems="Center"
                       justifyContent="Center"
                       class="sapUiMediumMargin">
-                    <BusyIndicator id="aiBusyIndicator" size="Medium"/>
+                    <BusyIndicator id="aiBusyIndicator" size="1rem"/>
                     <Text id="aiBusyText" text="Analyzing data with Gemini..." class="sapUiSmallMarginTop"/>
                 </VBox>
 
