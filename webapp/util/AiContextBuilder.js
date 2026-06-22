@@ -28,7 +28,7 @@ sap.ui.define([], function () {
      * which loads the key from .env / config at runtime.
      * For production: route through BTP destination with server-side auth.
      */
-    var AI_API_KEY = "";
+    var AI_API_KEY = "Gemini_API_Key";
 
     /* ─── System Prompt ──────────────────────────────────────────────────── */
 
