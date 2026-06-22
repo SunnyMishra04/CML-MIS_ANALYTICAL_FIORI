@@ -13,7 +13,8 @@
     <Toolbar
         id="schemeTabHeaderToolbar"
         class="cmlSchemeHeader"
-        style="Standard">
+        style="Standard"
+        visible="{view>/showSchemeTab}">
 
         <Label id="_IDGenLabel2"
             text="Scheme:"

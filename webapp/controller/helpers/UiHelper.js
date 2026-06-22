@@ -56,7 +56,12 @@ sap.ui.define([
     };
 
     /* ─── KPI computation from dataset rows ─────────────────────────────── */
-    function _computeKpis(aRows, bCompare) {
+    function _computeKpis(aRows, bCompare, sTenure) {
+        var fTenureFactor = 1.0;
+        if (sTenure === "HalfYearly") fTenureFactor = 0.5;
+        if (sTenure === "Quarterly") fTenureFactor = 0.25;
+        if (sTenure === "Monthly") fTenureFactor = 0.0833;
+
         var totals = {
             disbCY: 0, disbPY: 0,
             sanctCY: 0, sanctPY: 0,
@@ -66,18 +71,18 @@ sap.ui.define([
         };
 
         aRows.forEach(function (r) {
-            totals.disbCY  += r.DisbursementCY  || 0;
-            totals.disbPY  += r.DisbursementPY  || 0;
-            totals.sanctCY += r.GrossSanctionCY || 0;
-            totals.sanctPY += r.GrossSanctionPY || 0;
+            totals.disbCY  += (r.DisbursementCY  || 0) * fTenureFactor;
+            totals.disbPY  += (r.DisbursementPY  || 0) * fTenureFactor;
+            totals.sanctCY += (r.GrossSanctionCY || 0) * fTenureFactor;
+            totals.sanctPY += (r.GrossSanctionPY || 0) * fTenureFactor;
             // PrincipalOs might be raw units — normalise
-            var posCY = r.PrincipalOsCY || 0;
-            var posPY = r.PrincipalOsPY || 0;
+            var posCY = (r.PrincipalOsCY || 0) * fTenureFactor;
+            var posPY = (r.PrincipalOsPY || 0) * fTenureFactor;
             totals.posCY  += Math.abs(posCY) > 1000000 ? posCY / CRORE : posCY;
             totals.posPY  += Math.abs(posPY) > 1000000 ? posPY / CRORE : posPY;
-            totals.projCY += r.ProjectsCY || 0;
+            totals.projCY += r.ProjectsCY || 0; // projects remain absolute count
             totals.projPY += r.ProjectsPY || 0;
-            totals.costCY += r.ProjectCostCY || 0;
+            totals.costCY += (r.ProjectCostCY || 0) * fTenureFactor;
         });
 
         var disbVar  = totals.disbCY  - totals.disbPY;
@@ -208,13 +213,18 @@ sap.ui.define([
          * @param {Array} aRows - normalised data rows
          */
         refreshUiMetrics: function (aRows) {
-            var oViewModel = this.getView().getModel("viewModel");
+            var oViewModel = this.getView().getModel("view");
+            if (!oViewModel) return; // Fallback for standalone helper usage without view model
+            
+            var oLocalFVM = this.getView().getModel("viewModel");
             var bCompare = oViewModel.getProperty("/comparisonMode") || false;
-            var kpis     = _computeKpis(aRows || [], bCompare);
+            var sTenure = oViewModel.getProperty("/selectedTenure") || "Yearly";
+            
+            var kpis     = _computeKpis(aRows || [], bCompare, sTenure);
             var insights = _buildInsights(aRows || []);
-            oViewModel.setProperty("/kpis",     kpis);
-            oViewModel.setProperty("/insights", insights);
-            oViewModel.setProperty("/filteredRowCount", (aRows || []).length);
+            oLocalFVM.setProperty("/kpis",     kpis);
+            oLocalFVM.setProperty("/insights", insights);
+            oLocalFVM.setProperty("/filteredRowCount", (aRows || []).length);
         },
 
         /**

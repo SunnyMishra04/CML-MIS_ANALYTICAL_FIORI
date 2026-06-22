@@ -227,6 +227,10 @@ busy: false                // Controls loading indicators,
             oVM.setProperty("/currentReportId", sId);
             oVM.setProperty("/currentReportTitle", oCfg.title || sId);
             oVM.setProperty("/isGeoReport", sId === "GEO_REPORT");
+            
+            // Scheme Tab is only shown for these three reports
+            var bShowSchemeTab = ["DEV_GROUP", "GEO_REPORT", "SCHEME_WISE"].indexOf(sId) !== -1;
+            oVM.setProperty("/showSchemeTab", bShowSchemeTab);
 
             if (!bShowExposure && oVM.getProperty("/selectedMetricKey") === "exposure") {
                 oVM.setProperty("/selectedMetricKey", "gross");
