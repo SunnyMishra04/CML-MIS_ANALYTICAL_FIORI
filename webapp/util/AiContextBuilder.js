@@ -57,6 +57,17 @@ sap.ui.define([], function () {
         },
 
         /**
+         * Set the System Prompt at runtime.
+         * Call this from the controller during onInit.
+         * @param {string} sPrompt - System prompt
+         */
+        setSystemPrompt: function (sPrompt) {
+            if (sPrompt) {
+                SYSTEM_PROMPT = sPrompt;
+            }
+        },
+
+        /**
          * Build a context object from the current app state.
          * @param {sap.ui.core.mvc.Controller} oController
          * @returns {object} structured context payload

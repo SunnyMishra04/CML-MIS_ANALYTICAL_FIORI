@@ -45,8 +45,15 @@ sap.ui.define([
             var oAiCfg = new JSONModel();
             var sAiConfigPath = sap.ui.require.toUrl("iifcl/cml/cmlmisapp/config/aiConfig.json");
             oAiCfg.loadData(sAiConfigPath, null, false);
-            var sApiKey = (oAiCfg.getData() && oAiCfg.getData().GEMINI_API_KEY) || "";
-            AiContextBuilder.setApiKey(sApiKey);
+            var oAiModel = oAiCfg;
+            var sKey = oAiModel.getProperty("/GEMINI_API_KEY");
+            if (sKey) {
+                AiContextBuilder.setApiKey(sKey);
+            }
+            var sPrompt = oAiModel.getProperty("/systemPrompt");
+            if (sPrompt) {
+                AiContextBuilder.setSystemPrompt(sPrompt);
+            }
 
             // Mixin UiHelper methods (KPI, insights, scheme filter, contract detail)
             Object.assign(this, UiHelper);
