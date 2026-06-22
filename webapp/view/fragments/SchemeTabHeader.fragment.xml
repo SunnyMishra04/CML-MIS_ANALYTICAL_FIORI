@@ -15,7 +15,7 @@
         class="cmlSchemeHeader"
         style="Standard">
 
-        <Label
+        <Label id="_IDGenLabel2"
             text="Scheme:"
             class="cmlSchemeLabel"/>
 
@@ -25,14 +25,14 @@
             selectedKey="{viewModel>/activeScheme}"
             selectionChange=".onSchemeChange">
             <items>
-                <SegmentedButtonItem key="ALL"  text="All Schemes"/>
-                <SegmentedButtonItem key="DL"   text="Direct Lending"/>
-                <SegmentedButtonItem key="TOF"  text="Take Out Finance"/>
-                <SegmentedButtonItem key="OTH"  text="Others"/>
+                <SegmentedButtonItem id="_IDGenSegmentedButtonItem14" key="ALL"  text="All Schemes"/>
+                <SegmentedButtonItem id="_IDGenSegmentedButtonItem15" key="DL"   text="Direct Lending"/>
+                <SegmentedButtonItem id="_IDGenSegmentedButtonItem16" key="TOF"  text="Take Out Finance"/>
+                <SegmentedButtonItem id="_IDGenSegmentedButtonItem17" key="OTH"  text="Others"/>
             </items>
         </SegmentedButton>
 
-        <ToolbarSpacer/>
+        <ToolbarSpacer id="_IDGenToolbarSpacer4"/>
 
         <!-- Record count -->
         <ObjectStatus

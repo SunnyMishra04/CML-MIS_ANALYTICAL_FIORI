@@ -44,7 +44,7 @@
                                 <!-- Tenure Selector -->
                                 <Label id="lblTenure" text="Tenure:" design="Bold" class="headerLabel sapUiSmallMarginBegin"/>
                                 <Select id="tenureSelector" change=".onTenureChange" selectedKey="{view>/selectedTenure}" width="120px" class="customSelect">
-                                    <layoutData><OverflowToolbarLayoutData priority="NeverOverflow"/></layoutData>
+                                    <layoutData><OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData" priority="NeverOverflow"/></layoutData>
                                     <core:Item id="itmYearly" key="Yearly" text="Yearly"/>
                                     <core:Item id="itmHalf" key="HalfYearly" text="Half-Yearly"/>
                                     <core:Item id="itmQuarter" key="Quarterly" text="Quarterly"/>
@@ -53,7 +53,7 @@
 
                                 <Label id="_IDGenLabel" text="Period:" design="Bold" class="headerLabel sapUiSmallMarginBegin"/>
                                 <SegmentedButton id="periodSelector" selectedKey="{view>/selectedBucketKey}" selectionChange=".onBucketToggle" class="customSegmented" enabled="{= !${view>/comparisonMode} }">
-                                    <layoutData><OverflowToolbarLayoutData priority="Low"/></layoutData>
+                                    <layoutData><OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData1" priority="Low"/></layoutData>
                                     <items>
                                         <SegmentedButtonItem id="_IDGenSegmentedButtonItem" key="CY" text="{view>/periodLabelCY}"/>
                                         <SegmentedButtonItem id="_IDGenSegmentedButtonItem1" key="PY" text="{view>/periodLabelPY}"/>
@@ -74,7 +74,7 @@
                                 <!-- Comparison Toggle Button -->
                                 <ToolbarSeparator id="_IDGenToolbarSeparator"/>
                                 <ToggleButton id="comparisonToggle" text="Compare CY vs PY" icon="sap-icon://compare" pressed="{view>/comparisonMode}" press=".onComparisonToggle" type="Emphasized">
-                                    <layoutData><OverflowToolbarLayoutData priority="High"/></layoutData>
+                                    <layoutData><OverflowToolbarLayoutData id="_IDGenOverflowToolbarLayoutData2" priority="High"/></layoutData>
                                 </ToggleButton>
 
                                 <Button id="btnExport" icon="sap-icon://excel-attachment" tooltip="Export to Excel" press=".onExport" type="Transparent"/>
@@ -113,9 +113,9 @@
 
                             <ScrollContainer id="mainScrollContainer" height="100%" vertical="true" focusable="true">
                                 <layoutData>
-                                    <FlexItemData growFactor="1"/>
+                                    <FlexItemData id="_IDGenFlexItemData2" growFactor="1"/>
                                 </layoutData>
-                                <VBox width="100%">
+                                <VBox id="_IDGenVBox2" width="100%">
                                     <items>
 
                             <!-- Step 3: Insight Strip -->
