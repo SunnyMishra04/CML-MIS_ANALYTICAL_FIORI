@@ -15,11 +15,11 @@
         width="100%"
         class="cmlKpiStrip">
 
-        <FlexBox
+        <HBox
             id="kpiFlexBox"
-            wrap="NoWrap"
-            alignItems="Stretch"
-            class="cmlKpiFlexBox">
+            justifyContent="SpaceBetween"
+            width="100%"
+            class="cmlKpiFlexBox sapUiSmallMarginBegin sapUiSmallMarginEnd">
 
             <!-- Rendered dynamically from JS: _renderKpiStrip() in UiHelper.js -->
             <!-- Placeholder panel — replaced at runtime -->
@@ -30,13 +30,13 @@
                 frameType="TwoByOne"
                 class="cmlKpiTile">
                 <tileContent>
-                    <TileContent
+                    <TileContent id="_IDGenTileContent1"
                         unit="₹ Cr"
                         footer="CY vs PY">
                         <content>
-                            <NumericContent
+                            <NumericContent id="_IDGenNumericContent"
                                 value="0"
-                                scale="K"
+                                scale="Cr"
                                 indicator="None"
                                 valueColor="Neutral"
                                 withMargin="false"/>
@@ -45,7 +45,7 @@
                 </tileContent>
             </GenericTile>
 
-        </FlexBox>
+        </HBox>
     </ScrollContainer>
 
 </core:FragmentDefinition>

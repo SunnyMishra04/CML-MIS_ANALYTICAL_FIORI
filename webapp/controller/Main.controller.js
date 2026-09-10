@@ -42,10 +42,21 @@ sap.ui.define([
             // Load Gemini API key from runtime config (gitignored)
             // Developers: place your key in webapp/config/aiConfig.json
             // Production: use BTP destination with server-side auth instead
-            var oAiCfg = new JSONModel();
-            oAiCfg.loadData("config/aiConfig.json", null, false);
-            var sApiKey = (oAiCfg.getData() && oAiCfg.getData().GEMINI_API_KEY) || "";
-            AiContextBuilder.setApiKey(sApiKey);
+            try {
+                var oAiCfg = new JSONModel();
+                var sAiConfigPath = sap.ui.require.toUrl("iifcl/cml/cmlmisapp/config/aiConfig.json");
+                oAiCfg.loadData(sAiConfigPath, null, false);
+                var sKey = oAiCfg.getProperty("/GEMINI_API_KEY");
+                if (sKey) {
+                    AiContextBuilder.setApiKey(sKey);
+                }
+                var sPrompt = oAiCfg.getProperty("/systemPrompt");
+                if (sPrompt) {
+                    AiContextBuilder.setSystemPrompt(sPrompt);
+                }
+            } catch (e) {
+                console.warn("[Main] aiConfig.json not found — AI mode will use mock responses.", e.message);
+            }
 
             // Mixin UiHelper methods (KPI, insights, scheme filter, contract detail)
             Object.assign(this, UiHelper);
@@ -226,6 +237,10 @@ busy: false                // Controls loading indicators,
             oVM.setProperty("/currentReportId", sId);
             oVM.setProperty("/currentReportTitle", oCfg.title || sId);
             oVM.setProperty("/isGeoReport", sId === "GEO_REPORT");
+            
+            // Scheme Tab is only shown for these three reports
+            var bShowSchemeTab = ["DEV_GROUP", "GEO_REPORT", "SCHEME_WISE"].indexOf(sId) !== -1;
+            oVM.setProperty("/showSchemeTab", bShowSchemeTab);
 
             if (!bShowExposure && oVM.getProperty("/selectedMetricKey") === "exposure") {
                 oVM.setProperty("/selectedMetricKey", "gross");

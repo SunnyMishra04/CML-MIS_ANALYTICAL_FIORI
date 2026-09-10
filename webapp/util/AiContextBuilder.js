@@ -28,7 +28,7 @@ sap.ui.define([], function () {
      * which loads the key from .env / config at runtime.
      * For production: route through BTP destination with server-side auth.
      */
-    var AI_API_KEY = "";
+    var AI_API_KEY = "Gemini_API_Key";
 
     /* ─── System Prompt ──────────────────────────────────────────────────── */
 
@@ -54,6 +54,17 @@ sap.ui.define([], function () {
          */
         setApiKey: function (sKey) {
             AI_API_KEY = sKey || "";
+        },
+
+        /**
+         * Set the System Prompt at runtime.
+         * Call this from the controller during onInit.
+         * @param {string} sPrompt - System prompt
+         */
+        setSystemPrompt: function (sPrompt) {
+            if (sPrompt) {
+                SYSTEM_PROMPT = sPrompt;
+            }
         },
 
         /**
@@ -217,7 +228,7 @@ sap.ui.define([], function () {
                    "### Recommendations\n" +
                    "- Review borrower groups with zero disbursement in current year\n" +
                    "- Monitor high principal outstanding positions for credit risk\n\n" +
-                   "_Configure Gemini API key for live AI analysis._";
+                   "Configure Gemini API key for live AI analysis.";
         }
     };
 });

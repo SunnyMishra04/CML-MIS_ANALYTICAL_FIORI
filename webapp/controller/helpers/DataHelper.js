@@ -39,8 +39,12 @@ processReportRows: function (aRows, oCfg, sBucketKey, sMetricKey, sTenure) {
 
     // Visibility Flags
     var oVM = this._controller.getView().getModel("view");
-    oVM.setProperty("/showProjectsCol", !!(oBucketCY && oBucketCY.noProj));
-    oVM.setProperty("/showCostCol", !!(oBucketCY && oBucketCY.projCost));
+    var sReportId = "";
+    if (oVM) {
+        sReportId = oVM.getProperty("/currentReportId") || "";
+        oVM.setProperty("/showProjectsCol", !!(oBucketCY && oBucketCY.noProj));
+        oVM.setProperty("/showCostCol", !!(oBucketCY && oBucketCY.projCost));
+    }
 
     // Tenure Factor
     var fTenureFactor = 1.0;
@@ -99,7 +103,8 @@ processReportRows: function (aRows, oCfg, sBucketKey, sMetricKey, sTenure) {
             if (r.MetricPY === 0) {
                 r.MetricVarPct = (r.MetricCY === 0) ? 0 : 100;
             } else {
-                r.MetricVarPct = (r.MetricVar / Math.abs(r.MetricPY)) * 100;
+                var rawPct = (r.MetricVar / Math.abs(r.MetricPY)) * 100;
+                r.MetricVarPct = Math.round(rawPct * 100) / 100;
             }
             r.MetricVarState = r.MetricVar >= 0 ? "Success" : "Error";
             r.ProjectsVarState = r.ProjectsVar >= 0 ? "Success" : "Error";
@@ -134,8 +139,8 @@ processReportRows: function (aRows, oCfg, sBucketKey, sMetricKey, sTenure) {
                 totalMetricPY: fMetricPY,
                 totalProjectsVar: iProjCY - iProjPY,
                 totalMetricVar: fMetricCY - fMetricPY,
-                totalMetricVarPct: (fMetricPY > 0) ? ((fMetricCY - fMetricPY)/fMetricPY)*100 : 0,
-                totalProjectsVarPct: (iProjPY > 0) ? ((iProjCY - iProjPY)/iProjPY)*100 : 0
+                totalMetricVarPct: (fMetricPY > 0) ? Math.round((((fMetricCY - fMetricPY)/fMetricPY)*100) * 100) / 100 : 0,
+                totalProjectsVarPct: (iProjPY > 0) ? Math.round((((iProjCY - iProjPY)/iProjPY)*100) * 100) / 100 : 0
             };
         }
     });

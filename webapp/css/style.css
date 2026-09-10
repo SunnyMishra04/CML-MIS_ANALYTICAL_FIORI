@@ -99,10 +99,15 @@
 }
 
 /* KPI cards */
-.kpiCard {
+.kpiCard, .cmlKpiTile {
     height: 220px !important;
     transition: height 0.3s ease;
     overflow: visible !important;
+    margin-right: 1rem !important;
+}
+.cmlKpiTile {
+    min-width: 160px !important;
+    margin-right: 0.5rem !important;
 }
 
 /* Chart cards - FORCE FULL WIDTH */
