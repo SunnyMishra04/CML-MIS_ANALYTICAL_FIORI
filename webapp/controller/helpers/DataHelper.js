@@ -39,9 +39,12 @@ processReportRows: function (aRows, oCfg, sBucketKey, sMetricKey, sTenure) {
 
     // Visibility Flags
     var oVM = this._controller.getView().getModel("view");
-    var sReportId = oVM.getProperty("/currentReportId");
-    oVM.setProperty("/showProjectsCol", !!(oBucketCY && oBucketCY.noProj));
-    oVM.setProperty("/showCostCol", !!(oBucketCY && oBucketCY.projCost));
+    var sReportId = "";
+    if (oVM) {
+        sReportId = oVM.getProperty("/currentReportId") || "";
+        oVM.setProperty("/showProjectsCol", !!(oBucketCY && oBucketCY.noProj));
+        oVM.setProperty("/showCostCol", !!(oBucketCY && oBucketCY.projCost));
+    }
 
     // Tenure Factor
     var fTenureFactor = 1.0;

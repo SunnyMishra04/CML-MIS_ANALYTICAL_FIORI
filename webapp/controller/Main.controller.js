@@ -42,17 +42,20 @@ sap.ui.define([
             // Load Gemini API key from runtime config (gitignored)
             // Developers: place your key in webapp/config/aiConfig.json
             // Production: use BTP destination with server-side auth instead
-            var oAiCfg = new JSONModel();
-            var sAiConfigPath = sap.ui.require.toUrl("iifcl/cml/cmlmisapp/config/aiConfig.json");
-            oAiCfg.loadData(sAiConfigPath, null, false);
-            var oAiModel = oAiCfg;
-            var sKey = oAiModel.getProperty("/GEMINI_API_KEY");
-            if (sKey) {
-                AiContextBuilder.setApiKey(sKey);
-            }
-            var sPrompt = oAiModel.getProperty("/systemPrompt");
-            if (sPrompt) {
-                AiContextBuilder.setSystemPrompt(sPrompt);
+            try {
+                var oAiCfg = new JSONModel();
+                var sAiConfigPath = sap.ui.require.toUrl("iifcl/cml/cmlmisapp/config/aiConfig.json");
+                oAiCfg.loadData(sAiConfigPath, null, false);
+                var sKey = oAiCfg.getProperty("/GEMINI_API_KEY");
+                if (sKey) {
+                    AiContextBuilder.setApiKey(sKey);
+                }
+                var sPrompt = oAiCfg.getProperty("/systemPrompt");
+                if (sPrompt) {
+                    AiContextBuilder.setSystemPrompt(sPrompt);
+                }
+            } catch (e) {
+                console.warn("[Main] aiConfig.json not found — AI mode will use mock responses.", e.message);
             }
 
             // Mixin UiHelper methods (KPI, insights, scheme filter, contract detail)
